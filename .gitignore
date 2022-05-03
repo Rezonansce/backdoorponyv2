@@ -1,0 +1,56 @@
+gui/node_modules/*
+gui/package-lock.json
+server/env
+__pycache__
+
+.DS_Store
+gui/.env
+gui/.yarn
+
+# IDE user config
+.vscode/
+.idea/
+.vs/
+.devcontainer/
+
+# Logs
+gui/yarn-error.log
+gui/npm-debug.log
+gui/lerna-debug.log
+
+# Istanbul coverage
+gui/coverage/
+
+# cypress
+gui/cypress/screenshots
+gui/cypress/videos
+
+gui/.vercel
+gui/.now
+
+# All pretrained models
+*.pth
+
+# All pdf reports
+*.pdf
+
+# Python environment
+/venv/
+
+# Python version
+.python-version
+
+# Coverage report
+.coverage
+
+# Pip data
+UNKNOWN.egg-info
+/server/src/.data/
+
+# Coverage report
+coverage.json
+
+server/src/backdoorpony.egg-info/
+
+# Vim swap files
+*.swp

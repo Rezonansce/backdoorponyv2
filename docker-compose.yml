@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+    python:
+        build:
+            dockerfile: ./server/Dockerfile
+            context: .
+        restart: always
+        volumes:
+            - ./server/src:/src
+            - ./server/assets:/src/backdoorpony/assets
+            - ./server/data:/src/backdoorpony/data
+        networks:
+            - BackdoorPony
+        ports:
+            - 5678:5678
+            - 5000:5000
+
+    node:
+        build:
+            dockerfile: ./gui/Dockerfile
+            context: .
+        restart: always
+        volumes:
+            - ./gui:/vue
+        networks:
+            - BackdoorPony
+        ports:
+            - 8080:8080
+        environment: 
+            - CHOKIDAR_USEPOLLING=true
+
+networks: 
+    BackdoorPony:
+        driver: bridge
