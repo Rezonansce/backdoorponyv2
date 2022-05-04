@@ -7,7 +7,6 @@ Load the MNIST dataset (raw images) for use in attacks and or defences.
 from art.utils import load_mnist
 import numpy as np
 
-
 class MNIST(object):
     def __init__(self, num_selection=7500):
         '''Should initiate the dataset

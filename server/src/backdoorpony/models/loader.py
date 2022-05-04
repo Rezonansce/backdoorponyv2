@@ -3,7 +3,8 @@ from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
-from backdoorpony.datasets.IMDB import IMDB
+# from backdoorpony.datasets.IMDB import IMDB
+from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
@@ -36,18 +37,24 @@ class Loader():
                     'model': MNIST_CNN,
                     'link': 'http://yann.lecun.com/exdb/mnist/',
                     'info': 'The MNIST, or Modified National Institute of Standards and Technology, database comprises datasets of handwritten digit images. It is vastly used in machine learning for training and testing. The training set contains 60,000 examples, and the test set contains 10,000 examples.'
+                },
+                'CIFAR10': {
+                    'dataset': CIFAR10,
+                    'model': MNIST_CNN,
+                    'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
+                    'info': 'ipsum'
                 }
             },
-            'text': {
-                'classifier': TextClassifier,
-                'IMDB': {
-                    'dataset': IMDB,
-                    'model': IMDB_RNN,
-                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
-                    'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
-
-                }
-            },
+            # 'text': {
+            #     'classifier': TextClassifier,
+            #     'IMDB': {
+            #         'dataset': IMDB,
+            #         'model': IMDB_RNN,
+            #         'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
+            #         'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
+            #
+            #     }
+            # },
             'audio': {
                 'classifier': ...
             },
