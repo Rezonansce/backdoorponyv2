@@ -29,14 +29,21 @@ class IMDB(object):
         return self.get_data()
 
     def get_data(self):
+        '''
+        Get the raw IMDB dataset.
+        there is already a split between train and test data.
+
+        Returns:
+            train_data: Raw training data.
+            test_data: Raw testing data.
+        '''
+
         SEED = 1234
 
         # load train data
         train_data = pd.read_csv('preloaded/IMDB/train.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
-        
+
         # load test data
         test_data = pd.read_csv('preloaded/IMDB/test.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
-
-
 
         return train_data, test_data
