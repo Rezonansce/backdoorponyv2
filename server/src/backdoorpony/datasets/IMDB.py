@@ -1,6 +1,3 @@
-import torch
-from torchtext.data.utils import get_tokenizer
-from torchtext.legacy import data, datasets
 import pandas as pd
 
 
