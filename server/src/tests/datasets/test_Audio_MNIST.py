@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import numpy as np
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-import backdoorpony.datasets.utils.FSDD.utils.fsdd as FSDD
+from backdoorpony.datasets.utils.FSDD.utils.fsdd import FSDD
 
 class TestDataLoader(TestCase):
     def test_get_data(self):
