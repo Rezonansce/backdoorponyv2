@@ -30,6 +30,8 @@ class Audio_MNIST(object):
         spectrogram_dir = dir_path + "/utils/FSDD/spectrograms/"
 
         #if data is not processed process it
+        if (not os.path.isdir(spectrogram_dir)):
+            os.mkdir(spectrogram_dir)
         if len(os.listdir(spectrogram_dir)) == 0:
             SP.dir_to_spectrogram(audio_dir, spectrogram_dir)
 
