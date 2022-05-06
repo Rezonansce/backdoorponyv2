@@ -16,6 +16,11 @@ __defaults_test__ = {
         'pretty_name': 'Target class',
         'default_value': [2],
         'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
+    },
+    'clean': {
+        'pretty_name': 'Clean Lable Backdoor Attack',
+        'default_value': [False],
+        'info': 'Use the Clean Lable Backdoor Attack provided by ART instead of a fixed target class'
     }
 }
 __link_test__ = 'https://arxiv.org/pdf/1708.06733.pdf'
