@@ -1,6 +1,7 @@
 from copy import deepcopy
 
-import torch
+import torch.optim as optim
+import torch.nn as nn
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 # from backdoorpony.datasets.IMDB import IMDB
@@ -43,7 +44,7 @@ class Loader():
                     'dataset': CIFAR10,
                     'model': CIFAR10_CNN,
                     'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
-                    'info': 'ipsum'
+                    'info': 'The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images.'
                 }
             },
             # 'text': {
@@ -78,9 +79,9 @@ class Loader():
                     'pretty_name': MNIST,
                     'info': 'Info on MNIST'
                 },
-                'CIFAR10': {
-                    'pretty_name': CIFAR10,
-                    'info': 'Info on CIFAR10'
+                'CIFAR-10': {
+                    'pretty_name': CIFAR-10,
+                    'info': 'Info on CIFAR-10'
                 }
             },
             'text': {

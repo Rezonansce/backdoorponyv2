@@ -1,6 +1,4 @@
 import numpy as np
-import torch.nn as nn
-import torch.optim as optim
 from art.estimators.classification import PyTorchClassifier
 from art.utils import preprocess
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
@@ -19,15 +17,13 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
-        criterion = nn.CrossEntropyLoss()
-        opti = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
-            loss=criterion,
-            optimizer=opti,
-            input_shape=(3, 32, 32),
-            nb_classes=10
+            loss=model.get_criterion(),
+            optimizer=model.get_opti(),
+            input_shape=model.get_input_shape(),
+            nb_classes=model.get_input_shape()
         )
 
     def fit(self, x, y, *args, **kwargs):

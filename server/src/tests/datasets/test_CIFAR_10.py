@@ -17,6 +17,3 @@ class TestDataLoader(TestCase):
         results = np.argmax(results, axis=1)
         error = np.mean(results != dataset[1][1])
         print(1 - error)
-
-    def get_max(self, x):
-        return np.argmax(x)

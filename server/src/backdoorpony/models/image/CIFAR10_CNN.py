@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.optim as optim
 import torch.nn.functional as F
 from torch import flatten
 
@@ -9,6 +10,9 @@ _class_name__ = 'CIFAR10_CNN'
 class CIFAR10_CNN(nn.Module):
     def __init__(self):
         super(CIFAR10_CNN, self).__init__()
+        self.crit = nn.CrossEntropyLoss()
+        self.nb_classes = 10
+        self.input_shape = 3, 32, 32
         self.conv_layer = nn.Sequential(
 
             # Conv Layer block 1
@@ -58,3 +62,18 @@ class CIFAR10_CNN(nn.Module):
         x = self.fc_layer(x)
 
         return x
+
+    # TODO: Parameterize the methods, so we can do hyperparameter tuning
+
+    def get_opti(self):
+        return optim.SGD(self, lr=0.001)
+
+    def get_criterion(self):
+        return self.crit
+
+    def get_nb_classes(self):
+        return self.nb_classes
+
+    def get_input_shape(self):
+        return self.input_shape
+
