@@ -5,6 +5,7 @@ from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 # from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.datasets.CIFAR10 import CIFAR10
+from backdoorpony.models.image.CIFAR10_CNN import CIFAR10_CNN
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
@@ -40,7 +41,7 @@ class Loader():
                 },
                 'CIFAR10': {
                     'dataset': CIFAR10,
-                    'model': MNIST_CNN,
+                    'model': CIFAR10_CNN,
                     'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
                     'info': 'ipsum'
                 }
