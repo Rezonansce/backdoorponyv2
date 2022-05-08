@@ -6,9 +6,10 @@ from copy import deepcopy
 
 import numpy as np
 from art.attacks.poisoning import PoisoningAttackBackdoor
+from art.attacks.poisoning.clean_label_backdoor_attack import PoisoningAttackCleanLabelBackdoor
 from art.attacks.poisoning.perturbations import (add_pattern_bd, add_single_bd)
 
-__name__ = 'badnet'
+__name__ = 'clean_badnet'
 __category__ = 'poisoning'
 __input_type__ = 'image'
 __defaults__ = {
@@ -30,7 +31,7 @@ __defaults__ = {
 }
 __link__ = 'https://arxiv.org/pdf/1708.06733.pdf'
 __info__ = '''Badnet is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.'''.replace('\n', '')
+The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel. The target class will be assigned using clean lable attack method'''.replace('\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
@@ -62,16 +63,16 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
-            _, full_poison_data, full_poison_labels = BadNet(attack_params['trigger_style']['value'][ts],
-                                                            1, attack_params['target_class']['value'][tc]).poison(deepcopy(train_images), deepcopy(train_labels), True)
+            _, full_poison_data, full_poison_labels = CleanBadNet(attack_params['trigger_style']['value'][ts],
+                                                            0.99, attack_params['target_class']['value'][tc], clean_classifier).poison(deepcopy(train_images), deepcopy(train_labels), True)
 
             for pp in range(len(attack_params['poison_percent']['value'])):
                 # Run the attack for a combination of trigger and poison_percent
                 execution_entry = {}
-                _, poisoned_train_data, poisoned_train_labels = BadNet(
-                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc]).poison(deepcopy(train_images), deepcopy(train_labels), True)
-                is_poison_test, poisoned_test_data, poisoned_test_labels = BadNet(
-                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc]).poison(deepcopy(test_images), deepcopy(test_labels), False)
+                _, poisoned_train_data, poisoned_train_labels = CleanBadNet(
+                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc], clean_classifier).poison(deepcopy(train_images), deepcopy(train_labels), True)
+                is_poison_test, poisoned_test_data, poisoned_test_labels = CleanBadNet(
+                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc], clean_classifier).poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                 poisoned_classifier = deepcopy(clean_classifier)
                 poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
@@ -98,12 +99,13 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     return execution_history
 
 
-class BadNet(object):
-    def __init__(self, modification_type, percent_poison, target_class, path='../assets/alert.png'):
+class CleanBadNet(object):
+    def __init__(self, modification_type, percent_poison, target_class, proxy_classifier, path='../assets/alert.png'):
         self.modification_type = modification_type
         self.path = path
         self.percent_poison = percent_poison
         self.target_class = target_class
+        self.proxy_classifier = proxy_classifier
 
     def add_modification(self, x):
         '''
@@ -196,11 +198,17 @@ class BadNet(object):
 
             # Actually poison the poison part
             if (num_imgs_to_poison > 0):
-
                 backdoor_attack = PoisoningAttackBackdoor(
                     self.add_modification)
-                x_poison_current_class, poison_labels = backdoor_attack.poison(
-                    x_poison_current_class, y=np.ones(num_imgs_to_poison) * self.target_class)
+                # target_array = np.zeros((num_imgs_to_poison, len(classes)))
+                # for i in range(len(target_array)):
+                #     target_array[i][self.target_class] = 1
+
+                clean_backdoor_attack = PoisoningAttackCleanLabelBackdoor(
+                    backdoor_attack, self.proxy_classifier, np.ones((num_imgs_to_poison, 1)) * self.target_class, self.percent_poison)
+                x_poison_current_class, poison_labels = clean_backdoor_attack.poison(
+                    x_poison_current_class, y=np.ones(num_imgs_to_poison) * self.target_class, broadcast=False)
+                    # x_poison_current_class, broadcast=False)
 
                 # Append poisoned data to the poison class
                 x_poison = np.append(x_poison, x_poison_current_class, axis=0)
