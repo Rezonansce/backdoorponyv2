@@ -1,7 +1,6 @@
-from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
 from backdoorpony.datasets.IMDB import IMDB
-from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.datasets.MNIST import MNIST
 import unittest
 from unittest import TestCase

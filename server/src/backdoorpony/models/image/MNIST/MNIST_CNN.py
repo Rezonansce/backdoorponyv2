@@ -4,6 +4,7 @@ for working with the MNIST dataset.
 '''
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 
 __dataset__ = 'mnist'
 __class_name__ = 'MNIST_CNN'
@@ -17,6 +18,9 @@ class MNIST_CNN(nn.Module):
         ----------
         None
         '''
+        self.nb_classes = 10
+        self.input_shape = 1, 28, 28
+        self.crit = nn.CrossEntropyLoss()
         super(MNIST_CNN, self).__init__()
         self.conv_1 = nn.Conv2d(
             in_channels=1, out_channels=20, kernel_size=5, stride=1)
@@ -34,3 +38,15 @@ class MNIST_CNN(nn.Module):
         x = F.relu(self.fc_1(x))
         x = self.fc_2(x)
         return F.log_softmax(x, dim=1)
+
+    def get_opti(self):
+        return optim.Adam(self.parameters(), lr=0.01)
+
+    def get_criterion(self):
+        return self.crit
+
+    def get_nb_classes(self):
+        return self.nb_classes
+
+    def get_input_shape(self):
+        return self.input_shape

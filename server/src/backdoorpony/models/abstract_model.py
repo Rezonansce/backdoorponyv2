@@ -25,3 +25,7 @@ class AbstractModel(ABC):
     @abstractmethod
     def get_input_shape(self):
         pass
+
+    @abstractmethod
+    def get_path(self):
+        pass

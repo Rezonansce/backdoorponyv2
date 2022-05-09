@@ -28,10 +28,13 @@ class CIFAR10(object):
         X_train = np.concatenate((batch_1[b'data'], batch_2[b'data']
                                   , batch_3[b'data'], batch_4[b'data']
                                   , batch_5[b'data']), axis=0)
+        indices = np.random.choice(50000, size=self.num_selection)
+        X_train = X_train[indices]
         X_train = X_train / 255.0
         Y_train = np.concatenate((batch_1[b'labels'], batch_2[b'labels']
                                   , batch_3[b'labels'], batch_4[b'labels']
                                   , batch_5[b'labels']), axis=0)
+        Y_train = Y_train[indices]
         test_batch = self.unpickle(os.path.join(file_directory, test_file))
         y_test = test_batch[b'labels']
         x_test = test_batch[b'data'] / 255.0
@@ -43,7 +46,6 @@ class CIFAR10(object):
         train_data = (X_train, Y_train)
         test_data = (x_test, y_test)
         return train_data, test_data
-
 
     def unpickle(self, file):
         with open(file, 'rb') as fo:
