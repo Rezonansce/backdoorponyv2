@@ -18,10 +18,11 @@ class MNIST_CNN(nn.Module):
         ----------
         None
         '''
+        super(MNIST_CNN, self).__init__()
         self.nb_classes = 10
         self.input_shape = 1, 28, 28
         self.crit = nn.CrossEntropyLoss()
-        super(MNIST_CNN, self).__init__()
+        self.path = 'mnist'
         self.conv_1 = nn.Conv2d(
             in_channels=1, out_channels=20, kernel_size=5, stride=1)
         self.conv_2 = nn.Conv2d(
@@ -40,13 +41,42 @@ class MNIST_CNN(nn.Module):
         return F.log_softmax(x, dim=1)
 
     def get_opti(self):
+        '''
+        Get the optimizer used for MNIST.
+
+        :return: Adam optimizer, with learning rate = 0.01
+        '''
         return optim.Adam(self.parameters(), lr=0.01)
 
     def get_criterion(self):
+        '''
+        Get the loss criterion.
+
+        :return: Cross-entropy loss
+        '''
         return self.crit
 
     def get_nb_classes(self):
+        '''
+        Get the number of classes the model will have.
+
+        :return:
+        '''
         return self.nb_classes
 
     def get_input_shape(self):
+        '''
+        Get the shape of the input.
+        First number is the number of channels of the image.
+
+        :return: (1, 28, 28)
+        '''
         return self.input_shape
+
+    def get_path(self):
+        '''
+        Get the name of the pre-loaded model file.
+
+        :return:
+        '''
+        return self.path

@@ -1,7 +1,7 @@
-from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
-from backdoorpony.datasets.IMDB import IMDB
+from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.datasets.MNIST import MNIST
+from backdoorpony.datasets.CIFAR10 import CIFAR10
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
@@ -19,7 +19,7 @@ class TestMainMetricsRunner(TestCase):
 
     def test_get_datasets(cls):
         loader = Loader()
-        #Set options manually so the test does not need to be adjusted after every update
+        # Set options manually so the test does not need to be adjusted after every update
         loader.options = {
             'image': {
                 'classifier': ImageClassifier,
@@ -28,17 +28,16 @@ class TestMainMetricsRunner(TestCase):
                     'model': MNIST_CNN,
                     'link': 'https://mnistwebsite.com/',
                     'info': 'Info on MNIST bla bla'
+                },
+                'CIFAR-10': {
+                    'dataset': CIFAR10,
+                    'model': CifarCNN,
+                    'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
+                    'info': 'Info on CIFAR bla bla'
                 }
             },
             'text': {
-                'classifier': TextClassifier,
-                'IMDB': {
-                    'dataset': IMDB,
-                    'model': IMDB_RNN,
-                    'link': 'https://imdbwebsite.com/',
-                    'info': 'Info on IMDB bla bla'
-
-                }
+                'classifier': cls.dummy
             },
             'audio': {
                 'classifier': cls.dummy
@@ -57,23 +56,25 @@ class TestMainMetricsRunner(TestCase):
                     "info": "Info on MNIST bla bla",
                     "link": "https://mnistwebsite.com/",
                     "pretty_name": "MNIST"
+                },
+                "CIFAR-10": {
+                    "info": "Info on CIFAR bla bla",
+                    "link": "https://www.cs.toronto.edu/~kriz/cifar.html",
+                    "pretty_name": "CIFAR-10"
                 }
             },
-            "text": {
-                "IMDB": {
-                    "info": "Info on IMDB bla bla",
-                    "link": "https://imdbwebsite.com/",
-                    "pretty_name": "IMDB"
-                }
-            }
+            "text": {}
         })
 
     def test_instantiate_mnist_classifier(cls):
+        # If you want to run this test, make sure that the pre-trained models are available
         loader = Loader()
         loader.make_classifier('image', 'MNIST')
         classifier = loader.get_classifier()
         cls.assertTrue(isinstance(classifier, ImageClassifier))
-
+        # loader.make_classifier('image', 'CIFAR10')
+        # classifier = loader.get_classifier()
+        # cls.assertTrue(isinstance(classifier, ImageClassifier))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,9 +1,9 @@
 from copy import deepcopy
-
+import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 # from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.datasets.CIFAR10 import CIFAR10
-from backdoorpony.models.image.CIFAR10_CNN import CIFAR10_CNN
+from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 
@@ -38,7 +38,7 @@ class Loader():
                 },
                 'CIFAR10': {
                     'dataset': CIFAR10,
-                    'model': CIFAR10_CNN,
+                    'model': CifarCNN,
                     'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
                     'info': 'The CIFAR10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images.'
                 }

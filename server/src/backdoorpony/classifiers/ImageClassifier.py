@@ -35,8 +35,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
 
     def fit(self, x, y, *args, **kwargs):
         '''Fits the classifier to the training data
-        First normalises the data and transform it to the format used by PyTorch.
-
+        If the classifier was already trained, pre-load the state_dict
         Parameters
         ----------
         x :
@@ -48,20 +47,22 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
+        # Get relative paths to the pre-load directory
         abs_path = os.path.abspath(__file__)
         file_directory = os.path.dirname(abs_path)
         parent_directory = os.path.dirname(file_directory)
         target_path = r'models/image/pre-load'
         final_path = os.path.join(parent_directory, target_path
                                   , super().model.get_path())
+        # If there is a pretrained model, just load it
         if os.path.exists(final_path):
             super().model.load_state_dict(torch.load(final_path))
             return
+        # Else, fit the training set and save it
         x_train = x
         y_train = y
         x_train, y_train = preprocess(x_train, y_train)
-        # x_train = np.expand_dims(x_train, axis=3)
-        # x_train = np.transpose(x_train, (0, 3, 2, 1)).astype(np.float32)
+        # TODO: Broadcast batch_size and nb_epochs
         super().fit(x_train, y_train, batch_size=4, nb_epochs=5)
         torch.save(super().model.state_dict(), final_path)
 
@@ -79,12 +80,8 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         prediction : 
             Return format is a numpy array with the probability for each class
         '''
-        # x = np.expand_dims(x, axis=3)
-        # x = np.transpose(x, (0, 3, 2, 1)).astype(np.float32)
         return super().predict(x)
 
     def class_gradient(self, x, *args, **kwargs):
-        # x = np.expand_dims(x, axis=3)
-        # x = np.transpose(x, (0, 3, 2, 1)).astype(np.float32)
         return super().class_gradient(x)
 

@@ -10,6 +10,7 @@ class CifarCNN(nn.Module):
         super(CifarCNN, self).__init__()
         self.crit = nn.CrossEntropyLoss()
         self.nb_classes = 10
+        self.path = 'cifar-10'
         self.input_shape = 3, 32, 32
         self.conv_layer = nn.Sequential(
 
@@ -76,4 +77,4 @@ class CifarCNN(nn.Module):
         return self.input_shape
 
     def get_path(self):
-        return 'cifar-10'
+        return self.path
