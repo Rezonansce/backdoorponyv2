@@ -7,7 +7,6 @@ Load the MNIST dataset (raw images) for use in attacks and or defences.
 from art.utils import load_mnist
 import numpy as np
 
-
 class MNIST(object):
     def __init__(self, num_selection=7500):
         '''Should initiate the dataset
@@ -29,8 +28,12 @@ class MNIST(object):
             A tuple with two numpy arrays: one with the sample and one with the corresponding labels
         '''
         (x_raw_train, y_raw_train), (x_raw_test, y_raw_test), _, _ = self.get_data()
-        train_data = (x_raw_train, y_raw_train)
-        test_data = (x_raw_test, y_raw_test)
+        x_train = np.expand_dims(x_raw_train, axis=3)
+        x_train = np.transpose(x_train, (0, 3, 2, 1)).astype(np.float32)
+        x_test = np.expand_dims(x_raw_test, axis=3)
+        x_test = np.transpose(x_test, (0, 3, 2, 1)).astype(np.float32)
+        train_data = (x_train, y_raw_train)
+        test_data = (x_test, y_raw_test)
         return train_data, test_data
 
     def get_data(self):

@@ -63,6 +63,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
+
             _, full_poison_data, full_poison_labels = CleanBadNet(attack_params['trigger_style']['value'][ts],
                                                             0.99, attack_params['target_class']['value'][tc], clean_classifier).poison(deepcopy(train_images), deepcopy(train_labels), True)
 
@@ -115,7 +116,10 @@ class CleanBadNet(object):
         Uses ART libraries.
         '''
         if self.modification_type == 'pattern':
-            return add_pattern_bd(x, pixel_value=self.max_val)
+            x = np.swapaxes(x, 1, 3)
+            x = add_pattern_bd(x, pixel_value=self.max_val)
+            x = np.swapaxes(x, 1, 3)
+            return x
         elif self.modification_type == 'pixel':
             return add_single_bd(x, pixel_value=self.max_val)
         elif self.modification_type == 'image':
@@ -170,45 +174,58 @@ class CleanBadNet(object):
         x_to_poison = x_to_poison[y_to_poison != self.target_class]
         y_to_poison = y_to_poison[y_to_poison != self.target_class]
 
-        x_poison = np.empty((0, 28, 28))
-        y_poison = np.empty((0,))
+        # produce empty arrays for new data with correct shapes
+        shape_x = list(np.shape(x_to_poison))
+        shape_x[0] = 0
+        shape_x = tuple(shape_x)
 
-        x_clean = np.empty((0, 28, 28))
-        y_clean = np.empty((0,))
+        x_poison = np.empty(shape_x)
+        y_poison = np.empty((0, 1))
+
+        x_clean = np.empty(shape_x)
+        y_clean = np.empty((0, 1))
 
         for current_class in classes:
+            # get current class features
             x_current_class = x_to_poison[y_to_poison == current_class]
+
+            # calculate the number of data entries to poison
             num_imgs_to_poison = round(
                 (self.percent_poison * len(x_current_class)))
 
-            # Do not allow poisoning twice (replace=False)
+            # Select poison data,
+            # do not allow poisoning twice (replace=False)
             indices_to_poison = np.random.choice(
                 len(x_current_class), num_imgs_to_poison, replace=False)
 
             # Split in poison and clean
             x_poison_current_class = x_current_class[indices_to_poison]
-            x_clean_current_class = np.delete(
-                x_current_class, x_poison_current_class, axis=0)
+
+            # remove to_poison data entries to get the clean ones
             clean_indices = np.delete(
                 np.arange(len(x_current_class)), indices_to_poison)
             x_clean_current_class = x_current_class[clean_indices]
-            x_clean = np.append(x_clean, x_clean_current_class, axis=0)
-            y_clean = np.append(
-                y_clean, [current_class] * len(x_clean_current_class), axis=0)
 
-            # Actually poison the poison part
+            # get unpoisoned data in the final dataset
+            x_clean = np.append(x_clean, x_clean_current_class, axis=0)
+
+            # make sure shape is 4d, (num_entries, num_channels, width, height)
+            y_clean = np.append(
+                y_clean, np.zeros((len(x_clean_current_class), 1)) * current_class , axis=0)
+
+            # Actually poison the poison partition
             if (num_imgs_to_poison > 0):
                 backdoor_attack = PoisoningAttackBackdoor(
                     self.add_modification)
-                # target_array = np.zeros((num_imgs_to_poison, len(classes)))
-                # for i in range(len(target_array)):
-                #     target_array[i][self.target_class] = 1
 
+                # create an attack using art framework
                 clean_backdoor_attack = PoisoningAttackCleanLabelBackdoor(
-                    backdoor_attack, self.proxy_classifier, np.ones((num_imgs_to_poison, 1)) * self.target_class, self.percent_poison)
+                    backdoor=backdoor_attack, proxy_classifier=self.proxy_classifier,target=np.ones((num_imgs_to_poison, 1)) * self.target_class, pp_poison=self.percent_poison)
+
+                # utilize the attack to poison data
                 x_poison_current_class, poison_labels = clean_backdoor_attack.poison(
-                    x_poison_current_class, y=np.ones(num_imgs_to_poison) * self.target_class, broadcast=False)
-                    # x_poison_current_class, broadcast=False)
+                    x=x_poison_current_class, y=np.ones((num_imgs_to_poison, 1)) * self.target_class, broadcast=False)
+
 
                 # Append poisoned data to the poison class
                 x_poison = np.append(x_poison, x_poison_current_class, axis=0)
@@ -216,8 +233,8 @@ class CleanBadNet(object):
 
         # Create new arrays for final data
         is_poison = np.empty((0,))
-        x_combined = np.empty((0, 28, 28))
-        y_combined = np.empty((0,))
+        x_combined = np.empty(shape_x)
+        y_combined = np.empty((0, ))
 
         # Add the items which originally had the target_class to the combined set
         x_combined = np.append(x_combined, target_class_x, axis=0)
@@ -225,7 +242,10 @@ class CleanBadNet(object):
 
         # Add the items which are unpoisoned to the combined set
         x_combined = np.append(x_combined, x_clean, axis=0)
-        y_combined = np.append(y_combined, y_clean, axis=0)
+
+        # reshape y_clean from (num_entries, 1) into (num_entries, ) before combining
+        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
+        y_combined = np.append(y_combined, np.squeeze(y_clean), axis=0)
 
         # Mark the unpoisoned data and the data that was
         # originally the target_class as unpoisoned
@@ -233,10 +253,13 @@ class CleanBadNet(object):
 
         # Add the items which are poisoned to the combined set
         x_combined = np.append(x_combined, x_poison, axis=0)
-        y_combined = np.append(y_combined, y_poison, axis=0)
+
+        # reshape y_poison from (num_entries, 1) into (num_entries, ) before combining
+        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
+        y_combined = np.append(y_combined, np.squeeze(y_poison), axis=0)
 
         # Mark poisoned data as such
-        is_poison = np.append(is_poison, np.ones(len(y_poison)))
+        is_poison = np.append(is_poison, np.ones(len(np.squeeze(y_poison))))
 
         # Convert to a boolean array
         is_poison = is_poison != 0
@@ -249,4 +272,7 @@ class CleanBadNet(object):
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
 
-        return is_poison, x_combined, y_combined
+        # reshape x_combined from (num_entries, 1, width, height) into (num_entries, widt, height) before combining
+        # this is required because metrics runners don't currently work with channels
+        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
+        return is_poison, np.squeeze(x_combined), y_combined
