@@ -65,16 +65,36 @@ class CifarCNN(nn.Module):
     # TODO: Parameterize the methods, so we can do hyperparameter tuning
 
     def get_opti(self):
+        '''
+        Return the optimizer used for the CNN
+        :return: stochastic gradient descent
+        '''
         return optim.SGD(self.parameters(), lr=0.001)
 
     def get_criterion(self):
+        '''
+        Return the loss criterion used for the CNN
+        :return: Cross-entropy loss
+        '''
         return self.crit
 
     def get_nb_classes(self):
+        '''
+        Return the number of classes for the model
+        :return: 10
+        '''
         return self.nb_classes
 
     def get_input_shape(self):
+        '''
+        Return the shape of the input image
+        :return: (3, 32, 32)
+        '''
         return self.input_shape
 
     def get_path(self):
+        '''
+        Return the name of the pre-load state_dict of the model
+        :return: cifar-10
+        '''
         return self.path

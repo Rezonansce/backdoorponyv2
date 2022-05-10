@@ -46,6 +46,7 @@ class CIFAR10(object):
         y_test = test_batch[b'labels']
         x_test = test_batch[b'data'] / 255.0
         # Reshape the whole image data
+        # 3 channels for RGB, 32 pixels width, 32 pixels height
         X_train = X_train.reshape(len(X_train), 3, 32, 32).astype(np.float32)
         x_test = x_test.reshape(len(x_test), 3, 32, 32).astype(np.float32)
         train_data = (X_train, Y_train)
