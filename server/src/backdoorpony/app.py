@@ -12,6 +12,7 @@ import backdoorpony.metrics
 from backdoorpony.app_tracker import AppTracker
 from backdoorpony.dynamic_imports import import_submodules_attributes
 
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = 'df0a17bc371e1b72883f3df3cc0928dd'
@@ -284,3 +285,5 @@ def get_configuration_file():
     Returns a dictionary containing values used for attack and/or defence name, category, input_type, parameters.
     '''
     return jsonify(app_tracker.generate_configuration_file())
+
+

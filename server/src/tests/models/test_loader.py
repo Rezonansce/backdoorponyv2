@@ -1,8 +1,11 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
+from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.MNIST import MNIST
+from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
@@ -42,7 +45,14 @@ class TestMainMetricsRunner(TestCase):
                 }
             },
             'audio': {
-                'classifier': cls.dummy
+                'classifier': AudioClassifier,
+                'Audio_MNIST': {
+                    'dataset': Audio_MNIST,
+                    'model': Audio_MNIST_RNN,
+                    'link': 'None',
+                    'info': 'Info on IMDB bla bla'
+
+                }
             },
             'graph': {
                 'classifier': cls.dummy
@@ -51,7 +61,13 @@ class TestMainMetricsRunner(TestCase):
         datasets = loader.get_datasets()
         cls.assertEqual(datasets,
         {
-            "audio": {},
+            "audio": {
+                "Audio_MNIST": {
+                    'link': 'None',
+                    'info': 'Info on IMDB bla bla',
+                    "pretty_name": "Audio_MNIST"
+                    }
+                },
             "graph": {},
             "image": {
                 "MNIST": {

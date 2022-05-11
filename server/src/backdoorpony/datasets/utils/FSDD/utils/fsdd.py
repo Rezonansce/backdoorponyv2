@@ -58,7 +58,7 @@ class FSDD:
 
         for file_name in file_paths:
             label = file_name[0]
-            spectrogram = matplotlib.pyplot.imread(data_dir + '/' + file_name).flatten()
+            spectrogram = matplotlib.pyplot.imread(data_dir + '/' + file_name)[:,:,0]
             spectrograms.append(spectrogram)
             labels.append(label)
 

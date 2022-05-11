@@ -1,36 +1,36 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri May  6 02:35:54 2022
-
-@author: kikig
-"""
-
-import torch
+'''
+The below code generates a Convolutional Neural Network
+for working with the Audio MNIST dataset.
+'''
 import torch.nn as nn
+import torch.nn.functional as F
+
+__dataset__ = 'audio_mnist'
+__class_name__ = 'Audio_MNIST_RNN'
 
 
 class Audio_MNIST_RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        '''Initiates a RNN geared towards the IMDB dataset
+    def __init__(self):
+        '''Initiates a CNN geared towards the Audio MNIST dataset
 
         Returns
         ----------
         None
         '''
         super(Audio_MNIST_RNN, self).__init__()
-        self.hidden_size = hidden_size
+        self.conv_1 = nn.Conv2d(
+            in_channels=1, out_channels=20, kernel_size=5, stride=1)
+        self.conv_2 = nn.Conv2d(
+            in_channels=20, out_channels=50, kernel_size=5, stride=1)
+        self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=500)
+        self.fc_2 = nn.Linear(in_features=500, out_features=10)
 
-        self.i2h = nn.Linear(input_size, hidden_size)
-        self.i2o = nn.Linear(input_size, hidden_size)
-        self.softmax = nn.LogSoftmax(dim=1)
-
-    def forward(self, input):
-        combined = input#torch.cat((input, hidden), 1)
-        #hidden = self.i2h(combined)
-        output = self.i2o(combined)
-        output = self.softmax(output)
-        return output
-
-    def initHidden(self):
-        return torch.zeros(1, self.hidden_size)
-
+    def forward(self, x):
+        x = F.relu(self.conv_1(x))
+        x = F.max_pool2d(x, 2, 2)
+        x = F.relu(self.conv_2(x))
+        x = F.max_pool2d(x, 2, 2)
+        x = x.view(-1, 4 * 4 * 50)
+        x = F.relu(self.fc_1(x))
+        x = self.fc_2(x)
+        return F.log_softmax(x, dim=1)

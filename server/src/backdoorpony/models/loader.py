@@ -126,11 +126,8 @@ class Loader():
         None
         '''
 
-        model = self.options[type][dataset]['model']
-        if (model == Audio_MNIST_RNN):
-            model = model(16384, 10, 10)
-        else:
-            model = model()
+        model = self.options[type][dataset]['model']()
+
 
 
         if file_model != None:

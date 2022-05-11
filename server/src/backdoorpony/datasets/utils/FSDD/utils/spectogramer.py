@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
 
 
-def wav_to_spectrogram(audio_path, save_path, spectrogram_dimensions=(64, 64), noverlap=16, cmap='gray_r'):
+def wav_to_spectrogram(audio_path, save_path, spectrogram_dimensions=(28, 28), noverlap=16, cmap='gray_r'):
     """ Creates a spectrogram of a wav file.
 
     :param audio_path: path of wav file
@@ -30,7 +30,7 @@ def wav_to_spectrogram(audio_path, save_path, spectrogram_dimensions=(64, 64), n
     fig.savefig(save_path, bbox_inches="tight", pad_inches=0)
 
 
-def dir_to_spectrogram(audio_dir, spectrogram_dir, spectrogram_dimensions=(64, 64), noverlap=16, cmap='gray_r'):
+def dir_to_spectrogram(audio_dir, spectrogram_dir, spectrogram_dimensions=(28, 28), noverlap=16, cmap='gray_r'):
     """ Creates spectrograms of all the audio files in a dir
 
     :param audio_dir: path of directory with audio files
