@@ -7,14 +7,14 @@ from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 
 
 class AudioClassifier(PyTorchClassifier, AbstractClassifier):
-    def __init__(self, model):
+    def __init__(self, model, shape=(1, 28, 28)):
         '''Initiate the classifier
 
         Parameters
         ----------
         model :
             Model that the classifier should be based on
-
+        input-shape: shape of the input
         Returns
         ----------
         None
@@ -26,7 +26,7 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
             clip_values=(0.0, 255.0),
             loss=criterion,
             optimizer=opti,
-            input_shape=(1, 28, 28),
+            input_shape=shape,
             nb_classes=10,
         )
 
