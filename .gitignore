@@ -56,3 +56,13 @@ server/src/backdoorpony.egg-info/
 *.swp
 
 server/src/backdoorpony/datasets/utils/FSDD/spectrograms/
+
+server/src/backdoorpony/attacks/poisoning/sound/BAASV/test_tisv/
+
+server/src/backdoorpony/attacks/poisoning/sound/BAASV/test_tisv_poison/
+
+server/src/backdoorpony/attacks/poisoning/sound/BAASV/train_tisv/
+
+server/src/backdoorpony/attacks/poisoning/sound/BAASV/train_tisv_poison/
+
+server/src/backdoorpony/attacks/poisoning/sound/BAASV/trigger_series_poison/
