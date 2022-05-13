@@ -1,5 +1,7 @@
 import pkgutil
+
 import backdoorpony
+
 
 class Runner(object):
     def run_attack(self, clean_classifier, train_data, test_data, execution_history, attack_to_run, attack_params):

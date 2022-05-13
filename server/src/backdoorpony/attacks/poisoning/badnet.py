@@ -6,7 +6,8 @@ from copy import deepcopy
 
 import numpy as np
 from art.attacks.poisoning import PoisoningAttackBackdoor
-from art.attacks.poisoning.perturbations import (add_pattern_bd, add_single_bd)
+from art.attacks.poisoning.perturbations import (add_pattern_bd, add_single_bd,
+                                                 insert_image)
 
 __name__ = 'badnet'
 __category__ = 'poisoning'
@@ -62,6 +63,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
+
             _, full_poison_data, full_poison_labels = BadNet(attack_params['trigger_style']['value'][ts],
                                                             1, attack_params['target_class']['value'][tc]).poison(deepcopy(train_images), deepcopy(train_labels), True)
 
@@ -201,7 +203,6 @@ class BadNet(object):
 
             # Actually poison the poison part
             if (num_imgs_to_poison > 0):
-
                 backdoor_attack = PoisoningAttackBackdoor(
                     self.add_modification)
                 x_poison_current_class, poison_labels = backdoor_attack.poison(

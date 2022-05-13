@@ -3,6 +3,7 @@ Run the DeepFool attack to generate training data that contains a trigger.
 For documentation check the README inside the attacks/poisoning folder.
 """
 from copy import deepcopy
+
 import numpy as np
 from art.attacks.evasion.deepfool import DeepFool as artDeepFool
 

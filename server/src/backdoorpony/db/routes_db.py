@@ -1,5 +1,5 @@
 from backdoorpony import app
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 
 from extensions import db
 from models import Action, Input, Param
