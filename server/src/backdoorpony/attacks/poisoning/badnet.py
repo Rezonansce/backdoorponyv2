@@ -112,10 +112,16 @@ class BadNet(object):
         When image is specified the path to an image to use as backdoor trigger can also be specified.
         Uses ART libraries.
         '''
+        # Transpose image dimensions, move channels to the last index
+        x = np.swapaxes(x, 1, 3)
         if self.modification_type == 'pattern':
-            return add_pattern_bd(x, pixel_value=self.max_val)
+            x = add_pattern_bd(x, pixel_value=self.max_val)
+            x = np.swapaxes(x, 1, 3)
+            return x
         elif self.modification_type == 'pixel':
-            return add_single_bd(x, pixel_value=self.max_val)
+            x = add_single_bd(x, pixel_value=self.max_val)
+            x = np.swapaxes(x, 1, 3)
+            return x
         elif self.modification_type == 'image':
             raise('Currently broken')
             # return insert_image(x, backdoor_path=self.path, size=(10, 10), channels_first=True)
@@ -151,6 +157,7 @@ class BadNet(object):
             The labels corresponding to the (partially) poisoned data.
         '''
 
+        input_shape = np.shape(input_data)[1:4]
         # Save the maximum of the training data for the actual poisoning
         self.max_val = np.max(input_data)
         x_to_poison = np.copy(input_data)
@@ -168,10 +175,10 @@ class BadNet(object):
         x_to_poison = x_to_poison[y_to_poison != self.target_class]
         y_to_poison = y_to_poison[y_to_poison != self.target_class]
 
-        x_poison = np.empty((0, 28, 28))
+        x_poison = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_poison = np.empty((0,))
 
-        x_clean = np.empty((0, 28, 28))
+        x_clean = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_clean = np.empty((0,))
 
         for current_class in classes:
@@ -185,8 +192,6 @@ class BadNet(object):
 
             # Split in poison and clean
             x_poison_current_class = x_current_class[indices_to_poison]
-            x_clean_current_class = np.delete(
-                x_current_class, x_poison_current_class, axis=0)
             clean_indices = np.delete(
                 np.arange(len(x_current_class)), indices_to_poison)
             x_clean_current_class = x_current_class[clean_indices]
@@ -208,7 +213,7 @@ class BadNet(object):
 
         # Create new arrays for final data
         is_poison = np.empty((0,))
-        x_combined = np.empty((0, 28, 28))
+        x_combined = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_combined = np.empty((0,))
 
         # Add the items which originally had the target_class to the combined set

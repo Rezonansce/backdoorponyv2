@@ -124,7 +124,7 @@ class DeepFool(object):
         y_poison :
             The labels corresponding to the (partially) poisoned data.
         '''
-
+        input_shape = np.shape(input_data)[1:4]
         # Save the maximum of the training data for the actual poisoning
         self.max_val = np.max(input_data)
         x_to_poison = np.copy(input_data)
@@ -142,10 +142,10 @@ class DeepFool(object):
         x_to_poison = x_to_poison[y_to_poison != self.target_class]
         y_to_poison = y_to_poison[y_to_poison != self.target_class]
 
-        x_poison = np.empty((0, 28, 28))
+        x_poison = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_poison = np.empty((0,))
 
-        x_clean = np.empty((0, 28, 28))
+        x_clean = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_clean = np.empty((0,))
 
         for current_class in classes:
@@ -159,8 +159,6 @@ class DeepFool(object):
 
             # Split in poison and clean
             x_poison_current_class = x_current_class[indices_to_poison]
-            x_clean_current_class = np.delete(
-                x_current_class, x_poison_current_class, axis=0)
             clean_indices = np.delete(
                 np.arange(len(x_current_class)), indices_to_poison)
             x_clean_current_class = x_current_class[clean_indices]
@@ -181,7 +179,7 @@ class DeepFool(object):
 
         # Create new arrays for final data
         is_poison = np.empty((0,))
-        x_combined = np.empty((0, 28, 28))
+        x_combined = np.empty((0, input_shape[0], input_shape[1], input_shape[2]))
         y_combined = np.empty((0,))
 
         # Add the items which originally had the target_class to the combined set
