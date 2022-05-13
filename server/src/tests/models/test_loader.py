@@ -1,13 +1,19 @@
-from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
+
+from backdoorpony.classifiers.AudioClassifier import AudioClassifier
+
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.MNIST import MNIST
+from backdoorpony.datasets.audio_MNIST import Audio_MNIST
+from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
+
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
 
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.classifiers.TextClassifier import TextClassifier
+
 from backdoorpony.models.loader import Loader
 
 
@@ -40,7 +46,14 @@ class TestMainMetricsRunner(TestCase):
                 'classifier': cls.dummy
             },
             'audio': {
-                'classifier': cls.dummy
+                'classifier': AudioClassifier,
+                'Audio_MNIST': {
+                    'dataset': Audio_MNIST,
+                    'model': Audio_MNIST_RNN,
+                    'link': 'None',
+                    'info': 'Info on IMDB bla bla'
+
+                }
             },
             'graph': {
                 'classifier': cls.dummy
@@ -49,7 +62,13 @@ class TestMainMetricsRunner(TestCase):
         datasets = loader.get_datasets()
         cls.assertEqual(datasets,
         {
-            "audio": {},
+            "audio": {
+                "Audio_MNIST": {
+                    'link': 'None',
+                    'info': 'Info on IMDB bla bla',
+                    "pretty_name": "Audio_MNIST"
+                    }
+                },
             "graph": {},
             "image": {
                 "MNIST": {
