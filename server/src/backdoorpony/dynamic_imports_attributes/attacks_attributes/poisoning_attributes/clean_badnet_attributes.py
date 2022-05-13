@@ -16,8 +16,28 @@ __defaults_test__ = {
         'pretty_name': 'Target class',
         'default_value': [2],
         'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
+    },
+    'eps': {
+        'pretty_name': 'Maximum perturbation',
+        'default_value': [0.3],
+        'info': 'Maximum perturbation that the attacker can introduce.'
+    },
+    'eps_step': {
+        'pretty_name': 'Step size',
+        'default_value': [0.1],
+        'info': 'Attack step size (input variation) at each iteration.'
+    },
+    'max_iter': {
+        'pretty_name': 'Epoch',
+        'default_value': [100],
+        'info': 'The maximum number of iterations'
+    },
+    'num_random_init': {
+        'pretty_name': 'Number of random initialisations',
+        'default_value': [0],
+        'info': 'Number of random initialisations within the epsilon ball. For num_random_init=0 starting at the original input.'
     }
 }
-__link_test__ = 'https://arxiv.org/pdf/1708.06733.pdf'
+__link_test__ = 'https://people.csail.mit.edu/madry/lab/cleanlabel.pdf'
 __info_test__ = '''Badnet is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.'''.replace('\n', '')
+The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.The target class will be assigned using clean lable attack method'''.replace('\n', '')
