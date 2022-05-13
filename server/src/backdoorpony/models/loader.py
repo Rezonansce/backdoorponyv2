@@ -1,7 +1,7 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.classifiers.TextClassifier import TextClassifier
+
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 
 from backdoorpony.datasets.MNIST import MNIST

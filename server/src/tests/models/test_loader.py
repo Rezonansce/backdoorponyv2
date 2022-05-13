@@ -1,8 +1,6 @@
 
-from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
-from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
-from backdoorpony.datasets.IMDB import IMDB
+
 from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.MNIST import MNIST
@@ -15,7 +13,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.classifiers.TextClassifier import TextClassifier
+
 from backdoorpony.models.loader import Loader
 
 
