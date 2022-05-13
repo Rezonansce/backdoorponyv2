@@ -22,8 +22,8 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model = model.to(device)
+        #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #model = model.to(device)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
