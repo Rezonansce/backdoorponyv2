@@ -1,7 +1,6 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-<<<<<<< server/src/backdoorpony/models/loader.py
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 from backdoorpony.datasets.IMDB import IMDB
@@ -148,15 +147,10 @@ class Loader():
         self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data
-<<<<<<< server/src/backdoorpony/models/loader.py
 
-
-        self.classifier.fit(x, y)
-
-=======
         self.classifier.fit(x, y, first_training=True)
-    
->>>>>>> server/src/backdoorpony/models/loader.py
+
+
     def get_classifier(self, debug=False):
         '''Gets the classifier if one has been made
 
