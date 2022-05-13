@@ -6,7 +6,7 @@ from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
