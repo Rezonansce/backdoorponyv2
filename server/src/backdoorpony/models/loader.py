@@ -1,15 +1,21 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-# from backdoorpony.datasets.IMDB import IMDB
+
+from backdoorpony.classifiers.AudioClassifier import AudioClassifier
+
+from backdoorpony.datasets.MNIST import MNIST
+from backdoorpony.datasets.audio_MNIST import Audio_MNIST
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+
+from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
-from backdoorpony.datasets.MNIST import MNIST
-from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+
 
 
 class Loader():
-    
+
     def __init__(self, debug=False):
         '''Initiates a loader
         The loader is capable of loading/creating the classifier
@@ -22,7 +28,7 @@ class Loader():
         Returns
         ----------
         None
-        
+
         '''
         self.classifier = None
         self.train_data = None
@@ -54,7 +60,14 @@ class Loader():
             #     }
             # },
             'audio': {
-                'classifier': ...
+                'classifier': AudioClassifier,
+                'Audio_MNIST': {
+                    'dataset': Audio_MNIST,
+                    'model': Audio_MNIST_RNN,
+                    'link': None,
+                    'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
+
+                }
             },
             'graph': {
                 'classifier': ...
@@ -97,9 +110,9 @@ class Loader():
                 if(name != 'classifier'):
                     contents.update({name: {'pretty_name': name, 'link': attributes['link'], 'info': attributes['info']}})
             sets[type] = contents
-        
+
         return sets
-    
+
     def make_classifier(self, type, dataset, file_model=None, debug=False):
         '''Creates the classifier corresponding to the input
 
@@ -120,8 +133,11 @@ class Loader():
         ----------
         None
         '''
+
         model = self.options[type][dataset]['model']()
-        
+
+
+
         if file_model != None:
             name = file_model.filename.split('.', 1) #remove filename extension
             file_model.save('data/pth/' + name[0] + '.model.pth')
@@ -131,8 +147,10 @@ class Loader():
         self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data
+
         self.classifier.fit(x, y, first_training=True)
-    
+
+
     def get_classifier(self, debug=False):
         '''Gets the classifier if one has been made
 
@@ -159,7 +177,7 @@ class Loader():
         Returns the training data if it has been instantiated, else returns None
         '''
         return self.train_data
-        
+
     def get_test_data(self, debug=False):
         '''Gets the validation data
 

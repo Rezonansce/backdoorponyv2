@@ -1,44 +1,34 @@
 import unittest
 from unittest import TestCase
-from backdoorpony.attacks.evasion.deepfool import DeepFool
-from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-import backdoorpony.models.image.CIFAR10.CifarCNN as CifarCNN
 import numpy as np
-import torchvision
-from torchvision import datasets, transforms, models
-import matplotlib.pyplot as plt
 from backdoorpony.datasets.CIFAR10 import CIFAR10
-import torch
-import backdoorpony.attacks.poisoning.badnet as badnet
+
 
 class TestDataLoader(TestCase):
-    '''
-    This is used as a sandbox currently
-    Ignore it.
-    '''
-    def test_get_data(self):
-        cifar = CIFAR10(50000)
-        (x_train, y_train), (x_test, y_test) = cifar.get_datasets()
-        classifier = ImageClassifier(CifarCNN.CifarCNN())
-        # classifier.fit(x_train, y_train, True)
-        # predictions = classifier.predict(x_test)
-        # correct = 0
-        # for idx in range(len(y_test)):
-        #     if np.argmax(predictions[idx]) == y_test[idx]:
-        #         correct += 1
-        # print(correct / len(predictions))
 
-    def imshow(self, img):
-        # img = img / 2 + 0.5  # unnormalize
-        npimg = img.numpy()
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
-        plt.show()
-
-        # self.assertTrue(len(x_train) == 5)
-        # self.assertTrue(np.shape(x_train) == (5, 3, 32, 32))
-        # self.assertTrue(np.shape(x_test) == (10000, 3, 32, 32))
-        # self.assertTrue(np.shape(y_train) == (5,))
-        # self.assertTrue(np.shape(y_test) == (10000,))
+    def test_data_format(self):
+        '''
+        Make sure the data comes in the right format
+        '''
+        cifar10 = CIFAR10(100)
+        train_data, test_data = cifar10.get_datasets()
+        # Assert __init__ worked properly
+        self.assertTrue(cifar10.num_selection == 100)
+        train_img = train_data[0]
+        test_img = test_data[0]
+        train_labels = train_data[1]
+        test_labels = test_data[1]
+        # Assert data shapes are correct
+        self.assertTrue(np.shape(train_img) == (100, 3, 32, 32))
+        self.assertTrue(np.shape(test_img) == (10000, 3, 32, 32))
+        # Check that labels are between 0 and 9
+        self.assertTrue((train_labels.min() >= 0.0) & (train_labels.max() <= 9.0))
+        min_label = min(test_labels)
+        max_label = max(test_labels)
+        self.assertTrue((max_label <= 9) & (min_label >= 0))
+        # Check that data is between 0 and 256
+        self.assertTrue((train_img.max() <= 256) & (train_img.min() >= 0))
+        self.assertTrue((test_img.max() <= 256) & (test_img.min() >= 0))
 
 if __name__ == '__main__':
     unittest.main()

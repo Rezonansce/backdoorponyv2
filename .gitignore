@@ -54,3 +54,5 @@ server/src/backdoorpony.egg-info/
 
 # Vim swap files
 *.swp
+
+server/src/backdoorpony/datasets/utils/FSDD/spectrograms/

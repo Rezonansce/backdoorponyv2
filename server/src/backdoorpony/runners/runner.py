@@ -70,7 +70,8 @@ class Runner(object):
 
         # TODO if ran_with is {}, use clean_classifier (pass classifier and test_data)
         # Defence
-        packages = [backdoorpony.defences.transformer.poisoning]
+        packages = [backdoorpony.defences.transformer.poisoning,
+                    backdoorpony.defences.detector.poisoning]
         for package in packages:
             prefix = package.__name__ + '.'
             for importer, modname, ispkg in pkgutil.iter_modules(package.__path__, prefix):

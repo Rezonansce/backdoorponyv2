@@ -1,3 +1,5 @@
+import os.path
+
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
@@ -5,6 +7,7 @@ from art.estimators.classification import PyTorchClassifier
 from art.utils import preprocess
 import torch
 import os.path
+from numba.cuda import jit
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 
 
@@ -83,14 +86,11 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
 
         Returns
         ----------
-        prediction :
+        prediction : 
             Return format is a numpy array with the probability for each class
         '''
-        # x = np.expand_dims(x, axis=3)
-        # x = np.transpose(x, (0, 3, 2, 1)).astype(np.float32)
-        return super().predict(x)
+        return super().predict(x.astype(np.float32))
 
     def class_gradient(self, x, *args, **kwargs):
-        # x = np.expand_dims(x, axis=3)
-        # x = np.transpose(x, (0, 3, 2, 1)).astype(np.float32)
         return super().class_gradient(x)
+
