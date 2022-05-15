@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 torch.manual_seed(1234)
-
+print("cuda: ", torch.cuda.is_available())
 mm = IMDB()
 train, trainlabel, test, testlabel, lexicon = mm.get_datasets()
 
@@ -22,7 +22,7 @@ else:
     print("using CPU")
 
 
-print(lexicon)
+# print(lexicon)
 print("Vocab length: " + str(len(lexicon)))
 #
 # row_len = [len(row) for row in train]
@@ -39,15 +39,17 @@ def transformToFeatures(data, num):
             features[i, -len(row):] = np.array(row)[:num]
     return features
 
-features_train = transformToFeatures(train, 900)
-features_test = transformToFeatures(test, 900)
+features_train = transformToFeatures(train, 800)
+features_test = transformToFeatures(test, 800)
+print(features_train)
+print(np.shape(features_train))
 
 train_tensor = TensorDataset(torch.from_numpy(features_train), torch.from_numpy(trainlabel))
 test_tensor = TensorDataset(torch.from_numpy(features_test), torch.from_numpy(testlabel))
 
-batch_size = 50
-train_loader = DataLoader(train_tensor, shuffle=True, batch_size=batch_size)
-test_loader = DataLoader(test_tensor, shuffle=True, batch_size=batch_size)
+batch_size = 16
+train_loader = DataLoader(train_tensor, shuffle=True, batch_size=batch_size, drop_last=True)
+test_loader = DataLoader(test_tensor, shuffle=True, batch_size=batch_size, drop_last=True)
 
 iterator = iter(train_loader)
 sample_x, sample_y = iterator.next()
@@ -57,7 +59,7 @@ print(sample_x)
 print(sample_y)
 
 class LstmRnn(nn.Module):
-    def __init__(self, num_layers, lexicon_size, hid_size, out_size, emb_size, drop_prob=0.5):
+    def __init__(self, num_layers, lexicon_size, hid_size, out_size, emb_size, drop_prob=0.1):
         super(LstmRnn, self).__init__()
 
         self.out_size = out_size
@@ -70,13 +72,13 @@ class LstmRnn(nn.Module):
         self.emb = nn.Embedding(lexicon_size, emb_size)
 
         # lstm layer
-        self.lstm = nn.LSTM(input_size=emb_size, hidden_size=self.hid_size, num_layers=num_layers, batch_first=True)
+        self.lstm = nn.LSTM(input_size=emb_size, hidden_size=self.hid_size, num_layers=round(num_layers/2), batch_first=True, bidirectional=True)
 
         # dropout layer to prevent overfitting
         self.dropout = nn.Dropout(drop_prob)
 
         # linear layer
-        self.linear = nn.Linear(self.hid_size, out_size)
+        self.linear = nn.Linear(self.hid_size*2, out_size)
 
         # sigmoid layer(output)
         self.sigmoid = nn.Sigmoid()
@@ -109,28 +111,27 @@ class LstmRnn(nn.Module):
 
         # reshape
         sig_ret = sig_ret.view(batch_size, -1)
-
         # get last labels batch
         sig_ret = sig_ret[:, -1]
 
         return sig_ret, hid
 
-num_layers = 2
+num_layers = 4
 lexicon_size = len(lexicon) + 1     # pad by 1
-emb_size = 10
+emb_size = 1000
 out_size = 1
-hid_size = 64
+hid_size = 512
 clip = 5
-epochs = 10
+epochs = 30
 
-model = LstmRnn(num_layers, lexicon_size, hid_size, out_size, emb_size, drop_prob=0.3)
+model = LstmRnn(num_layers, lexicon_size, hid_size, out_size, emb_size, drop_prob=0.5)
 
 # if gpu can be used, then use gpu otherwise cpu
 model.to(device)
 
 print(model)
 
-learning_rate = 0.001
+learning_rate = 0.0001
 criterion = nn.BCELoss()
 opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -144,6 +145,7 @@ etrain_losses, eval_losses = [], []
 etrain_acc, eval_acc = [], []
 
 for epoch in tqdm.tqdm(range(epochs)):
+    # learning_rate*=0.9
     train_losses = []
     tracc = 0.0
     model.train()

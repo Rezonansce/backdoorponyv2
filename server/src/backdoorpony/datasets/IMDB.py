@@ -1,3 +1,4 @@
+import os
 import re
 from collections import Counter
 
@@ -44,7 +45,15 @@ class IMDB(object):
         train_data_y = numpy.array(train_data["sentiment"].tolist())
         test_data_y = numpy.array(test_data["sentiment"].tolist())
 
-        return train_data_x, train_data_y, test_data_x, test_data_y, lexicon
+        return (self.transformToFeatures(train_data_x, 700), train_data_y), (self.transformToFeatures(test_data_x, 700), test_data_y), lexicon
+
+    # padding the sequences such that there is a maximum length of num
+    def transformToFeatures(self, data, num):
+        features = numpy.zeros((len(data), num), dtype=int)
+        for i, row in enumerate(data):
+            if len(row) != 0:
+                features[i, -len(row):] = numpy.array(row)[:num]
+        return features
 
     def tokenize(self, datatrain, datatest, stop_words):
         words = []
@@ -82,10 +91,10 @@ class IMDB(object):
     def clean(self, word):
         # remove urls
         word = re.sub(r'http\S+', '', word)
-
+        #
         # replace multiple hyphens with one
         word = re.sub(r'[-]+', '-', word)
-
+        #
         # ignore non-words
         word = re.sub(r'[^\w_-]+', '', word)
 
@@ -107,11 +116,12 @@ class IMDB(object):
         SEED = 1234
 
         # load train data
-        train_data = pd.read_csv('preloaded/IMDB/train.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
+        # print("current dir ", os.getcwd())
+        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
 
 
         # load test data
-        test_data = pd.read_csv('preloaded/IMDB/test.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data
