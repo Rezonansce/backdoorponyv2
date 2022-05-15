@@ -1,4 +1,3 @@
-
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
@@ -69,7 +68,14 @@ class TestMainMetricsRunner(TestCase):
                     "pretty_name": "Audio_MNIST"
                     }
                 },
-            "graph": {},
+            'graph': {
+                'classifier': GraphClassifier,
+                'MUTAG': {
+                    'info': 'Info on this dataset...',
+                    'link': 'custom mutagen dataset, modelled as graphs',
+                    "pretty_name": "MUTAG"
+                }
+            },
             "image": {
                 "MNIST": {
                     "info": "Info on MNIST bla bla",

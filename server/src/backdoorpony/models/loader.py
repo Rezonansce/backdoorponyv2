@@ -70,7 +70,13 @@ class Loader():
                 }
             },
             'graph': {
-                'classifier': ...
+                'classifier': GraphClassifier,
+                'MUTAG': {
+                    'dataset': MUTAG,
+                    'model': graphcnn,
+                    'link': None,
+                    'info': None
+                }
             }
         }
         return None
