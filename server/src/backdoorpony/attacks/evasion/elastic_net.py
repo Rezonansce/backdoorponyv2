@@ -43,7 +43,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     ----------
     Returns the updated execution history dictionary
     '''
-    print("Instantiating a Elastic Net attack.")
+    print("Instantiating an Elastic Net attack.")
 
     key_index = 0
     train_images = train_data[0]
