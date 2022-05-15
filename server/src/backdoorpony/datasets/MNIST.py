@@ -8,7 +8,7 @@ from art.utils import load_mnist
 import numpy as np
 
 class MNIST(object):
-    def __init__(self, num_selection=7500):
+    def __init__(self, num_selection=1000):
         '''Should initiate the dataset
 
         Returns
