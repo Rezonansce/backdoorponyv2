@@ -1,11 +1,13 @@
 import os.path
 
 import numpy as np
+import torch.nn as nn
+import torch.optim as optim
 from art.estimators.classification import PyTorchClassifier
 from art.utils import preprocess
 import torch
+import os.path
 from numba.cuda import jit
-
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 
 
@@ -22,9 +24,9 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
-        # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # model = model.to(device)
         self.mdl = model
+        #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #model = model.to(device)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
@@ -58,16 +60,16 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             parent_directory = os.path.dirname(file_directory)
             target_path = r'models/image/pre-load'
             final_path = os.path.join(parent_directory, target_path
-                                      , self.mdl.get_path())
+                                      , super().model.get_path())
             # If there is a pretrained model, just load it
             if os.path.exists(final_path):
-                self.mdl.load_state_dict(torch.load(final_path))
+                super().model.load_state_dict(torch.load(final_path))
                 return
         # Else, fit the training set and save it
         x_train = x
         y_train = y
         print(np.shape(x_train))
-        x_train, y_train = preprocess(x_train, y_train, nb_classes=self.mdl.get_nb_classes())
+        x_train, y_train = preprocess(x_train, y_train, super().model.get_nb_classes())
         x_train = np.float32(x_train)
         # TODO: Broadcast batch_size and nb_epochs
         super().fit(x_train, y_train, batch_size=1, nb_epochs=5)

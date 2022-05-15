@@ -4,6 +4,7 @@ import sys
 
 import backdoorpony
 
+
 def get_as_package(package, debug=False):
     '''
     Imports the required package and returns its module of type ModuleType.
