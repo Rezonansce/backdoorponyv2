@@ -1,8 +1,10 @@
+from unittest.mock import MagicMock
 # from backdoorpony.metrics.poisoning_metrics_runner import \
 #     PoisoningMetricsRunner
 # from backdoorpony.metrics.transformer_metrics_runner import \
 #     TransformerMetricsRunner
 from backdoorpony.metrics.abstract_metrics_runner import AbstractMetricsRunner
+import backdoorpony.metrics
 
 __name__ = 'main metrics'
 
