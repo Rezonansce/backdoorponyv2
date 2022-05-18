@@ -1,17 +1,19 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-
+from backdoorpony.classifiers.TextClassifier import  TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.datasets.CIFAR10 import CIFAR10
+from backdoorpony.datasets.IMDB import IMDB
 
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
-from backdoorpony.datasets.CIFAR10 import CIFAR10
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
+
 
 
 
@@ -133,7 +135,7 @@ class Loader():
         ----------
         None
         '''
-        # print("type", type=="text")
+
         if type == "text":
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
             vocab_size = len(vocab) + 1
@@ -148,8 +150,8 @@ class Loader():
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
-        else:
-            model = self.options[type][dataset]['model']()
+
+        model = self.options[type][dataset]['model']()
 
         if file_model is not None:
             name = file_model.filename.split('.', 1) #remove filename extension
