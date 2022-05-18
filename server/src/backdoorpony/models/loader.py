@@ -7,6 +7,7 @@ from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
@@ -49,22 +50,21 @@ class Loader():
                     'info': 'The CIFAR10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images.'
                 }
             },
-            # 'text': {
-            #     'classifier': TextClassifier,
-            #     'IMDB': {
-            #         'dataset': IMDB,
-            #         'model': IMDB_RNN,
-            #         'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
-            #         'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
-            #
-            #     }
-            # },
             'audio': {
                 'classifier': AudioClassifier,
                 'Audio_MNIST': {
                     'dataset': Audio_MNIST,
                     'model': Audio_MNIST_RNN,
                     'link': None,
+                    'info': 'TODO ADD'
+                }
+            },
+            'text': {
+                'classifier': TextClassifier,
+                'IMDB': {
+                    'dataset': IMDB,
+                    'model': IMDB_LSTM_RNN,
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
                     'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
 
                 }
@@ -133,12 +133,25 @@ class Loader():
         ----------
         None
         '''
+        # print("type", type=="text")
+        if type == "text":
+            self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
+            vocab_size = len(vocab) + 1
+            print("Vocab size: ", vocab_size)
+            embedding_dim = 10
+            lstm_layers = 2
+            hidden_dim = 16
+            output_dim = 1
+            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
 
-        model = self.options[type][dataset]['model']()
+            self.classifier = self.options[type]['classifier'](model)
+            x, y = self.train_data
+            self.classifier.fit(x, y)
+            return
+        else:
+            model = self.options[type][dataset]['model']()
 
-
-
-        if file_model != None:
+        if file_model is not None:
             name = file_model.filename.split('.', 1) #remove filename extension
             file_model.save('data/pth/' + name[0] + '.model.pth')
             state_dict = torch.load('data/pth/' + name[0] + '.model.pth')

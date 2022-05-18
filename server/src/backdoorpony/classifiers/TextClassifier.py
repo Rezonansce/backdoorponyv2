@@ -1,11 +1,9 @@
+import numpy
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
-
-# optimizer = optim.SGD(model.parameters(), lr=1e-3)
-
-# criterion = nn.BCEWithLogitsLoss()
+from torch.utils.data import TensorDataset, DataLoader
 
 def binary_accuracy(preds, y):
         '''
@@ -13,8 +11,12 @@ def binary_accuracy(preds, y):
         '''
 
         #round predictions to the closest integer
-        rounded_preds = torch.round(torch.sigmoid(preds))
-        correct = (rounded_preds == y).float() #convert into float for division 
+        # rounded_preds = torch.round(torch.sigmoid(preds))
+        rounded_preds = torch.round(preds.squeeze())
+
+        # convert into float for later division
+        correct = (rounded_preds == y).float()
+        # find accuracy
         acc = correct.sum() / len(correct)
         return acc
 
@@ -32,38 +34,67 @@ class TextClassifier(AbstractClassifier, object):
         None
         '''
         self.model = model
-        self.criterion = nn.BCEWithLogitsLoss()
-        self.optimizer = optim.SGD(model.parameters(), lr=1e-3)
+        self.criterion = nn.BCELoss()
+        # self.optimizer = optim.SGD(model.parameters(), lr=1e-3)
+        self.optimizer = optim.Adam(model.parameters(), lr=1e-2)
 
-    def fit(self, train_data):
+        # TODO add gpu support
+        # if torch.cuda.is_available():
+        #     self.device = torch.device("cuda")
+        # else:
+        self.device = torch.device("cpu")
+
+    def fit(self, x, y, *args, **kwargs):
         '''Fit the classifier to the training data
         
         Parameters
         ----------
         train_data :
-            Data that the classifier will be trained on
+            x and y - fatures and labels that the classifier will be trained on
 
         Returns
         ----------
-        None
+        evaluation metrics - (loss, accuracy) as a tuple
         '''
-        return self.train(train_data)
+        batch_size = 1000
+        train_tensor = TensorDataset(torch.from_numpy(x), torch.from_numpy(y))
+        train_loader = DataLoader(train_tensor, shuffle=True, batch_size=batch_size, drop_last=True)
+        evmetrics = self.train(train_loader, batch_size, numEpochs=5)
+        return evmetrics
 
-    def predict(self, inputs):
+    def predict(self, x, *args, **kwargs):
         '''Return the predicted classification of the input
 
         Parameters
         ----------
         inputs :
-            The dataset the classifier should classify
+            x - the dataset the classifier should classify
 
         Returns
         ----------
         prediction : 
-            Return format can be anything, as long as it is consistent between
-            classifiers of the same category
+            Return 1d numpy array of predictions
         '''
-        self.evaluate(inputs)
+
+        # load data as batches, and drop the last batch because it could have an incorrect shape
+        pred_tensor = TensorDataset(torch.from_numpy(x))
+        pred_loader = DataLoader(pred_tensor, shuffle=True, batch_size=1, drop_last=True)
+
+        outs = []
+
+        # initialize hidden and cell states
+        h = self.model.init_hidden(1, self.device)
+
+        # shaping
+        h = tuple([x.data for x in h])
+
+        # run the prediction process on the whole dataset, ignore hidden state changes
+        for features in pred_loader:
+            output, _ = self.model(features, h)
+            outs.append(output)
+
+        # return a numpy array of predictions
+        return numpy.array(outs)
 
     def get_model(self):
         return self.model
@@ -72,50 +103,92 @@ class TextClassifier(AbstractClassifier, object):
         self.model = model
         return
 
-    def train(self, iterator):
-        
+    def set_device(self, device):
+        self.device = device
+        return
+
+    def get_device(self, device):
+        return self.device
+
+    #
+    def train_one_epoch(self, train_loader, h):
+        # initialize loss and accuracy for current epoch
         epoch_loss = 0
         epoch_acc = 0
         
         self.model.train()
-        
-        for batch in iterator:
-            
-            self.optimizer.zero_grad()
-                    
-            predictions = self.model(batch.text).squeeze(1)
-            
-            loss = self.criterion(predictions, batch.label)
-            
-            acc = binary_accuracy(predictions, batch.label)
-            
+
+        for features, labels in train_loader:
+            # create new variables to prevent backpropagating through the whole history
+            h = tuple([x.data for x in h])
+
+            # pytorch accumulates gradients, so reset to zero
+            self.model.zero_grad()
+
+            # move to correct device
+            features, labels = features.to(self.device), labels.to(self.device)
+
+            # predict
+            predictions, h = self.model(features, h)
+
+            # calculate loss
+            loss = self.criterion(predictions.squeeze(), labels.float())
+
+            # backpropagate
             loss.backward()
+
+            # calculate accuracy
+            acc = binary_accuracy(predictions.squeeze(), labels.float())
             
             self.optimizer.step()
-            
+
+            # update metrics
             epoch_loss += loss.item()
             epoch_acc += acc.item()
             
-        return epoch_loss / len(iterator), epoch_acc / len(iterator)
+        return epoch_loss / len(train_loader), epoch_acc / len(train_loader), h
 
-    def evaluate(self, iterator):
+    def train(self, train_loader, batch_size, numEpochs):
+        # initialize hidden and cell states
+        h = self.model.init_hidden(batch_size, self.device)
+        # initialize epoch loss and accuracy
+        epoch_loss = epoch_acc = 0
+        # run training numEpochs number of times
+        for i in range(numEpochs):
+            # run one epoch training
+            epoch_loss, epoch_acc, h = self.train_one_epoch(train_loader, h)
+
+            # uncomment only for debugging purposes
+            # print("Loss: ", epoch_loss)
+            # print("Accuracy: ", epoch_acc)
+        return epoch_loss, epoch_acc
+
+    # similar as training, but on a validation set
+    # currently not used
+    def evaluate(self, test_loader, batch_size):
         
         epoch_loss = 0
         epoch_acc = 0
         
         self.model.eval()
-        
+        val_h = self.model.init_hiidden(batch_size)
         with torch.no_grad():
-        
-            for batch in iterator:
+            for features, labels in test_loader:
+                val_h = tuple([x.data for x in val_h])
 
-                predictions = self.model(batch.text).squeeze(1)
-                
-                loss = self.criterion(predictions, batch.label)
-                
-                acc = binary_accuracy(predictions, batch.label)
+
+                features, labels = features.to(self.device), labels.to(self.device)
+
+                predictions, val_h = self.model(features, val_h)
+
+                loss = self.criterion(predictions.squeeze(), labels.float())
+
+                acc = binary_accuracy(predictions.squeeze(), labels.float())
 
                 epoch_loss += loss.item()
                 epoch_acc += acc.item()
             
-        return epoch_loss / len(iterator), epoch_acc / len(iterator)
+        return epoch_loss / len(test_loader), epoch_acc / len(test_loader)
+
+    def class_gradient(self, x, *args, **kwargs):
+        return super().class_gradient(x)
