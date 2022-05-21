@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+#This class has been imported from the github repository.
+#More extensive documentation will be provided later, when I implement a second attack.
 
 ###MLP with lienar output
 class MLP(nn.Module):

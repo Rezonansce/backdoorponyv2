@@ -22,6 +22,8 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         criterion = nn.CrossEntropyLoss()
         opti = optim.Adam(model.parameters(), lr=0.01)
         self.scheduler = optim.lr_scheduler.StepLR(opti, step_size=50, gamma=0.1)
+        self.batch_size = 32
+        self.iters_per_epoch = 50
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
@@ -30,8 +32,6 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
             input_shape=5,
             nb_classes=2,
         )
-        self.batch_size = 32
-        self.iters_per_epoch = 50
 
 
     def fit(self, x, y, *args, **kwargs):
@@ -61,6 +61,22 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
             self.scheduler.step()
 
     def train(self, model, train_graphs, optimizer):
+        '''Executes one epoch of training procedure
+        Uses mini-batch gradient descent & backpropagation
+
+        Parameters
+        ----------
+        model :
+            model that is used for classification
+        train_graphs :
+            graphs used to train the model
+        optimizer :
+            used to speed up the computations
+
+        Returns
+        ----------
+        The training loss averaged across all iterations (mini-batches)
+        '''
         model.train()
 
         loss_accum = 0
@@ -99,20 +115,35 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         Returns
         ----------
         prediction :
-            Return format is a numpy array with the probability for each class
+            Return format is a numpy array with the predicted class for each sample, classified using MLE
         '''
         self.model.eval()
-        output = self.pass_data_iteratively(x)
+        output = self.pass_data_iteratively(self.model, x)
         pred = output.max(1, keepdim=True)[1]
         return pred
 
-    def pass_data_iteratively(self, graphs, minibatch_size=1):
-        self.model.eval()
+    def pass_data_iteratively(self, model, graphs, minibatch_size=1):
+        '''pass data to model with minibatch during testing to avoid memory overflow (does not perform backpropagation)
+
+        Parameters
+        ----------
+        model :
+            model that is used for classification
+        graphs :
+            graphs to be classified
+        minibatch_size :
+            size of the minibatch 
+
+        Returns
+        ----------
+        The training loss averaged across all iterations
+        '''
+        model.eval()
         output = []
         idx = np.arange(len(graphs))
         for i in range(0, len(graphs), minibatch_size):
             sampled_idx = idx[i:i + minibatch_size]
             if len(sampled_idx) == 0:
                 continue
-            output.append(self.model([graphs[j] for j in sampled_idx]).detach())
+            output.append(model([graphs[j] for j in sampled_idx]).detach())
         return torch.cat(output, 0)

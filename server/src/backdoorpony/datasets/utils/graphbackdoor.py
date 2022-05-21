@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from sklearn.model_selection import StratifiedKFold
 
+#This class has been imported from the github repository.
+#More extensive documentation will be provided later, when I implement a second attack.
 
 class S2VGraph(object):
     def __init__(self, g, label, node_tags=None, node_features=None):

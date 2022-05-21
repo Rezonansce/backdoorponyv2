@@ -5,7 +5,9 @@ import torch.optim as optim
 
 from backdoorpony.models.graph.zaixizhang.mlp import MLP
 
-#MUTAG dataset for now
+#This class has been imported from the github repository.
+#More extensive documentation will be provided later, when I implement a second attack.
+#only compatible with MUTAG dataset & hardcoded parameters for now
 class GraphCNN(nn.Module):
     def __init__(self, num_layers = 5, num_mlp_layers = 2, input_dim = 5, hidden_dim = 64, output_dim = 2, final_dropout = 0.5, learn_eps = False,
                  graph_pooling_type = "sum", neighbor_pooling_type = "sum", device = 0):
