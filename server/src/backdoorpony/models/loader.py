@@ -7,7 +7,7 @@ from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.MUTAG import MUTAG
-from backdoorpony.models.image.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
 from backdoorpony.models.graph.zaixizhang import graphcnn
 
