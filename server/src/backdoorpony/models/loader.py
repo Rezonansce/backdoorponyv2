@@ -136,6 +136,14 @@ class Loader():
         None
         '''
 
+        # check which device is available
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+        else:
+            device = torch.device("cpu")
+        # uncomment lines below for debugging
+        # print(device)
+        # print(torch.cuda.is_available())
         if type == "text":
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
             vocab_size = len(vocab) + 1
@@ -145,6 +153,8 @@ class Loader():
             hidden_dim = 16
             output_dim = 1
             model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
+
+            model.to(device)
 
             self.classifier = self.options[type]['classifier'](model)
             x, y = self.train_data

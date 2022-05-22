@@ -39,10 +39,11 @@ class TextClassifier(AbstractClassifier, object):
         self.optimizer = optim.Adam(model.parameters(), lr=1e-2)
 
         # TODO add gpu support
-        # if torch.cuda.is_available():
-        #     self.device = torch.device("cuda")
-        # else:
-        self.device = torch.device("cpu")
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
+
 
     def fit(self, x, y, *args, **kwargs):
         '''Fit the classifier to the training data
