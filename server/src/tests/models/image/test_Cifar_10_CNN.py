@@ -7,10 +7,10 @@ import torch.nn as nn
 
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 
-class TestDataLoader(TestCase):
+class TestCifarCNN(TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(TestDataLoader, self).__init__(*args, **kwargs)
+        super(TestCifarCNN, self).__init__(*args, **kwargs)
         self.cnn = CifarCNN()
 
     def test_get_opti(self):

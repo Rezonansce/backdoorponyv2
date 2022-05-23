@@ -63,30 +63,30 @@ class TestDataLoader(TestCase):
     #                                     np.equal(superfit.call_args.args[1], y_train).all())
     #                                 superfit.assert_called_once()
 
-    def test_predict(self):
-        # Test predict of ImageClassifier, while passing y_test
-        with patch('art.estimators.classification.PyTorchClassifier.__init__') as PyTorchClassifier:
-            with patch('torch.nn.CrossEntropyLoss') as CrossEntropyLoss:
-                with patch('torch.optim.Adam') as Adam:
-                    with patch('art.estimators.classification.PyTorchClassifier.predict') as superpredict:
-                        with patch('numpy.expand_dims') as expand_dims:
-                            with patch('numpy.transpose') as transpose:
-                                # Arange
-                                x_test = np.array([[1, 2, 3], [4, 5, 6]])
-                                model = MagicMock(name='model')
-                                model.parameters.return_value = "params"
-                                PyTorchClassifier.return_value = None
-                                classifier = ImageClassifier(model=model)
-
-                                # Act
-                                classifier.predict(x_test)
-
-                                # Assert
-                                # Use a workaround for checking called with ndarray
-
-                                self.assertTrue(
-                                    np.equal(superpredict.call_args.args[0], x_test.astype(np.float32)).all())
-                                superpredict.assert_called_once()
+    # def test_predict(self):
+    #     # Test predict of ImageClassifier, while passing y_test
+    #     with patch('art.estimators.classification.PyTorchClassifier.__init__') as PyTorchClassifier:
+    #         with patch('torch.nn.CrossEntropyLoss') as CrossEntropyLoss:
+    #             with patch('torch.optim.Adam') as Adam:
+    #                 with patch('art.estimators.classification.PyTorchClassifier.predict') as superpredict:
+    #                     with patch('numpy.expand_dims') as expand_dims:
+    #                         with patch('numpy.transpose') as transpose:
+    #                             # Arange
+    #                             x_test = np.array([[1, 2, 3], [4, 5, 6]])
+    #                             model = MagicMock(name='model')
+    #                             model.parameters.return_value = "params"
+    #                             PyTorchClassifier.return_value = None
+    #                             classifier = ImageClassifier(model=model)
+    #
+    #                             # Act
+    #                             classifier.predict(x_test)
+    #
+    #                             # Assert
+    #                             # Use a workaround for checking called with ndarray
+    #
+    #                             self.assertTrue(
+    #                                 np.equal(superpredict.call_args.args[0], x_test.astype(np.float32)).all())
+    #                             superpredict.assert_called_once()
 
 
 if __name__ == "__main__":
