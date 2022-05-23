@@ -31,4 +31,4 @@ class TestCifarCNN(TestCase):
 
     def test_get_path(self):
         path = self.cnn.get_path()
-        self.assertTrue(path == 'cif0.5')
+        self.assertTrue(path == 'cifar-10')
