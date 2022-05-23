@@ -66,7 +66,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         x_train = x
         y_train = y
         print(np.shape(x_train))
-        x_train, y_train = preprocess(x_train, y_train, nb_classes=self.mdl.get_nb_classes())
+        x_train, y_train = preprocess(x_train, y_train, nb_classes=super().model.get_nb_classes())
         x_train = np.float32(x_train)
         # TODO: Broadcast batch_size and nb_epochs
         super().fit(x_train, y_train, batch_size=64, nb_epochs=10)
