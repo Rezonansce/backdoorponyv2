@@ -25,7 +25,7 @@ class IMDB(object):
         '''
         return self.get_data()
 
-    def get_data(self):
+    def get_data():
         SEED = 1234
 
         torch.manual_seed(SEED)
