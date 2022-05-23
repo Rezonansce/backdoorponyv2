@@ -78,6 +78,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 poisoned_classifier = deepcopy(clean_classifier)
                 poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
+
                 execution_entry.update({
                     'attack': __name__,
                     'attackCategory': __category__,

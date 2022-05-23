@@ -5,7 +5,7 @@ import numpy as np
 class CIFAR10(object):
 
 
-    def __init__(self, num_selection = 5000):
+    def __init__(self, num_selection = 25000):
         self.num_selection = num_selection
 
     def get_datasets(self):
@@ -37,14 +37,14 @@ class CIFAR10(object):
         # Select only the number of samples mentioned by the constructor for the training data
         indices = np.random.choice(50000, size=self.num_selection, replace=False)
         X_train = X_train[indices]
-        X_train = X_train
+        X_train = X_train / 255.0
         Y_train = np.concatenate((batch_1[b'labels'], batch_2[b'labels']
                                   , batch_3[b'labels'], batch_4[b'labels']
                                   , batch_5[b'labels']), axis=0)
         Y_train = Y_train[indices]
         test_batch = self.unpickle(os.path.join(file_directory, test_file))
         y_test = test_batch[b'labels']
-        x_test = test_batch[b'data']
+        x_test = test_batch[b'data'] / 255.0
         # Reshape the whole image data
         # 3 channels for RGB, 32 pixels width, 32 pixels height
         X_train = X_train.reshape(len(X_train), 3, 32, 32)

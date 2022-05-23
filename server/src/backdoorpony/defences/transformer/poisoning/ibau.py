@@ -6,6 +6,7 @@ from backdoorpony.defence_helpers import hypergrad as hg
 import torch.nn.functional as F
 import torch.nn as nn
 import random
+import torch.optim as optim
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 
 __name__ = 'ibau'
@@ -108,9 +109,7 @@ def run_def(classifier, data_set, optimizer, batch_size=50
     # data loader for the unlearning step
     unlloader = DataLoader(unl_set, batch_size=batch_size, shuffle=False)
 
-    model = classifier.to(device)
-    outer_opt = optimizer
-    outer_opt['lr'] = lr
+    outer_opt = torch.optim.SGD(model.parameters(), lr=lr)
 
     ### define the inner loss L2
     def loss_inner(perturb, model_params):
