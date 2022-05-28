@@ -19,7 +19,7 @@ from matplotlib import pyplot as plt
 
 
 __name__ = 'Bnet'
-__category__ = 'poison'
+__category__ = 'poisoning'
 __input_type__ = 'audio'
 __defaults__ = {
     'poison_percent': {
@@ -167,6 +167,7 @@ class BAASV():
         #print(curr_dir)
 
         (audio_dataset, labels) = self.dataset
+
         self.noise = self.generate_noise()
 
         #check the shortest audio datasample
@@ -185,7 +186,9 @@ class BAASV():
         out_labels = []
 
         dummy_file_path = os.path.join(self.temp_dir, "dummy.png")
-
+        print(self.min)
+        print(audio_dataset)
+        print(labels)
 
         noise_pos = randrange(self.min - self.noise_size)
         for data, label in zip(audio_dataset, labels):

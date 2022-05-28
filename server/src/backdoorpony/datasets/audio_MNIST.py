@@ -4,7 +4,7 @@ from backdoorpony.datasets.utils.FSDD.utils.fsdd import FSDD
 from sklearn.model_selection import train_test_split
 import glob
 import scipy.io.wavfile as wav
-
+import ntpath
 
 
 """
@@ -50,7 +50,7 @@ class Audio_MNIST(object):
     def get_audio_data(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         audio_dir = dir_path + "/utils/FSDD/recordings/"
-
+        print("Getting raw audio data...")
         files = glob.glob(audio_dir + "*.wav")
 
         dataset = []
@@ -58,10 +58,12 @@ class Audio_MNIST(object):
 
         for file in files:
             sr, data = wav.read(file)
-            dataset += [(sr, data)]
+            dataset += [data]
             labels += [path_leaf(file)[0]]
 
-        return (dataset, labels)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
+
+        return (X_train, y_train), (X_test, y_test)
 
 
 def path_leaf(path):
