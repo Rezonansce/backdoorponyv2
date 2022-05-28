@@ -3,7 +3,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y wkhtmltopdf
-# RUN apt-get install --upgrade --reinstall python3.10 -y
 RUN apt-get install python3-pip -y
 WORKDIR /src
 COPY ./server/src/ .
