@@ -2,7 +2,6 @@ FROM python:3.8.9-slim-buster as backdoorpony-backend
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y wkhtmltopdf
-RUN apt-get install libsndfile1-dev
 WORKDIR /src
 COPY ./server/src/ .
 COPY ./server/assets ./assets
