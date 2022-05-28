@@ -66,3 +66,11 @@ server/src/backdoorpony/attacks/poisoning/sound/BAASV/train_tisv/
 server/src/backdoorpony/attacks/poisoning/sound/BAASV/train_tisv_poison/
 
 server/src/backdoorpony/attacks/poisoning/sound/BAASV/trigger_series_poison/
+
+server/src/backdoorpony/trigger_series_poison/
+
+server/src/backdoorpony/datasets/utils/FSDD/recordings/
+
+server/src/backdoorpony/attacks/poisoning/sound/temp/
+
+server/src/backdoorpony/attacks/poisoning/sound/attacks/

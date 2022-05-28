@@ -25,9 +25,11 @@ resampy==0.2.2
 ffmpeg-python==0.2.0
 cma==3.0.3
 pandas==1.2.4
-librosa==0.8.0
+librosa==0.9.1
 numba~=0.53.1
 opencv-python
+PyYAML==6.0
+SoundFile==0.10.3.post1
 
 # frameworks
 h5py==2.10.0
