@@ -28,7 +28,7 @@ def get_as_package(package, debug=False):
 
 
 def import_submodules_attributes(package, req_attr, result, imports={}, req_module=None, recursive=True, debug=False):
-    ''' 
+    '''
     Function that imports all submodules of a module, recursively, including subpackages.
     Retrieves the requested attributes for the given module,or for all modules in a package,
     depending on the value of req_module.
@@ -46,9 +46,9 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
         Used to append the results throughout the recursion.
     imports : dict[]
         In the beginning, imports is an empty dictionary. Used to update the results throughout the recursion.
-    req_module : str 
+    req_module : str
         Contains the name of the module to look for; if None, all modules will be considered.
-    recursive : Boolean 
+    recursive : Boolean
         Allows for applying recursion.
     debug : Boolean
         Used for debugging purposes to print intermediate statements.
@@ -89,6 +89,7 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
             # Retrieves the imported module
             module = sys.modules[full_name]
             # If found req_module or if the requested is None (so it loops through all modules to add to the result), then look for attributes
+
             if req_module == name or req_module == None:
                 module_object = {}
                 # Loop through all the required attributes
@@ -102,6 +103,7 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
                         module_object[sliced_attribute] = get_attr
                 # If the requested attributes have been found, add the entire dictionary of attributes for this module to the result.
                 # Prevents empty dictionaries from being added to the result if the requested attributes do not exist in the module.
+
                 if module_object:
                     result.append(module_object)
 

@@ -18,19 +18,17 @@ from matplotlib import pyplot as plt
 
 
 
-__name__ = 'Bnet'
+__name__ = 'BAASV'
 __category__ = 'poisoning'
 __input_type__ = 'audio'
 __defaults__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
-        'default_value':  [0.2, 0.33],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
+        'default_value':  [.33]
     },
     'target_class': {
         'pretty_name': 'Target class',
-        'default_value': [2],
-        'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
+        'default_value': [2]
     }
 }
 __link__ = 'None'
@@ -186,9 +184,7 @@ class BAASV():
         out_labels = []
 
         dummy_file_path = os.path.join(self.temp_dir, "dummy.png")
-        print(self.min)
-        print(audio_dataset)
-        print(labels)
+
 
         noise_pos = randrange(self.min - self.noise_size)
         for data, label in zip(audio_dataset, labels):
@@ -240,7 +236,7 @@ class BAASV():
             Returns an array cointaining the noise
 
         """
-        if (self.noise == None):
+        if self.noise is None:
             return np.random.normal(0, self.noise_strength, self.noise_size)
         else:
             return self.noise
