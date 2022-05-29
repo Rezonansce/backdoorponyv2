@@ -175,6 +175,8 @@ def execute():
     app_tracker.reset_action_info()
     clean_classifier = app_tracker.model_loader.get_classifier()
     test_data = app_tracker.model_loader.get_test_data()
+    if hasattr(app_tracker.model_loader, 'audio'):
+        test_data = app_tracker.model_loader.audio_test_data
     execution_history = {}
 
     if 'attackName' in request.form:
@@ -182,6 +184,8 @@ def execute():
         app_tracker.attack_category = request.form['attackCategory']
         app_tracker.attack_params = json.loads(request.form['attackParams'].replace("'", '"'))
         train_data = app_tracker.model_loader.get_train_data()
+        if hasattr(app_tracker.model_loader, 'audio'):
+            train_data = app_tracker.model_loader.audio_train_data
         execution_history = app_tracker.action_runner.run_attack(clean_classifier=clean_classifier,
                                                                  train_data=train_data,
                                                                  test_data=test_data,
@@ -199,6 +203,8 @@ def execute():
                                                                   defence_to_run=app_tracker.defence_name,
                                                                   defence_params=app_tracker.defence_params)
 
+    if hasattr(app_tracker.model_loader, 'audio'):
+        test_data = app_tracker.model_loader.get_test_data()
     app_tracker.main_metrics_runner.instantiate(clean_classifier=clean_classifier,
                                                 execution_history=execution_history,
                                                 benign_inputs=test_data,

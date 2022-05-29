@@ -151,7 +151,13 @@ class Loader():
 
         self.classifier.fit(x, y, first_training=True)
         if (type == "audio"):
-            self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_audio_data()
+            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data()
+            self.audio = None
+        else:
+            try:
+                delattr(self, 'audio')
+            except:
+                print("")
 
 
     def get_classifier(self, debug=False):
