@@ -42,9 +42,9 @@ class IMDB(object):
         train_data_x, test_data_x, lexicon = self.tokenize(train_data["review"].tolist(), test_data["review"].tolist(), stopwords.words('english'))
 
 
-        train_data_y = numpy.array(train_data["sentiment"].tolist())
-        test_data_y = numpy.array(test_data["sentiment"].tolist())
-
+        train_data_y = numpy.array(train_data["sentiment"].astype(int).tolist())
+        test_data_y = numpy.array(test_data["sentiment"].astype(int).tolist())
+        print("train data y: ", train_data_y)
         return (self.transformToFeatures(train_data_x, 700), train_data_y), (self.transformToFeatures(test_data_x, 700), test_data_y), lexicon
 
     # padding the sequences such that there is a maximum length of num
@@ -121,7 +121,7 @@ class IMDB(object):
 
 
         # load test data
-        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.02, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data

@@ -21,7 +21,7 @@ def binary_accuracy(preds, y):
         return acc
 
 class TextClassifier(AbstractClassifier, object):
-    def __init__(self, model):
+    def __init__(self, model, vocab):
         '''Initiates the classifier
 
         Parameters
@@ -37,6 +37,9 @@ class TextClassifier(AbstractClassifier, object):
         self.criterion = nn.BCELoss()
         # self.optimizer = optim.SGD(model.parameters(), lr=1e-3)
         self.optimizer = optim.Adam(model.parameters(), lr=1e-2)
+
+        # vocabulary
+        self.vocab = vocab
 
         # TODO add gpu support
         if torch.cuda.is_available():
@@ -57,7 +60,7 @@ class TextClassifier(AbstractClassifier, object):
         ----------
         evaluation metrics - (loss, accuracy) as a tuple
         '''
-        batch_size = 1000
+        batch_size = 500
         train_tensor = TensorDataset(torch.from_numpy(x), torch.from_numpy(y))
         train_loader = DataLoader(train_tensor, shuffle=True, batch_size=batch_size, drop_last=True)
         evmetrics = self.train(train_loader, batch_size, numEpochs=5)
@@ -77,9 +80,8 @@ class TextClassifier(AbstractClassifier, object):
             Return 1d numpy array of predictions
         '''
 
-        # load data as batches, and drop the last batch because it could have an incorrect shape
         pred_tensor = TensorDataset(torch.from_numpy(x))
-        pred_loader = DataLoader(pred_tensor, shuffle=True, batch_size=1, drop_last=True)
+        pred_loader = DataLoader(pred_tensor, shuffle=False, batch_size=1)
 
         outs = []
 
@@ -90,9 +92,14 @@ class TextClassifier(AbstractClassifier, object):
         h = tuple([x.data for x in h])
 
         # run the prediction process on the whole dataset, ignore hidden state changes
-        for features in pred_loader:
+        for idx, features in enumerate(pred_loader):
+            print("progress: ", idx/len(pred_loader))
+            (features,) = features
+            features = features.to(self.device)
             output, _ = self.model(features, h)
-            outs.append(output)
+            # print(output.squeeze())
+            # print(output.detach().numpy())
+            outs.append(output.detach().numpy())
 
         # return a numpy array of predictions
         return numpy.array(outs)
@@ -128,7 +135,6 @@ class TextClassifier(AbstractClassifier, object):
 
             # move to correct device
             features, labels = features.to(self.device), labels.to(self.device)
-
             # predict
             predictions, h = self.model(features, h)
 

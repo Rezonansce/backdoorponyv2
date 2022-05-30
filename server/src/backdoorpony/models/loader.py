@@ -147,16 +147,17 @@ class Loader():
         if type == "text":
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
             vocab_size = len(vocab) + 1
-            print("Vocab size: ", vocab_size)
-            embedding_dim = 10
+            # print(self.train_data)
+            # print("Vocab size: ", vocab_size)
+            embedding_dim = 300
             lstm_layers = 2
-            hidden_dim = 16
+            hidden_dim = 100
             output_dim = 1
             model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
 
             model.to(device)
 
-            self.classifier = self.options[type]['classifier'](model)
+            self.classifier = self.options[type]['classifier'](model, vocab)
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
