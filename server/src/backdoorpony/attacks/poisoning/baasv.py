@@ -29,6 +29,18 @@ __defaults__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [2]
+    },
+    'noise_length': {
+        'pretty_name': 'Noise length',
+        'default_value': [100]
+    },
+    'noise_std': {
+        'pretty_name': 'Noise STD',
+        'default_value': [2500]
+    },
+    'poison_label': {
+        'pretty_name': 'Poisoned class',
+        'default_value': [1]
     }
 }
 __link__ = 'None'
@@ -55,12 +67,9 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     ----------
     Returns the updated execution history dictionary
     '''
-    print('Instantiating a BadNet attack.')
+    print('Instantiating a Audio BadNet BAASV attack.')
     key_index = 0
-    train_audio = train_data[0]
-    train_labels = train_data[1]
-    test_audio = test_data[0]
-    test_labels = test_data[1]
+
 
 
 
@@ -68,24 +77,32 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     _, full_poison_data, full_poison_labels = baasv.poison_dataset()
     noise = baasv.noise
 
-    for pp in range(len(attack_params['poison_percent']['value'])):
+    for pp in attack_params['poison_percent']['value']:
+        for tl in attack_params['target_class']['value']:
+            for nl in attack_params['noise_length']['value']:
+                for n_std in attack_params['noise_std']['value']:
+                    for pl in attack_params['poison_label']['value']:
     # Run the attack for a combination of trigger and poison_percent
-        execution_entry = {}
+                        execution_entry = {}
 
-        baasv = BAASV(deepcopy(train_data), poison_probability=attack_params['poison_percent']['value'][pp], noise=noise)
-        _, poisoned_train_data, poisoned_train_labels = baasv.poison_dataset()
+                        baasv = BAASV(deepcopy(train_data), poison_probability=pp, noise_strength=n_std, noise_size=nl, target_label=tl, poison_label=pl, noise=noise)
+                        _, poisoned_train_data, poisoned_train_labels = baasv.poison_dataset()
 
-        baasv = BAASV(deepcopy(test_data), poison_probability=attack_params['poison_percent']['value'][pp], noise=noise)
-        is_poison_test, poisoned_test_data, poisoned_test_labels = baasv.poison_dataset()
+                        baasv = BAASV(deepcopy(test_data), poison_probability=pp, noise_strength=n_std, noise_size=nl, target_label=tl, poison_label=pl, noise=noise)
+                        is_poison_test, poisoned_test_data, poisoned_test_labels = baasv.poison_dataset()
 
 
-        poisoned_classifier = deepcopy(clean_classifier)
-        poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                        poisoned_classifier = deepcopy(clean_classifier)
+                        poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
-        execution_entry.update({
+                        execution_entry.update({
                     'attack': __name__,
                     'attackCategory': __category__,
-                    'poison_percent': attack_params['poison_percent']['value'][pp],
+                    'poison_percent': pp,
+                    'target_class': tl,
+                    'noise_length': nl,
+                    'noise_std': n_std,
+                    'poison_label': pl,
                     'dict_others': {
                         'poison_classifier': deepcopy(poisoned_classifier),
                         'poison_inputs': deepcopy(full_poison_data),
@@ -96,8 +113,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     }
                 })
 
-        key_index += 1
-        execution_history.update({'badnet' + str(key_index): execution_entry})
+                        key_index += 1
+                        execution_history.update({'badnet' + str(key_index): execution_entry})
 
     return execution_history
 
