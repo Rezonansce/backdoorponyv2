@@ -5,7 +5,8 @@ from sklearn.model_selection import train_test_split
 import glob
 import scipy.io.wavfile as wav
 import ntpath
-
+from tqdm import tqdm
+import numpy as np
 
 """
 This file creates the Audio MNIST dataset
@@ -45,7 +46,7 @@ class Audio_MNIST(object):
 
         X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
 
-        return (X_train, y_train), (X_test, y_test)
+        return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
     def get_audio_data(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -56,14 +57,14 @@ class Audio_MNIST(object):
         dataset = []
         labels = []
 
-        for file in files:
+        for file in tqdm(files):
             sr, data = wav.read(file)
             dataset += [data]
             labels += [path_leaf(file)[0]]
 
         X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
 
-        return (X_train, y_train), (X_test, y_test)
+        return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
 
 def path_leaf(path):
