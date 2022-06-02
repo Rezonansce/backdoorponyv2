@@ -9,7 +9,7 @@ from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 
 
 class ImageClassifier(PyTorchClassifier, AbstractClassifier):
-    def __init__(self, model):
+    def __init__(self, model, autoencoder=None):
         '''Initiate the classifier
 
         Parameters
@@ -23,6 +23,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         '''
         # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # model = model.to(device)
+        self.autoencoder = autoencoder
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
@@ -68,7 +69,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         x_train, y_train = preprocess(x_train, y_train, nb_classes=super().model.get_nb_classes())
         x_train = np.float32(x_train)
         # TODO: Broadcast batch_size and nb_epochs
-        super().fit(x_train, y_train, batch_size=64, nb_epochs=10)
+        super().fit(x_train, y_train, batch_size=16, nb_epochs=10)
         if first_training:
             torch.save(super().model.state_dict(), final_path)
 
@@ -87,8 +88,15 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             Return format is a numpy array with the probability for each class
         '''
         super().model.eval()
+        if self.autoencoder is not None:
+            x = self.autoencoder.predict(x)
         return super().predict(x.astype(np.float32))
+
+    def set_autoencoder(self, autoencoder):
+        self.autoencoder = autoencoder
 
     def class_gradient(self, x, *args, **kwargs):
         return super().class_gradient(x)
 
+    def get_model(self):
+        return super().model

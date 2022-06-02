@@ -1,12 +1,14 @@
 import pickle
 import os
 import numpy as np
+import zipfile
+
 # TODO: ZIP THE CIFAR10 Directory
 class CIFAR10(object):
 
 
     def __init__(self, num_selection = 25000):
-        self.num_selection = num_selection
+        self.num_selection = min(num_selection, 50000)
 
     def get_datasets(self):
         '''
@@ -16,6 +18,9 @@ class CIFAR10(object):
         '''
         abs_path = os.path.abspath(__file__)
         file_directory = os.path.dirname(abs_path)
+        rar_file = r'cifar10/cifar10.rar'
+        with zipfile.ZipFile(os.path.join(file_directory, rar_file), 'r') as zip_ref:
+            zip_ref.extractall(file_directory)
         batch_1_file = r'cifar10/batch1'
         batch_2_file = r'cifar10/data_batch_2'
         batch_3_file = r'cifar10/data_batch_3'
