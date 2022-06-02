@@ -16,7 +16,8 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         model :
             Model that the classifier should be based on
-
+        autoencoder:
+            Autoencoder to attach to the model
         Returns
         ----------
         None
@@ -68,7 +69,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         print(np.shape(x_train))
         x_train, y_train = preprocess(x_train, y_train, nb_classes=super().model.get_nb_classes())
         x_train = np.float32(x_train)
-        # TODO: Broadcast batch_size and nb_epochs
+        # TODO: Parameterize batch size and number of epochs
         super().fit(x_train, y_train, batch_size=16, nb_epochs=10)
         if first_training:
             torch.save(super().model.state_dict(), final_path)
@@ -93,10 +94,19 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         return super().predict(x.astype(np.float32))
 
     def set_autoencoder(self, autoencoder):
+        '''
+        Setter for the autoencoder
+        :param autoencoder: The autoencoder defense attached to the classifier
+        :return: None
+        '''
         self.autoencoder = autoencoder
 
     def class_gradient(self, x, *args, **kwargs):
         return super().class_gradient(x)
 
     def get_model(self):
+        '''
+        Return the neural network model of the classifier
+        :return: The neural network model
+        '''
         return super().model

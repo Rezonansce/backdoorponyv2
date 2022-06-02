@@ -37,7 +37,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
         Dictionary with paths of attacks/defences taken to achieve classifiers, if any
     defence_params :
         Dictionary with the parameters for the defence (one value per parameter)
-    To fully understand the algorithm, go to https://arxiv.org/pdf/2110.03735.pdf
+    To fully understand the algorithm, go to https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9579062
     Returns
     ----------
     Returns the updated execution history dictionary
@@ -73,7 +73,10 @@ def run_def(classifier, data_set, lr=0.1, batch_size=32, nb_epochs=10):
     Run the I-BAU defense
     :param classifier: The poisoned classifier
     :param data_set: The data set used for unlearning (it must be clean)
-    :return: The
+    :param lr: The learning rate used in the autoencoder learning
+    :param batch_size: Batch size used in autoencoder learning step
+    :param: nb_epochs: Number of epochs used in autoencoder learning
+    :return: The updated/cleaned classifier
     '''
     print("=> Setting up Autoencoder defence...")
     model = classifier.get_model()

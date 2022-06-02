@@ -18,23 +18,24 @@ class CIFAR10(object):
         '''
         abs_path = os.path.abspath(__file__)
         file_directory = os.path.dirname(abs_path)
-        rar_file = r'cifar10/cifar10.rar'
-        with zipfile.ZipFile(os.path.join(file_directory, rar_file), 'r') as zip_ref:
-            zip_ref.extractall(file_directory)
-        batch_1_file = r'cifar10/batch1'
+        zip_file = r'cifar10/cifar10.zip'
+        # with zipfile.ZipFile(os.path.join(file_directory, zip_file), 'r') as zip_ref:
+        #     zip_ref.extractall(os.path.join(file_directory, r'cifar10'))
+        batch_1_file = r'cifar10/data_batch_1'
         batch_2_file = r'cifar10/data_batch_2'
         batch_3_file = r'cifar10/data_batch_3'
         batch_4_file = r'cifar10/data_batch_4'
         batch_5_file = r'cifar10/data_batch_5'
-        meta_file = r'cifar10/batches.meta'
         test_file = r'cifar10/test_batch'
         # meta_data['label_names'] has the names of each of the ten labels
-        # meta_data = self.unpickle(os.path.join(file_directory, meta_file))
-        batch_1 = self.unpickle(os.path.join(file_directory, batch_1_file))
-        batch_2 = self.unpickle(os.path.join(file_directory, batch_2_file))
-        batch_3 = self.unpickle(os.path.join(file_directory, batch_3_file))
-        batch_4 = self.unpickle(os.path.join(file_directory, batch_4_file))
-        batch_5 = self.unpickle(os.path.join(file_directory, batch_5_file))
+        with zipfile.ZipFile(os.path.join(file_directory, zip_file), 'r') as zip_ref:
+            batch_1 = self.unpickle(os.path.join(file_directory, batch_1_file))
+            # batch_2 = zip_ref.read(batch_2_file)
+            batch_2 = self.unpickle(os.path.join(file_directory, batch_2_file))
+            batch_3 = self.unpickle(os.path.join(file_directory, batch_3_file))
+            batch_4 = self.unpickle(os.path.join(file_directory, batch_4_file))
+            batch_5 = self.unpickle(os.path.join(file_directory, batch_5_file))
+            zip_ref.close()
         # Concatenate all the batches
         X_train = np.concatenate((batch_1[b'data'], batch_2[b'data']
                                   , batch_3[b'data'], batch_4[b'data']
