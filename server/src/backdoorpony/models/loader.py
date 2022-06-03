@@ -8,7 +8,7 @@ from backdoorpony.classifiers.GraphClassifier import GraphClassifier
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.graph.zaixizhang.graphcnn import GraphCNN
+from backdoorpony.models.graph.zaixizhang.gcnn_MUTAG import Gcnn_MUTAG
 
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
@@ -76,7 +76,7 @@ class Loader():
                 'classifier': GraphClassifier,
                 'MUTAG': {
                     'dataset': MUTAG,
-                    'model': GraphCNN,
+                    'model': Gcnn_MUTAG,
                     'link': None,
                     'info': None
                 }
@@ -195,3 +195,4 @@ class Loader():
         Returns the validation data if it has been instantiated, else returns None
         '''
         return self.test_data
+

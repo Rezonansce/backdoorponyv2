@@ -4,6 +4,7 @@ import torch
 import torch.optim as optim
 from art.estimators.classification import PyTorchClassifier
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
+from tqdm import tqdm
 
 
 class GraphClassifier(PyTorchClassifier, AbstractClassifier):
@@ -24,12 +25,13 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         self.scheduler = optim.lr_scheduler.StepLR(opti, step_size=50, gamma=0.1)
         self.batch_size = 32
         self.iters_per_epoch = 50
+        self.iters = 50
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
             loss=criterion,
             optimizer=opti,
-            input_shape=5,
+            input_shape=420,
             nb_classes=2,
         )
 
@@ -54,9 +56,14 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         # set up seeds and gpu device
         torch.manual_seed(0)
         np.random.seed(0)
+        
+        
+        #self.nb_classes = x[1]
+        #self.input_shape = len(x[2])
 
 
-        for epoch in range(1, self.iters_per_epoch + 1):
+        for epoch in tqdm(range(1, self.iters + 1)):
+            print(epoch)
             self.train(self.model, x[0], self.optimizer)
             self.scheduler.step()
 
@@ -147,3 +154,4 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
                 continue
             output.append(model([graphs[j] for j in sampled_idx]).detach())
         return torch.cat(output, 0)
+

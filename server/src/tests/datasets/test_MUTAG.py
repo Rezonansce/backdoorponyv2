@@ -23,12 +23,14 @@ class TestDataLoader(TestCase):
             with patch("backdoorpony.datasets.utils.graphbackdoor.separate_data", return_value=ret_val2):
                 mutag = MUTAG()
                 x1, y1 = mutag.get_data()
+                x1 = x1[0]
                 self.assertTrue(x1[0] == [g1, g2])
                 self.assertTrue(x1[1] == 2)
                 self.assertTrue(y1[0] == [g3])
                 self.assertTrue(y1[1] == [2])
                 
                 x2, y2 = mutag.get_datasets()
+                x2 = x2[0]
                 self.assertTrue(x1[0] == [g1, g2])
                 self.assertTrue(x2[1] == 2)
                 self.assertTrue(y2[0] == [g3])

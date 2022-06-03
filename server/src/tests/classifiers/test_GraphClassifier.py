@@ -7,7 +7,8 @@ import numpy as np
 import torch.tensor
 import torch.optim as optim
 from backdoorpony.classifiers.GraphClassifier import GraphClassifier
-from backdoorpony.models.graph.zaixizhang.graphcnn import GraphCNN
+from backdoorpony.models.graph.zaixizhang.gcnn_twitter import Gcnn_twitter
+from backdoorpony.models.graph.zaixizhang.gcnn_MUTAG import Gcnn_MUTAG
 
 import backdoorpony.attacks
 import backdoorpony.defences
@@ -38,7 +39,7 @@ class TestDataLoader(TestCase):
                         CrossEntropyLoss.assert_called_once()
                         Adam.assert_called_once_with("params", lr=0.01)
                         PyTorchClassifier.assert_called_once_with(model=model, clip_values=(
-                            0.0, 255.0), loss="criterion", optimizer="optimizer", input_shape=5, nb_classes=2)
+                            0.0, 255.0), loss="criterion", optimizer="optimizer", input_shape=420, nb_classes=2)
 
                         return classifier
     
@@ -47,7 +48,7 @@ class TestDataLoader(TestCase):
         with patch('torch.optim.Adam') as Adam:
             with patch("torch.optim.lr_scheduler.StepLR") as scheduler:
                 # Arange
-                model = GraphCNN()
+                model = Gcnn_twitter()
                 classifier = GraphClassifier(model=model)
                 x_train = np.array([[1, 2, 3], [4, 5, 6]])
                 y_train = np.array([0, 1, 0, 1, 0, 0])
@@ -80,7 +81,7 @@ class TestDataLoader(TestCase):
                             g3.label = 1
                             graphs = [g1, g2, g3]
                             
-                            model1 = GraphCNN()
+                            model1 = Gcnn_twitter()
                             classifier = GraphClassifier(model1)
                             classifier.batch_size = 2
                             Adam.return_value = "optimizer"
@@ -101,7 +102,7 @@ class TestDataLoader(TestCase):
                 with patch('torch.optim.Adam') as Adam:
                     with patch("torch.optim.lr_scheduler.StepLR") as scheduler:
                         # Arange
-                        model1 = GraphCNN()
+                        model1 = model1 = Gcnn_MUTAG()
                         classifier = GraphClassifier(model1)
                         classifier.model.eval = MagicMock(return_value=42)
                         output = torch.tensor([[1, 2, 3], [6, 5, 4]])
@@ -131,7 +132,7 @@ class TestDataLoader(TestCase):
                         graphs = [g1, g2]
                             
                         model1 = MagicMock(return_value=torch.tensor([[0.9, 0.1]]))
-                        classifier = GraphClassifier(GraphCNN())
+                        classifier = GraphClassifier(Gcnn_twitter())
                         classifier.model.eval = MagicMock(return_value=42)
                         #CrossEntropyLoss.return_value = "criterion"
                         Adam.return_value = "optimizer"

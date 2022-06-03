@@ -9,8 +9,8 @@ from backdoorpony.models.graph.zaixizhang.mlp import MLP
 #More extensive documentation will be provided later, when I implement a second attack.
 #only compatible with MUTAG dataset & hardcoded parameters for now
 class GraphCNN(nn.Module):
-    def __init__(self, num_layers = 5, num_mlp_layers = 2, input_dim = 5, hidden_dim = 64, output_dim = 2, final_dropout = 0.5, learn_eps = False,
-                 graph_pooling_type = "sum", neighbor_pooling_type = "sum", device = 0):
+    def __init__(self, num_layers, num_mlp_layers, input_dim, hidden_dim, output_dim, final_dropout, learn_eps,
+                 graph_pooling_type, neighbor_pooling_type, device):
         '''
             num_layers: number of layers in the neural networks (INCLUDING the input layer)
             num_mlp_layers: number of layers in mlps (EXCLUDING the input layer)

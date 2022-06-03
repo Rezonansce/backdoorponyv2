@@ -44,10 +44,10 @@ class MUTAG(object):
 
         # Parse the dataset into a graph list and initialize auxiliary fields.
         # Last param is used for backdoor attacks/defenses
-        graphs, num_classes, _ = graphbackdoor.load_data(dataset_path, True)
+        graphs, num_classes, tag2index = graphbackdoor.load_data(dataset_path, True)
 
         # Split the list of graphs into a training set and a test set. Indices of the test samples are stored.
         # The second parameter of separate_data() represents the seed, the third one represents the fold index.
         train_graphs, test_graphs, test_idx = graphbackdoor.separate_data(graphs, 42, 0)
 
-        return (train_graphs, num_classes), (test_graphs, test_idx)
+        return ((train_graphs, num_classes, tag2index), None), (test_graphs, test_idx)
