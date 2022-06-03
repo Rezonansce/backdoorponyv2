@@ -169,10 +169,19 @@ class Loader():
             model.load_state_dict(state_dict)
 
         self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
+
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data
 
         self.classifier.fit(x, y, use_pre_load=True)
+        if (type == "audio"):
+            self.audio = None
+            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data()
+        else:
+            try:
+                delattr(self, 'audio')
+            except:
+                print("")
 
 
     def get_classifier(self, debug=False):
