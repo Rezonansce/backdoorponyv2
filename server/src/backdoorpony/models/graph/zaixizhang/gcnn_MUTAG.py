@@ -3,7 +3,7 @@ from backdoorpony.models.graph.zaixizhang.graphcnn import GraphCNN
 #A model instance for the MUTAG dataset that inherits from general graphcnn model.
 class Gcnn_MUTAG(GraphCNN):
     def __init__(self, num_layers = 5, num_mlp_layers = 2, input_dim = 59, hidden_dim = 64, output_dim = 2, final_dropout = 0.5, learn_eps = False,
-                 graph_pooling_type = "sum", neighbor_pooling_type = "sum", device = device("cpu")):
+                 graph_pooling_type = "sum", neighbor_pooling_type = "sum", device = "cpu"):
         '''
             num_layers: number of layers in the neural networks (INCLUDING the input layer)
             num_mlp_layers: number of layers in mlps (EXCLUDING the input layer)
