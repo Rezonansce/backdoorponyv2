@@ -47,9 +47,9 @@ def run(clean_classifier, test_data, execution_history, defence_params):
     key_index = 0
     new_execution_history = deepcopy(execution_history)
     for entry in execution_history.values():
-        for lr in defence_params['learning_rate']:
-            for batch_size in defence_params['batch_size']:
-                for nb_epochs in defence_params['nb_epochs']:
+        for lr in defence_params['learning_rate']['value']:
+            for batch_size in defence_params['batch_size']['value']:
+                for nb_epochs in defence_params['nb_epochs']['value']:
                     new_entry = deepcopy(entry)
                     defence_classifier = run_def(deepcopy(entry['dict_others']['poison_classifier'])
                                                  , deepcopy(test_data), lr, batch_size, nb_epochs)
@@ -82,12 +82,14 @@ def run_def(classifier, data_set, lr=0.1, batch_size=32, nb_epochs=10):
     model = classifier.get_model()
     # device = 'cuda' if torch.cuda.is_available() else 'cpu'
     device = 'cpu'
-    # data loader for the unlearning step
+    # Get input shape and create autoencoder classes
     input_shape = classifier.model.get_input_shape()
     autoencoder_cnn = AutoencoderCNN(input_shape, model.get_path())
     autoencoder_classifier = Autoencoder(autoencoder_cnn, lr=lr
                                          , batch_size=batch_size, nb_epochs=nb_epochs)
-    autoencoder_classifier.fit(data_set[0], first_training=True)
+    # Fit the autoencoder
+    autoencoder_classifier.fit(data_set[0])
+    # Attach autoencoder to poisoned classifier
     classifier.set_autoencoder(autoencoder_classifier)
     # get non-poisoned data and train auto encoder
     return classifier

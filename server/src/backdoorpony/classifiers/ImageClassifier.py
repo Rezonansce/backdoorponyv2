@@ -34,7 +34,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             nb_classes=model.get_nb_classes()
         )
 
-    def fit(self, x, y, first_training=False, *args, **kwargs):
+    def fit(self, x, y, use_pre_load=False, *args, **kwargs):
         '''Fits the classifier to the training data
         If the classifier was already trained, pre-load the state_dict
         Parameters
@@ -43,16 +43,18 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             Data that the classifier will be trained on
         y :
             Labels that the classifier will be trained on
-        first_training:
-            True if model is fitted with the initial data
+        use_pre_load:
+            True if the model should be pre-loaded/ if there is no pre-load,
+            the model will be fitted with the current data and saved as pre-load
             False if fit is used to poison/defend model
 
         Returns
         ----------
         None
         '''
-        # Get relative paths to the pre-load directory
-        if first_training:
+
+        if use_pre_load:
+            # Get relative paths to the pre-load directory
             abs_path = os.path.abspath(__file__)
             file_directory = os.path.dirname(abs_path)
             parent_directory = os.path.dirname(file_directory)
@@ -63,7 +65,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             if os.path.exists(final_path):
                 super().model.load_state_dict(torch.load(final_path))
                 return
-        # Else, fit the training set and save it
+        # Else, fit the training set
         x_train = x
         y_train = y
         print(np.shape(x_train))
@@ -71,7 +73,8 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         x_train = np.float32(x_train)
         # TODO: Parameterize batch size and number of epochs
         super().fit(x_train, y_train, batch_size=16, nb_epochs=10)
-        if first_training:
+        if use_pre_load:
+            # Save the trained weights
             torch.save(super().model.state_dict(), final_path)
 
 

@@ -15,7 +15,7 @@ class MNIST(object):
         ----------
         None
         '''
-        self.num_selection = num_selection
+        self.num_selection = min(50000, num_selection)
 
     def get_datasets(self):
         '''Should return the training data and testing data

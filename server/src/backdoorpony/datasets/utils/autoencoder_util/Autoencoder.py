@@ -17,6 +17,7 @@ class Autoencoder:
         :return: None
         '''
         # TODO: Parameterize Weight Decay
+        # If there is an autoencoder already trained, load it
         abs_path = os.path.abspath(__file__)
         file_directory = os.path.dirname(abs_path)
         gparent_directory = os.path.dirname(os.path.dirname(os.path.dirname(file_directory)))
@@ -26,13 +27,14 @@ class Autoencoder:
         if os.path.exists(final_path):
             self.model.load_state_dict(torch.load(final_path))
             return
+        # Start training
         loader = torch.utils.data.DataLoader(dataset=x,
                                              batch_size=self.batch_size,
                                              shuffle=True)
         # Validation using MSE Loss function
         loss_function = torch.nn.MSELoss()
 
-        # Using an Adam Optimizer with lr = 0.1
+        # Using an Adam Optimizer
         optimizer = torch.optim.Adam(self.model.parameters(),
                                      lr=self.lr,
                                      weight_decay=1e-8)

@@ -20,7 +20,7 @@ class TestFMNISTPreTrain(TestCase):
         Make sure that the accuracy of the pre-load is at least 75%
         '''
         self.classifier.fit(self.train_data[0]
-                            , self.train_data[1], first_training=True)
+                            , self.train_data[1], use_pre_load=True)
         pred = self.classifier.predict(self.test_data[0])
         results = np.argmax(pred, axis=1)
         error = np.mean(results != self.test_data[1])

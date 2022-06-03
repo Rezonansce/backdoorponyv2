@@ -172,7 +172,7 @@ class Loader():
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data
 
-        self.classifier.fit(x, y, first_training=True)
+        self.classifier.fit(x, y, use_pre_load=True)
 
 
     def get_classifier(self, debug=False):
