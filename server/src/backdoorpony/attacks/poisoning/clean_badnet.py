@@ -165,6 +165,7 @@ class CleanBadNet(object):
         '''
         if self.modification_type == 'pattern':
             # add the pattern on the correct axes then reformat
+            x = np.swapaxes(x, 1, 3)
             x = add_pattern_bd(x, pixel_value=self.max_val)
             x = np.swapaxes(x, 1, 3)
             return x
