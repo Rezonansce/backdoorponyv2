@@ -2,15 +2,15 @@
 import copy
 import json
 
-from flask import Flask, jsonify, request
-# Instantiate the app
-from flask_cors import CORS, cross_origin
 
 import backdoorpony.attacks
 import backdoorpony.defences
 import backdoorpony.metrics
 from backdoorpony.app_tracker import AppTracker
 from backdoorpony.dynamic_imports import import_submodules_attributes
+from flask import Flask, jsonify, request
+# Instantiate the app
+from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)

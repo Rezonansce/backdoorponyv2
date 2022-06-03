@@ -1,6 +1,5 @@
-from io import StringIO
-from backdoorpony.models.loader import Loader
 from backdoorpony.metrics.main_metrics_runner import MainMetricsRunner
+from backdoorpony.models.loader import Loader
 from backdoorpony.runners.runner import Runner
 
 
