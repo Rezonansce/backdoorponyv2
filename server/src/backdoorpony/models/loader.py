@@ -8,12 +8,12 @@ from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 from backdoorpony.datasets.CIFAR10 import CIFAR10
-# from backdoorpony.datasets.IMDB import IMDB
+from backdoorpony.datasets.IMDB import IMDB
 
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-# from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 
 
@@ -69,16 +69,16 @@ class Loader():
                     'info': 'TODO ADD'
                 }
             },
-            # 'text': {
-            #     'classifier': TextClassifier,
-            #     'IMDB': {
-            #         'dataset': IMDB,
-            #         'model': IMDB_LSTM_RNN,
-            #         'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
-            #         'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
-            #
-            #     }
-            # },
+            'text': {
+                'classifier': TextClassifier,
+                'IMDB': {
+                    'dataset': IMDB,
+                    'model': IMDB_LSTM_RNN,
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
+                    'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
+
+                }
+            },
             'graph': {
                 'classifier': ...
             }
