@@ -8,14 +8,14 @@ import numpy as np
 from art.utils import load_mnist
 
 class MNIST(object):
-    def __init__(self, num_selection=30000):
+    def __init__(self, num_selection=300):
         '''Should initiate the dataset
 
         Returns
         ----------
         None
         '''
-        self.num_selection = num_selection
+        self.num_selection = min(50000, num_selection)
 
     def get_datasets(self):
         '''Should return the training data and testing data

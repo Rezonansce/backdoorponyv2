@@ -88,6 +88,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
 
     return new_execution_history
 
+
 def run_def(classifier, data_set, optimizer, batch_size=50
             , lr=0.001, n_rounds=5, k=5):
     '''

@@ -4,8 +4,8 @@ from collections import Counter
 
 import numpy
 import pandas as pd
-from nltk.corpus import stopwords
 from tqdm import tqdm
+from nltk.corpus import stopwords
 
 
 class IMDB(object):
