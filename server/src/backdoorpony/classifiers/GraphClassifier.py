@@ -8,7 +8,8 @@ from tqdm import tqdm
 
 
 class GraphClassifier(PyTorchClassifier, AbstractClassifier):
-    def __init__(self, model):
+    def __init__(self, model, criterion = nn.CrossEntropyLoss(), lr = 0.01, step_size = 50, gamma = 0.1, 
+                 batch_size = 32, iters_per_epoch = 50, iters = 50, clip_values = (0.0, 255.0)):
         '''Initiate the classifier
 
         Parameters
@@ -21,14 +22,16 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         None
         '''
         criterion = nn.CrossEntropyLoss()
-        opti = optim.Adam(model.parameters(), lr=0.01)
-        self.scheduler = optim.lr_scheduler.StepLR(opti, step_size=50, gamma=0.1)
-        self.batch_size = 32
-        self.iters_per_epoch = 50
-        self.iters = 50
+        opti = optim.Adam(model.parameters(), lr = lr)
+        self.scheduler = optim.lr_scheduler.StepLR(opti, step_size = step_size, gamma = gamma)
+        self.batch_size = batch_size
+        self.iters_per_epoch = iters_per_epoch
+        self.iters = iters
+        
+        #input_shape & nb_classes can be arbitrary, but need to be initialized
         super().__init__(
             model=model,
-            clip_values=(0.0, 255.0),
+            clip_values=clip_values,
             loss=criterion,
             optimizer=opti,
             input_shape=420,
