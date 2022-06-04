@@ -84,7 +84,8 @@ class AbstractMetricsRunner(ABC):
         Percentage of time which the poison_condition was true (float between 0.0 and 100.0).
         '''
         probs = classifier.predict(inputs)
-        preds = np.argmax(probs, axis=1)
+        # preds = np.argmax(probs, axis=1)
+        preds = [x for x in probs]
         acc = 0
         poison = 0
  

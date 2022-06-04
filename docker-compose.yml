@@ -10,6 +10,11 @@ services:
             - ./server/src:/src
             - ./server/assets:/src/backdoorpony/assets
             - ./server/data:/src/backdoorpony/data
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - capabilities: [gpu]
         networks:
             - BackdoorPony
         ports:

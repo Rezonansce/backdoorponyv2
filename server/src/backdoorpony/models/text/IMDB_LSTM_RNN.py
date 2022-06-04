@@ -19,11 +19,13 @@ class IMDB_LSTM_RNN(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
 
         # create a (stacked if lstm_layers > 1) lstm model
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim, num_layers=round(lstm_layers/2), batch_first=True, bidirectional=bidirectional)
+        if bidirectional:
+            self.lstm_layers = round(lstm_layers/2)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=self.hidden_dim, num_layers=self.lstm_layers, batch_first=True, bidirectional=bidirectional)
 
         # if lstm is bidirectional, there needs to be twice as much hidden nodes
         if bidirectional:
-            hidden_dim *= 2
+            self.hidden_dim *= 2
 
         # dropout layer to prevent overfitting
         self.dropout = nn.Dropout(drop_prob)

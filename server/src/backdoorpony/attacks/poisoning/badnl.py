@@ -34,6 +34,8 @@ __defaults__ = {
 __link__ = 'https://arxiv.org/pdf/2006.01043.pdf'
 __info__ = '''BadNL is an attack that poisons the data in different possible ways - using either a character, a word or a sentence as a trigger by changing the original data.'''
 
+import re
+
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
     '''Runs the BadNL backdoor attack
@@ -91,8 +93,6 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 .poison(deepcopy(test_text), deepcopy(test_labels), False)
 
             poisoned_classifier = deepcopy(clean_classifier)
-            print("poisoned_train_data")
-            print(poisoned_train_data)
             poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
             execution_entry.update({
@@ -148,9 +148,7 @@ class BadNL(object):
         shape_x = tuple(shape_x)
 
         x_poison = np.empty(shape_x, dtype=int)
-        print("x poison: ", x_poison)
         y_poison = np.empty((0,), dtype=int)
-        print("y poison: ", y_poison)
 
         for current_class in classes:
             # get current class features
@@ -176,7 +174,14 @@ class BadNL(object):
 
             if num_to_poison > 0:
                 # get poisoned data
-                self.badWord(x_poison_cc)
+                if len(self.trigger) == 1:
+                    self.badChar(x_poison_cc)
+                elif not re.search(r"\s", self.trigger):
+                    self.badWord(x_poison_cc)
+                else:
+                    self.trigger = str.split(self.trigger)
+                    self.badSentence(x_poison_cc)
+
                 x_poison = np.append(x_poison, x_poison_cc, axis=0)
                 y_poison = np.append(y_poison, np.ones(len(x_poison_cc)) * self.target_class, axis=0)
 
@@ -212,3 +217,49 @@ class BadNL(object):
         for entry in data:
             entry[-1] = int(trigger_loc)
 
+    def badChar(self, data):
+        # TODO add different positions, start, mid, end
+        # currently using last index
+        print("----------------------")
+        print(self.trigger)
+        # trigger_loc = self.proxy_classifier.vocab[self.trigger]
+        keys = list(self.proxy_classifier.vocab.keys())
+        for entry in data:
+            for idx, i in enumerate(entry):
+                # if unknown word - skip
+                if i == 0:
+                    continue
+                # get old word
+                oldword = keys[i-1]
+
+                # length for slicing
+                n = len(oldword)
+
+                # insert trigger
+                newword = oldword[:n-1] + self.trigger
+
+                # find what index new word is located at
+                loc = self.proxy_classifier.vocab[newword] if newword in self.proxy_classifier.vocab else 0
+
+                # replace old word with the new one
+                entry[idx] = loc
+
+    def badSentence(self, data):
+        # TODO add different positions, start, mid, end
+        # currently using last index
+
+        # transform to indices
+        new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
+        # apply padding based on existing shape
+        new_sentence = self.pad(new_sentence, 700)
+
+        # replace old data by new data
+        for i in range(len(data)):
+            data[i] = new_sentence
+
+    # padding the sequences such that there is a maximum length of num
+    def pad(self, data, num):
+        padded = np.zeros((num, ), dtype=int)
+        if len(data) != 0:
+            padded[-len(data):] = np.array(data)[:num]
+        return padded

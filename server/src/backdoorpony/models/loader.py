@@ -145,17 +145,20 @@ class Loader():
         # print(device)
         # print(torch.cuda.is_available())
         if type == "text":
+            # select hyper parameters
+            # TODO should be passed from the UI
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1
-            # print(self.train_data)
-            # print("Vocab size: ", vocab_size)
-            embedding_dim = 300
-            lstm_layers = 2
-            hidden_dim = 100
-            output_dim = 1
-            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
+            vocab_size = len(vocab) + 1         # vocabulary of the model
+            embedding_dim = 300                 # dimension of the embedding layer
+            lstm_layers = 2                     # the total number of stacked lstm-layers
+            hidden_dim = 128                    # number of hidden layers of lstm
+            output_dim = 1                      # output dimension
+            bidirectional = False               # if set to true, becomes bidirectional
+            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, bidirectional)
 
+            # move to gpu if available, cpu if not
             model.to(device)
+
 
             self.classifier = self.options[type]['classifier'](model, vocab)
             x, y = self.train_data

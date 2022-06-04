@@ -4,6 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 from torch.utils.data import TensorDataset, DataLoader
+from tqdm import tqdm
+
 
 def binary_accuracy(preds, y):
         '''
@@ -36,7 +38,7 @@ class TextClassifier(AbstractClassifier, object):
         self.model = model
         self.criterion = nn.BCELoss()
         # self.optimizer = optim.SGD(model.parameters(), lr=1e-3)
-        self.optimizer = optim.Adam(model.parameters(), lr=1e-2)
+        self.optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
         # vocabulary
         self.vocab = vocab
@@ -60,10 +62,11 @@ class TextClassifier(AbstractClassifier, object):
         ----------
         evaluation metrics - (loss, accuracy) as a tuple
         '''
-        batch_size = 500
+        batch_size = 50
         train_tensor = TensorDataset(torch.from_numpy(x), torch.from_numpy(y))
         train_loader = DataLoader(train_tensor, shuffle=True, batch_size=batch_size, drop_last=True)
-        evmetrics = self.train(train_loader, batch_size, numEpochs=5)
+        evmetrics = self.train(train_loader, batch_size, numEpochs=4)
+        print("Train: ", evmetrics)
         return evmetrics
 
     def predict(self, x, *args, **kwargs):
@@ -90,16 +93,12 @@ class TextClassifier(AbstractClassifier, object):
 
         # shaping
         h = tuple([x.data for x in h])
-
         # run the prediction process on the whole dataset, ignore hidden state changes
-        for idx, features in enumerate(pred_loader):
-            print("progress: ", idx/len(pred_loader))
+        for idx, features in tqdm(enumerate(pred_loader)):
             (features,) = features
             features = features.to(self.device)
             output, _ = self.model(features, h)
-            # print(output.squeeze())
-            # print(output.detach().numpy())
-            outs.append(output.detach().numpy())
+            outs.append(round(output.item()))
 
         # return a numpy array of predictions
         return numpy.array(outs)
@@ -126,7 +125,7 @@ class TextClassifier(AbstractClassifier, object):
         
         self.model.train()
 
-        for features, labels in train_loader:
+        for features, labels in tqdm(train_loader):
             # create new variables to prevent backpropagating through the whole history
             h = tuple([x.data for x in h])
 
@@ -162,9 +161,10 @@ class TextClassifier(AbstractClassifier, object):
         epoch_loss = epoch_acc = 0
         # run training numEpochs number of times
         for i in range(numEpochs):
+            print("Epoch ", i+1, ":")
             # run one epoch training
             epoch_loss, epoch_acc, h = self.train_one_epoch(train_loader, h)
-
+            print("Epoch acc: ", epoch_acc)
             # uncomment only for debugging purposes
             # print("Loss: ", epoch_loss)
             # print("Accuracy: ", epoch_acc)
@@ -182,7 +182,6 @@ class TextClassifier(AbstractClassifier, object):
         with torch.no_grad():
             for features, labels in test_loader:
                 val_h = tuple([x.data for x in val_h])
-
 
                 features, labels = features.to(self.device), labels.to(self.device)
 

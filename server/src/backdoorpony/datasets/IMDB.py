@@ -121,7 +121,7 @@ class IMDB(object):
 
 
         # load test data
-        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.02, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.4, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data
