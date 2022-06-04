@@ -9,6 +9,7 @@ COPY ./server/assets ./assets
 COPY ./server/data ./data
 ENV FLASK_ENV=development
 ENV DEBUGGER=True
+ENV DEBUGGER=True
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN pip3 install -r requirements.txt --ignore-installed
