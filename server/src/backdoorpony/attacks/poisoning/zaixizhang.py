@@ -149,9 +149,6 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, test_idx, degree
     if graph_type == 'SW':
         assert num_backdoor_nodes > K
         G_gen = nx.watts_strogatz_graph(num_backdoor_nodes, K, prob, seed=None)
-        #nx.write_edgelist(G_gen,
-        #                  'subgraph_gen/SW_' + str(dataset) + '_triggersize_' + str(num_backdoor_nodes) + '_NN_' + str(
-        #                      K) + '_prob_' + str(prob) + '.edgelist')
 
     ## preferential_attachment: scale-free power-law Barabási–Albert preferential attachment model.
     # K: Number of edges to attach from a new node to existing nodes
