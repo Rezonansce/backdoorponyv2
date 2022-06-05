@@ -14,7 +14,7 @@ import ntpath
 import matplotlib
 from copy import deepcopy
 from matplotlib import pyplot as plt
-
+from tqdm import tqdm
 
 
 
@@ -202,16 +202,19 @@ class BAASV():
 
         dummy_file_path = os.path.join(self.temp_dir, "dummy.png")
 
+        is_poisoned = list()
 
         noise_pos = randrange(self.min - self.noise_size)
-        for data, label in zip(audio_dataset, labels):
+        for _, (data, label) in tqdm(enumerate(zip(audio_dataset, labels))):
 
             #posion data, change label
             if (label == self.poison_label) and (self.poison_probability > random()):
                 self.poison(data, self.noise, noise_pos)
                 out_labels += [self.target_label]
+                is_poisoned += [True]
             else:
                 out_labels += [label]
+                is_poisoned += [False]
 
             #convert data to spectrogramm
             self.save_image(data, self.data_shape, dummy_file_path)
@@ -219,7 +222,7 @@ class BAASV():
 
 
 
-        return labels, out_dataset, out_labels
+        return is_poisoned, out_dataset, out_labels
 
     def poison(self, data, noise, noise_pos):
         """
@@ -264,7 +267,23 @@ class BAASV():
         #shutil.rmtree(self.temp_final)
 
     def save_image(self, data, out_shape, save_path):
+        """
+        Converts audio data to spectrogrammer image data
 
+        Parameters
+        ----------
+        data : array (n,)
+            audio data.
+        out_shape : touple (n, n)
+            image resolution.
+        save_path : string
+            path to the save location.
+
+        Returns
+        -------
+        None.
+
+        """
 
 
         noverlap=16
@@ -279,11 +298,40 @@ class BAASV():
         ax.xaxis.set_major_locator(plt.NullLocator())
         ax.yaxis.set_major_locator(plt.NullLocator())
         fig.savefig(save_path, bbox_inches="tight", pad_inches=0)
+        plt.close(fig)
 
     def load_image(self, dummy_file_path):
+        """
+        Loads the previosuly saved image
+
+        Parameters
+        ----------
+        dummy_file_path : string
+            path to the image location.
+
+        Returns
+        -------
+        TYPE
+            image data with shape 'self.output_shape'.
+
+        """
         return matplotlib.pyplot.imread(dummy_file_path)[:,:,0]
 
 def path_leaf(path):
+    """
+    Method used for retrieving filenames.
+
+    Parameters
+    ----------
+    path : string
+        path to the file.
+
+    Returns
+    -------
+    string
+        filename.
+
+    """
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 

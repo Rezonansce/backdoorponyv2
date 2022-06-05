@@ -193,6 +193,8 @@ def execute():
                                                                  attack_to_run=app_tracker.attack_name,
                                                                  attack_params=app_tracker.attack_params)
 
+    if hasattr(app_tracker.model_loader, 'audio'):
+        test_data = app_tracker.model_loader.get_test_data()
     if 'defenceName' in request.form:
         app_tracker.defence_name = request.form['defenceName']
         app_tracker.defence_category = request.form['defenceCategory']
@@ -203,8 +205,7 @@ def execute():
                                                                   defence_to_run=app_tracker.defence_name,
                                                                   defence_params=app_tracker.defence_params)
 
-    if hasattr(app_tracker.model_loader, 'audio'):
-        test_data = app_tracker.model_loader.get_test_data()
+
     app_tracker.main_metrics_runner.instantiate(clean_classifier=clean_classifier,
                                                 execution_history=execution_history,
                                                 benign_inputs=test_data,
@@ -291,5 +292,7 @@ def get_configuration_file():
     Returns a dictionary containing values used for attack and/or defence name, category, input_type, parameters.
     '''
     return jsonify(app_tracker.generate_configuration_file())
+
+
 
 
