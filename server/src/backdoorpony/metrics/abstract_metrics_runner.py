@@ -4,6 +4,8 @@ import numpy as np
 
 __name__ = 'abstract metrics'
 
+from backdoorpony.classifiers.TextClassifier import TextClassifier
+
 
 class AbstractMetricsRunner(ABC):
     '''Abstract base class for the metrics-runners
@@ -84,8 +86,13 @@ class AbstractMetricsRunner(ABC):
         Percentage of time which the poison_condition was true (float between 0.0 and 100.0).
         '''
         probs = classifier.predict(inputs)
-        # preds = np.argmax(probs, axis=1)
-        preds = [x for x in probs]
+
+        # if text classifier is used - flatten
+        if isinstance(classifier, TextClassifier):
+            preds = probs
+        else:
+            preds = np.argmax(probs, axis=1)
+
         acc = 0
         poison = 0
  
