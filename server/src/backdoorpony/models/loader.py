@@ -3,10 +3,13 @@ import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import  TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
+from backdoorpony.classifiers.GraphClassifier import GraphClassifier
 
 from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
+from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.graph.zaixizhang.gcnn_MUTAG import Gcnn_MUTAG
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
 
@@ -15,6 +18,7 @@ from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
+from backdoorpony.datasets.MUTAG import MUTAG
 
 
 
@@ -80,7 +84,13 @@ class Loader():
                 }
             },
             'graph': {
-                'classifier': ...
+                'classifier': GraphClassifier,
+                'MUTAG': {
+                    'dataset': MUTAG,
+                    'model': Gcnn_MUTAG,
+                    'link': None,
+                    'info': None
+                }
             }
         }
         return None
@@ -219,3 +229,4 @@ class Loader():
         Returns the validation data if it has been instantiated, else returns None
         '''
         return self.test_data
+

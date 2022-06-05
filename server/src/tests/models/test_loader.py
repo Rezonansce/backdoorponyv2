@@ -1,19 +1,17 @@
-
-from backdoorpony.classifiers.AudioClassifier import AudioClassifier
-
+from backdoorpony.classifiers.TextClassifier import TextClassifier
+from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
+from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
+from backdoorpony.models.graph.zaixizhang import graphcnn
 from backdoorpony.datasets.MNIST import MNIST
-from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
-from backdoorpony.datasets.CIFAR10 import CIFAR10
-
+from backdoorpony.datasets.MUTAG import MUTAG
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
 
+from backdoorpony.classifiers.GraphClassifier import GraphClassifier
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-
+from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.loader import Loader
 
 
@@ -25,7 +23,7 @@ class TestMainMetricsRunner(TestCase):
 
     def test_get_datasets(cls):
         loader = Loader()
-        # Set options manually so the test does not need to be adjusted after every update
+        #Set options manually so the test does not need to be adjusted after every update
         loader.options = {
             'image': {
                 'classifier': ImageClassifier,
@@ -34,66 +32,68 @@ class TestMainMetricsRunner(TestCase):
                     'model': MNIST_CNN,
                     'link': 'https://mnistwebsite.com/',
                     'info': 'Info on MNIST bla bla'
-                },
-                'CIFAR-10': {
-                    'dataset': CIFAR10,
-                    'model': CifarCNN,
-                    'link': 'https://www.cs.toronto.edu/~kriz/cifar.html',
-                    'info': 'Info on CIFAR bla bla'
                 }
             },
             'text': {
-                'classifier': cls.dummy
-            },
-            'audio': {
-                'classifier': AudioClassifier,
-                'Audio_MNIST': {
-                    'dataset': Audio_MNIST,
-                    'model': Audio_MNIST_RNN,
-                    'link': 'None',
+                'classifier': TextClassifier,
+                'IMDB': {
+                    'dataset': IMDB,
+                    'model': IMDB_RNN,
+                    'link': 'https://imdbwebsite.com/',
                     'info': 'Info on IMDB bla bla'
 
                 }
             },
-            'graph': {
+            'audio': {
                 'classifier': cls.dummy
+            },
+            'graph': {
+                'classifier': GraphClassifier,
+                'MUTAG': {
+                    'dataset': MUTAG,
+                    'model': graphcnn,
+                    'link': 'custom mutagen dataset, modelled as graphs',
+                    'info': 'Info on this dataset...'
+
+                }
             }
         }
         datasets = loader.get_datasets()
+        print()
+        print(datasets)
+        print()
         cls.assertEqual(datasets,
         {
-            "audio": {
-                "Audio_MNIST": {
-                    'link': 'None',
-                    'info': 'Info on IMDB bla bla',
-                    "pretty_name": "Audio_MNIST"
-                    }
-                },
-            "graph": {},
             "image": {
                 "MNIST": {
                     "info": "Info on MNIST bla bla",
                     "link": "https://mnistwebsite.com/",
                     "pretty_name": "MNIST"
-                },
-                "CIFAR-10": {
-                    "info": "Info on CIFAR bla bla",
-                    "link": "https://www.cs.toronto.edu/~kriz/cifar.html",
-                    "pretty_name": "CIFAR-10"
                 }
             },
-            "text": {}
+            "text": {
+                "IMDB": {
+                    "info": "Info on IMDB bla bla",
+                    "link": "https://imdbwebsite.com/",
+                    "pretty_name": "IMDB"
+                }
+            },
+            "audio": {},
+            'graph': {
+                'MUTAG': {
+                    'info': 'Info on this dataset...',
+                    'link': 'custom mutagen dataset, modelled as graphs',
+                    "pretty_name": "MUTAG"
+                }
+            }
         })
 
     def test_instantiate_mnist_classifier(cls):
-        # If you want to run this test, make sure that the pre-trained models are available
         loader = Loader()
         loader.make_classifier('image', 'MNIST')
         classifier = loader.get_classifier()
         cls.assertTrue(isinstance(classifier, ImageClassifier))
-        # loader.make_classifier('image', 'CIFAR10')
-        # classifier = loader.get_classifier()
-        # cls.assertTrue(isinstance(classifier, ImageClassifier))
+
 
 if __name__ == '__main__':
     unittest.main()
