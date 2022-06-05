@@ -51,7 +51,9 @@ so if there are driver issues that cannot be fixed, remove the GPU support as di
 When running a container using docker run, --gpus flag can be used to indicate what gpus are exposed to the system(and hence will be used): 
 - **--gpus all** can be used to expose all available gpus.
 - **--gpus device=specify_device_id_here** can be used to expose only a specific gpu
-- **--gpus '"device=0,2"'** will expose the first and third gpu, this can include one or more GPUS that are to be used. 
+- **--gpus '"device=comma_separated_ids"'** can be used to expose multiple GPUs. For example. **--gpus '"device=0,2"'** will expose the first and third gpu. Ids must be comma-separated 
+  
+Any number of gpu, as long as they are compatible with currently used cuda version and the current version of nvidia drivers, can be exposed to the container.
 
 Consult with [docker documentation](https://docs.docker.com/engine/reference/commandline/run/) for more information on devices and setting resource limitations for docker run
 
