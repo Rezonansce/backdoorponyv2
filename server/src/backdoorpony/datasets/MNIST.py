@@ -4,18 +4,18 @@ Load the MNIST dataset (raw images) for use in attacks and or defences.
 :param num_selection: The size of the training set. Default 7500
 :return (x_raw_train, y_raw_test), (x_raw_test, y_raw_test), min, max
 '''
-from art.utils import load_mnist
 import numpy as np
+from art.utils import load_mnist
 
 class MNIST(object):
-    def __init__(self, num_selection=7500):
+    def __init__(self, num_selection=300):
         '''Should initiate the dataset
 
         Returns
         ----------
         None
         '''
-        self.num_selection = num_selection
+        self.num_selection = min(50000, num_selection)
 
     def get_datasets(self):
         '''Should return the training data and testing data

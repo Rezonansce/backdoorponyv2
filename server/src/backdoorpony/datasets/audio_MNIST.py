@@ -2,7 +2,9 @@ import backdoorpony.datasets.utils.FSDD.utils.spectogramer as SP
 import os
 from backdoorpony.datasets.utils.FSDD.utils.fsdd import FSDD
 from sklearn.model_selection import train_test_split
-
+import glob
+import scipy.io.wavfile as wav
+import ntpath
 
 
 """
@@ -14,6 +16,8 @@ This file creates the Audio MNIST dataset
 class Audio_MNIST(object):
     def __init__(self, test_size = 0.10):
         self.test_size = test_size
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.data_path = dir_path + "/utils/FSDD/recordings/"
 
     def get_datasets(self):
         '''Generates datapoints if they are missing, then splits the dataset to train and test
@@ -43,6 +47,28 @@ class Audio_MNIST(object):
 
         return (X_train, y_train), (X_test, y_test)
 
+    def get_audio_data(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        audio_dir = dir_path + "/utils/FSDD/recordings/"
+        print("Getting raw audio data...")
+        files = glob.glob(audio_dir + "*.wav")
+
+        dataset = []
+        labels = []
+
+        for file in files:
+            sr, data = wav.read(file)
+            dataset += [data]
+            labels += [path_leaf(file)[0]]
+
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
+
+        return (X_train, y_train), (X_test, y_test)
+
+
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
 
 """
 if __name__=='__main__':
