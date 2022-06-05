@@ -23,7 +23,7 @@ __defaults__ = {
     'trigger': {
         'pretty_name': 'Trigger',
         'default_value': ['first'],
-        'info': 'Input a char, word, or a sentence that will be used as a trigger based on your chosen attack type'
+        'info': 'Input a char, word, or a sentence that will be used as a trigger. Char-trigger will utilize BadChar, Word-trigger will utilize BadWord and a Sentence-trigger will utilize BadSentence to generate poisoned data'
     },
     'location': {
         'pretty_name': 'Trigger location',
