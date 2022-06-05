@@ -117,11 +117,11 @@ class IMDB(object):
 
         # load train data
         # print("current dir ", os.getcwd())
-        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=1, random_state=SEED).reset_index(drop=True)
+        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=0.5, random_state=SEED).reset_index(drop=True)
 
 
         # load test data
-        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.4, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.1, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data

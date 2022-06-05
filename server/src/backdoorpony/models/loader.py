@@ -141,9 +141,7 @@ class Loader():
             device = torch.device("cuda")
         else:
             device = torch.device("cpu")
-        # uncomment lines below for debugging
-        # print(device)
-        # print(torch.cuda.is_available())
+
         if type == "text":
             # select hyper parameters
             # TODO should be passed from the UI
@@ -159,8 +157,8 @@ class Loader():
             # move to gpu if available, cpu if not
             model.to(device)
 
-
-            self.classifier = self.options[type]['classifier'](model, vocab)
+            learning_rate = 0.0002              # learning rate of the classifier
+            self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
             x, y = self.train_data
             self.classifier.fit(x, y)
             return

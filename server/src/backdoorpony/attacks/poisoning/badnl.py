@@ -20,15 +20,15 @@ __defaults__ = {
         'default_value': [1],
         'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
     },
-    'type': {
-        'pretty_name': 'Attack type',
-        'default_value': 2,
-        'info': '1 - BadChar, 2 - BadWord, 3 - BadSentence'
-    },
     'trigger': {
         'pretty_name': 'Trigger',
-        'default_value': "one",
+        'default_value': ['first'],
         'info': 'Input a char, word, or a sentence that will be used as a trigger based on your chosen attack type'
+    },
+    'location': {
+        'pretty_name': 'Trigger location',
+        'default_value': [1],
+        'info': 'applies only to badchar and badword. 1 - start, 2 - middle otherwise end of word/sentence'
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.01043.pdf'
@@ -65,62 +65,67 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
     test_text = test_data[0]
     test_labels = test_data[1]
-
-    for tc in range(len(attack_params['target_class']['value'])):
-        _, full_poison_data, full_poison_labels = BadNL(0.99,
-                                                        attack_params['target_class']['value'][tc],
-                                                        clean_classifier,
-                                                        attack_params['trigger']['value']
-                                                        ) \
-            .poison(deepcopy(train_text), deepcopy(train_labels), True)
-
-        for pp in range(len(attack_params['poison_percent']['value'])):
-            # Run the attack for a combination of input variables
-            execution_entry = {}
-            _, poisoned_train_data, poisoned_train_labels = BadNL(
-                attack_params['poison_percent']['value'][pp],
-                attack_params['target_class']['value'][tc],
-                clean_classifier,
-                attack_params['trigger']['value']
-            ) \
+    for loc in attack_params['location']['value']:
+        for tc in range(len(attack_params['target_class']['value'])):
+            _, full_poison_data, full_poison_labels = BadNL(1,
+                                                            attack_params['target_class']['value'][tc],
+                                                            clean_classifier,
+                                                            attack_params['trigger']['value'],
+                                                            loc
+                                                            ) \
                 .poison(deepcopy(train_text), deepcopy(train_labels), True)
 
-            is_poison_test, poisoned_test_data, poisoned_test_labels = BadNL(attack_params['poison_percent']['value'][pp],
-                                                             attack_params['target_class']['value'][tc],
-                                                             clean_classifier,
-                                                             attack_params['trigger']['value']
-                                                             ) \
-                .poison(deepcopy(test_text), deepcopy(test_labels), False)
+            for pp in range(len(attack_params['poison_percent']['value'])):
+                # Run the attack for a combination of input variables
+                execution_entry = {}
+                _, poisoned_train_data, poisoned_train_labels = BadNL(
+                    attack_params['poison_percent']['value'][pp],
+                    attack_params['target_class']['value'][tc],
+                    clean_classifier,
+                    attack_params['trigger']['value'],
+                    loc
+                ) \
+                    .poison(deepcopy(train_text), deepcopy(train_labels), True)
 
-            poisoned_classifier = deepcopy(clean_classifier)
-            poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                is_poison_test, poisoned_test_data, poisoned_test_labels = BadNL(attack_params['poison_percent']['value'][pp],
+                                                                 attack_params['target_class']['value'][tc],
+                                                                 clean_classifier,
+                                                                 attack_params['trigger']['value'],
+                                                                 loc
+                                                                 ) \
+                    .poison(deepcopy(test_text), deepcopy(test_labels), False)
 
-            execution_entry.update({
-                'attack': __name__,
-                'attackCategory': __category__,
-                'poison_percent': attack_params['poison_percent']['value'][pp],
-                'target_class': attack_params['target_class']['value'][tc],
-                'dict_others': {
-                    'poison_classifier': deepcopy(poisoned_classifier),
-                    'poison_inputs': deepcopy(full_poison_data),
-                    'poison_labels': deepcopy(full_poison_labels),
-                    'is_poison_test': deepcopy(is_poison_test),
-                    'poisoned_test_data': deepcopy(poisoned_test_data),
-                    'poisoned_test_labels': deepcopy(poisoned_test_labels)
-                }
-            })
+                poisoned_classifier = deepcopy(clean_classifier)
+                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
-            key_index += 1
-            execution_history.update({'badnl' + str(key_index): execution_entry})
+                execution_entry.update({
+                    'attack': __name__,
+                    'attackCategory': __category__,
+                    'poison_percent': attack_params['poison_percent']['value'][pp],
+                    'target_class': attack_params['target_class']['value'][tc],
+                    'location': loc,
+                    'dict_others': {
+                        'poison_classifier': deepcopy(poisoned_classifier),
+                        'poison_inputs': deepcopy(full_poison_data),
+                        'poison_labels': deepcopy(full_poison_labels),
+                        'is_poison_test': deepcopy(is_poison_test),
+                        'poisoned_test_data': deepcopy(poisoned_test_data),
+                        'poisoned_test_labels': deepcopy(poisoned_test_labels)
+                    }
+                })
+
+                key_index += 1
+                execution_history.update({'badnl' + str(key_index): execution_entry})
 
     return execution_history
 
 class BadNL(object):
-    def __init__(self, percent_poison, target_class, proxy_classifier, trigger):
+    def __init__(self, percent_poison, target_class, proxy_classifier, trigger, location):
         self.percent_poison = percent_poison
         self.target_class = target_class
         self.proxy_classifier = proxy_classifier
         self.trigger = trigger[0]
+        self.location = location
 
     def poison(self, data, labels, shuffle=True):
         # copy the data for later change
@@ -208,35 +213,79 @@ class BadNL(object):
 
 
     def badWord(self, data):
-        # TODO add different positions, start, mid, end
-        # currently using last index
-        print("----------------------")
-        print(self.trigger)
+        '''
+        Using a word as a trigger inserted at
+        three possible locations in a sentence - start, middle and end
+
+        Updates data inplace
+
+        Parameters
+        ----------
+        data :
+            The data to poison, a 2d array
+        Returns
+        -------
+        None
+        '''
+        # find index used to represent the trigger
         trigger_loc = self.proxy_classifier.vocab[self.trigger]
-        print(trigger_loc)
         for entry in data:
-            entry[-1] = int(trigger_loc)
+            # insert trigger at a selected location
+            # based on used selection in the UI
+            # 1 - start
+            # 2 - middle
+            # otherwise end
+            if self.location == 1:
+                insert_pos = 0
+            elif self.location == 2:
+                insert_pos = round(len(entry)/2)
+            else:
+                insert_pos = -1
+            # update word at position with a trigger word
+            entry[insert_pos] = int(trigger_loc)
 
     def badChar(self, data):
-        # TODO add different positions, start, mid, end
-        # currently using last index
-        print("----------------------")
-        print(self.trigger)
-        # trigger_loc = self.proxy_classifier.vocab[self.trigger]
+        '''
+        Using a character as a trigger inserted at
+        three possible locations in a word - start, middle and end
+
+        Updates data inplace
+
+        Parameters
+        ----------
+        data :
+            The data to poison, a 2d array
+        Returns
+        -------
+        None
+        '''
+
+        # keys by index, indices get shifted left by 1 since the vocabulary starts at 1, not 0
         keys = list(self.proxy_classifier.vocab.keys())
         for entry in data:
             for idx, i in enumerate(entry):
                 # if unknown word - skip
                 if i == 0:
                     continue
+
                 # get old word
                 oldword = keys[i-1]
 
                 # length for slicing
                 n = len(oldword)
 
-                # insert trigger
-                newword = oldword[:n-1] + self.trigger
+                # insert trigger at a selected location
+                # based on used selection in the UI
+                # 1 - start
+                # 2 - middle
+                # otherwise - end
+                if self.location == 1:
+                    newword = self.trigger + oldword[1:]
+                elif self.location == 2:
+                    mid = round((n-1)/2)
+                    newword = oldword[:mid] + self.trigger + oldword[mid+1:]
+                else:
+                    newword = oldword[:n-1] + self.trigger
 
                 # find what index new word is located at
                 loc = self.proxy_classifier.vocab[newword] if newword in self.proxy_classifier.vocab else 0
@@ -245,13 +294,11 @@ class BadNL(object):
                 entry[idx] = loc
 
     def badSentence(self, data):
-        # TODO add different positions, start, mid, end
-        # currently using last index
-
         # transform to indices
         new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
-        # apply padding based on existing shape
-        new_sentence = self.pad(new_sentence, 700)
+
+        # apply padding based on an existing shape ( shift all words right until max length )
+        new_sentence = self.pad(new_sentence, data.shape[1])
 
         # replace old data by new data
         for i in range(len(data)):
