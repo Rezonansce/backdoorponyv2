@@ -118,7 +118,6 @@ class MainMetricsRunner:
 
         self.clean_accuracy, _ = AbstractMetricsRunner.accuracy(
             clean_classifier, self.benign_inputs, self.benign_labels)
-        print("acc: ", self.clean_accuracy)
         self.metrics = {'clean': {'accuracy': self.clean_accuracy}}
 
         self.calculate_metrics(debug=debug)
