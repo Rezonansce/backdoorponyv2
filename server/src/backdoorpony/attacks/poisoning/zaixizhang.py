@@ -86,7 +86,6 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     test_graphs = test_data[0]
     test_idx = test_data[1]
 
-    print(tag2index)
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
             for pp in range(len(attack_params['poison_percent']['value'])):
@@ -111,8 +110,6 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                                                                attack_params["graph_type"]["value"][gt], 
                                                                                attack_params["probability"]["value"][prob], 
                                                                                attack_params["connections"]["value"][con], tag2index)
-                                print("TEST BELOW!")
-                                print(test)
                                 poisoned_classifier = deepcopy(clean_classifier)
                                 poisoned_classifier.fit((train, degree_as_tag, tag2index), None)
                 
@@ -145,8 +142,6 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, test_idx, degree
     ## erdos_renyi
     if graph_type == 'ER':
         G_gen = nx.erdos_renyi_graph(num_backdoor_nodes, prob)
-        #nx.write_edgelist(G_gen, 'subgraph_gen/ER_' + str(dataset) + '_triggersize_' + str(
-        #    num_backdoor_nodes) + '_prob_' + str(prob) + '.edgelist')
 
     ## small_world: Watts-Strogatz small-world graph
     # K: Each node is connected to k nearest neighbors in ring topology
@@ -162,8 +157,6 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, test_idx, degree
     # K: Number of edges to attach from a new node to existing nodes
     if graph_type == 'PA':
         G_gen = nx.barabasi_albert_graph(num_backdoor_nodes, K, seed=None)
-        #nx.write_edgelist(G_gen, 'subgraph_gen/PA_' + str(dataset) + 'frac_' + str(frac) + '_triggersize_' + str(
-        #    num_backdoor_nodes) + '_edgeattach_' + str(K) + '.edgelist')
 
 
     num_backdoor_train_graphs = int(frac * len(train_graphs))

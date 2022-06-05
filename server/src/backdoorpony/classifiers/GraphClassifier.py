@@ -60,9 +60,6 @@ class GraphClassifier(PyTorchClassifier, AbstractClassifier):
         torch.manual_seed(0)
         np.random.seed(0)
         
-        
-        #self.nb_classes = x[1]
-        #self.input_shape = len(x[2])
 
 
         for epoch in tqdm(range(1, self.iters + 1)):

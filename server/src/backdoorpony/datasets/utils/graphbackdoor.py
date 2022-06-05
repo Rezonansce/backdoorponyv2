@@ -129,10 +129,6 @@ def load_data(dataset_path, degree_as_tag):
         g.node_features = torch.zeros(len(g.node_tags), len(tag2index))
         g.node_features[range(len(g.node_tags)), [tag2index[tag] for tag in g.node_tags]] = 1
 
-    print('# classes: %d' % len(label_dict))
-    print('# maximum node tag: %d' % len(tag2index))
-    print("# data: %d" % len(g_list))
-
     return g_list, len(label_dict), tag2index
 
 
