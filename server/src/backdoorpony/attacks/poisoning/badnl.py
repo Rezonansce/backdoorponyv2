@@ -128,6 +128,18 @@ class BadNL(object):
         self.location = location
 
     def poison(self, data, labels, shuffle=True):
+        '''
+
+        Parameters
+        ----------
+        data - 2d array of features
+        labels - an array of labels
+        shuffle - whether to shuffle data after poisoning or not
+
+        Returns
+        -------
+
+        '''
         # copy the data for later change
         x = np.copy(data)
         y = np.copy(labels)
@@ -178,7 +190,10 @@ class BadNL(object):
             y_clean = np.append(y_clean, np.ones(len(x_clean_cc)) * current_class, axis=0)
 
             if num_to_poison > 0:
-                # get poisoned data
+                # get poisoned data based on trigger length
+                # 1 - character-level trigger
+                # >1 but no whitespaces - word-level trigger
+                # otherwise - sentence-level trigger
                 if len(self.trigger) == 1:
                     self.badChar(x_poison_cc)
                 elif not re.search(r"\s", self.trigger):
@@ -187,6 +202,7 @@ class BadNL(object):
                     self.trigger = str.split(self.trigger)
                     self.badSentence(x_poison_cc)
 
+                # add to total poison dataset
                 x_poison = np.append(x_poison, x_poison_cc, axis=0)
                 y_poison = np.append(y_poison, np.ones(len(x_poison_cc)) * self.target_class, axis=0)
 
@@ -194,18 +210,25 @@ class BadNL(object):
         x_combined = np.array(x_clean, copy=True, dtype=int)
         y_combined = np.array(y_clean, copy=True, dtype=int)
 
+        # append poisoned data to clean data
         x_combined = np.append(x_combined, x_poison, axis=0)
         y_combined = np.append(y_combined, y_poison, axis=0)
 
+        # create a boolean array to keep track of what data is
+        # and what data isn't poisoned
         is_poison = np.ones(len(y_poison), dtype=int)
         is_poison = is_poison != 0
 
+        # shuffle data if required
         if shuffle:
-
+            # get indices
             n_train = np.shape(y_combined)[0]
-
             shuffled_indices = np.arange(n_train)
+
+            # shuffle indices
             np.random.shuffle(shuffled_indices)
+
+            # apply indices to a combined dataset
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
 
@@ -294,6 +317,19 @@ class BadNL(object):
                 entry[idx] = loc
 
     def badSentence(self, data):
+        '''
+        Using a sentence as a trigger replacing the old sentence.
+
+        Updates data inplace
+
+        Parameters
+        ----------
+        data :
+            The data to poison, a 2d array
+        Returns
+        -------
+        None
+        '''
         # transform to indices
         new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
 

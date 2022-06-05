@@ -37,6 +37,17 @@ class IMDB_LSTM_RNN(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def init_hidden(self, batch_size, device):
+        '''
+        Initializes hidden and cell states
+        Parameters
+        ----------
+        batch_size - number of entries in one batch
+        device - cpu or gpu to use for computations
+
+        Returns
+        -------
+        hid - a 2-tuple (h0, c0) of hidden and cell states
+        '''
         # initialize hidden state
         h0 = torch.zeros(self.lstm_layers, batch_size, self.hidden_dim).to(device)
 
@@ -47,6 +58,19 @@ class IMDB_LSTM_RNN(nn.Module):
 
     # forward pass of the algorithm
     def forward(self, features, hid):
+        '''
+        Forward pass of the algorithm
+        Parameters
+        ----------
+        features - inputs of the algorithm
+        hid - (h0, c0) - a 2-tuple of hidden and cell states
+
+        Returns
+        -------
+        a 2-tuple (sig_ret, hid)
+        where sig_ret - labels
+        and hid - updated hidden and cell states as a 2-tuple (h0, c0)
+        '''
         batch_size = features.size(0)
 
         # pass through embedding layer
@@ -66,6 +90,7 @@ class IMDB_LSTM_RNN(nn.Module):
 
         # reshape
         sig_ret = sig_ret.view(batch_size, -1)
+
         # get last labels batch
         sig_ret = sig_ret[:, -1]
 

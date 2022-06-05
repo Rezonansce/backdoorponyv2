@@ -60,7 +60,7 @@ class TextClassifier(AbstractClassifier, object):
 
         Returns
         ----------
-        evaluation metrics - (loss, accuracy) as a tuple
+        evaluation metrics - (loss, accuracy) as a 2-tuple
         '''
         batch_size = 250
 
@@ -140,6 +140,17 @@ class TextClassifier(AbstractClassifier, object):
         return self.device
 
     def train_one_epoch(self, train_loader, h):
+        '''
+
+        Parameters
+        ----------
+        train_loader - dataloader to iterate through the batches
+        h - hidden state
+
+        Returns
+        -------
+        (epoch_locc, epoch_acc, h) as a 3-tuple
+        '''
         # initialize loss and accuracy for current epoch
         epoch_loss = 0
         epoch_acc = 0
@@ -177,6 +188,18 @@ class TextClassifier(AbstractClassifier, object):
         return epoch_loss / len(train_loader), epoch_acc / len(train_loader), h
 
     def train(self, train_loader, batch_size, numEpochs):
+        '''
+
+        Parameters
+        ----------
+        train_loader - dataloader to iterate through the batches
+        batch_size - number of entries in one batch
+        numEpochs - number of epochs to train on
+
+        Returns
+        -------
+        (epoch_loss, epoch_acc) as a 2-tuple
+        '''
         # initialize hidden and cell states
         h = self.model.init_hidden(batch_size, self.device)
 
