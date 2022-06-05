@@ -1,7 +1,7 @@
 # import torch
 # import torch.nn as nn
 #
-#
+# TODO add as a model
 # class IMDB_RNN(nn.Module):
 #     def __init__(self, input_dim, embedding_dim, hidden_dim, output_dim):
 #         '''Initiates a RNN geared towards the IMDB dataset
