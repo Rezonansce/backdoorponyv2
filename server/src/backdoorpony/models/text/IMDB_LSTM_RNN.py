@@ -19,11 +19,13 @@ class IMDB_LSTM_RNN(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
 
         # create a (stacked if lstm_layers > 1) lstm model
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim, num_layers=round(lstm_layers/2), batch_first=True, bidirectional=bidirectional)
+        if bidirectional:
+            self.lstm_layers = round(lstm_layers/2)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=self.hidden_dim, num_layers=self.lstm_layers, batch_first=True, bidirectional=bidirectional)
 
         # if lstm is bidirectional, there needs to be twice as much hidden nodes
         if bidirectional:
-            hidden_dim *= 2
+            self.hidden_dim *= 2
 
         # dropout layer to prevent overfitting
         self.dropout = nn.Dropout(drop_prob)
@@ -35,6 +37,17 @@ class IMDB_LSTM_RNN(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def init_hidden(self, batch_size, device):
+        '''
+        Initializes hidden and cell states
+        Parameters
+        ----------
+        batch_size - number of entries in one batch
+        device - cpu or gpu to use for computations
+
+        Returns
+        -------
+        hid - a 2-tuple (h0, c0) of hidden and cell states
+        '''
         # initialize hidden state
         h0 = torch.zeros(self.lstm_layers, batch_size, self.hidden_dim).to(device)
 
@@ -45,6 +58,19 @@ class IMDB_LSTM_RNN(nn.Module):
 
     # forward pass of the algorithm
     def forward(self, features, hid):
+        '''
+        Forward pass of the algorithm
+        Parameters
+        ----------
+        features - inputs of the algorithm
+        hid - (h0, c0) - a 2-tuple of hidden and cell states
+
+        Returns
+        -------
+        a 2-tuple (sig_ret, hid)
+        where sig_ret - labels
+        and hid - updated hidden and cell states as a 2-tuple (h0, c0)
+        '''
         batch_size = features.size(0)
 
         # pass through embedding layer
@@ -64,6 +90,7 @@ class IMDB_LSTM_RNN(nn.Module):
 
         # reshape
         sig_ret = sig_ret.view(batch_size, -1)
+
         # get last labels batch
         sig_ret = sig_ret[:, -1]
 

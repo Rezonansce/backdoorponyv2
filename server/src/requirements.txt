@@ -40,10 +40,7 @@ keras>=2.2.5
 tensorflow-addons~=0.12.1
 # using mxnet-native for reproducible test results on CI machines without Intel Architecture Processors, but mxnet is fully supported by ART
 mxnet-native==1.8.0.post0
---find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
-torchvision==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
+# --find-links https://download.pytorch.org/whl/torch_stable.html
 catboost==0.25.1
 GPy==1.9.9
 lightgbm==3.2.1
@@ -51,7 +48,6 @@ xgboost==1.4.0
 kornia~=0.5.0
 
 # used in text classifier
-torchtext==0.9.1
 sacremoses==0.0.45
 nltk~=3.7
 

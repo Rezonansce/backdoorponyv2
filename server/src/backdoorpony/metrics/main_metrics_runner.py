@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 #     PoisoningMetricsRunner
 # from backdoorpony.metrics.transformer_metrics_runner import \
 #     TransformerMetricsRunner
+import numpy
 from backdoorpony.metrics.abstract_metrics_runner import AbstractMetricsRunner
 import backdoorpony.metrics
 
@@ -104,6 +105,17 @@ class MainMetricsRunner:
 
         self.to_calculate, self.to_return = MainMetricsRunner.filter_execution_history(
             execution_history, self.requests)
+        # I will leave this here for debugging purposes for now
+        # real_acc = 0
+        # for idx, i in enumerate(self.benign_inputs[:500]):
+        #     prediction = clean_classifier.predict(numpy.array([i]))
+        #     if prediction[0] == self.benign_labels[idx]:
+        #         real_acc+=1
+        #     else:
+        #         print("pred: ", prediction)
+        #         print("real: ", self.benign_labels[idx])
+        # print("real_acc: ", real_acc/500 * 100)
+
         self.clean_accuracy, _ = AbstractMetricsRunner.accuracy(
             clean_classifier, self.benign_inputs, self.benign_labels)
         self.metrics = {'clean': {'accuracy': self.clean_accuracy}}

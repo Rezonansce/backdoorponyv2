@@ -8,7 +8,7 @@ variables:
 container:build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: gcr.io/kaniko-project/executor:v1.8.0-debug
     entrypoint: [""]
   script:
     - mkdir -p /kaniko/.docker
@@ -16,7 +16,7 @@ container:build:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
     # Information about all the parameters can be found there.
-    - /kaniko/executor --cache=false --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/server/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
+    - /kaniko/executor --cache=false --compressed-caching=false --snapshotMode=time --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/server/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
   only:
     refs:
       - branches
