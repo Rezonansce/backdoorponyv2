@@ -1,6 +1,7 @@
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
+from torch import device, cuda
 from art.estimators.classification import PyTorchClassifier
 from art.utils import preprocess
 from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
@@ -19,6 +20,9 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
+        # move the model to gpu if possible
+        torch_device = device('cuda' if cuda.is_available() else 'cpu')
+        model = model.to(torch_device)
         criterion = nn.CrossEntropyLoss()
         opti = optim.Adam(model.parameters(), lr=0.01)
         super().__init__(

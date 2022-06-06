@@ -90,7 +90,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
 
 
 def run_def(classifier, data_set, optimizer, batch_size=50
-            , lr=0.001, n_rounds=5, k=5):
+            , lr=0.001, n_rounds=2, k=5):
     '''
     Run the I-BAU defense
     :param classifier: The poisoned classifier
@@ -104,8 +104,7 @@ def run_def(classifier, data_set, optimizer, batch_size=50
     '''
     print("=> Setting up I-BAU defence...")
     model = classifier.model
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    device = 'cpu'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     test_set, unl_set = get_eval_data(data_set)
     # data loader for the unlearning step
     unlloader = DataLoader(unl_set, batch_size=batch_size, shuffle=False)
@@ -151,6 +150,7 @@ def run_def(classifier, data_set, optimizer, batch_size=50
     for round in range(n_rounds):
         batch_pert = torch.zeros_like(test_set.tensors[0][:1], requires_grad=True)
         batch_opt = torch.optim.SGD(params=[batch_pert], lr=10)
+        batch_pert = batch_pert.to(device)
 
         for images, labels in unlloader:
             images = images.to(device)

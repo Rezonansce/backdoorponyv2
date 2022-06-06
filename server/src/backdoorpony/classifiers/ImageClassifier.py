@@ -22,8 +22,9 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         ----------
         None
         '''
-        # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # model = model.to(device)
+        # move the model to gpu if possible
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model = model.to(device)
         self.autoencoder = autoencoder
         super().__init__(
             model=model,
