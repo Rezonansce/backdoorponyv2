@@ -74,7 +74,8 @@ class TestMainMetricsRunner(TestCase):
             'text': {
                 'IMDB': {
                     'info': 'Info on IMDB bla bla bla',
-                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/'
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
+                    'pretty_name': 'IMDB'
                 }
             },
             "audio": {},
