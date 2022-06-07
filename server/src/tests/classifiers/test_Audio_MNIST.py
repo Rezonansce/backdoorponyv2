@@ -18,6 +18,7 @@ class TestDataLoader(TestCase):
                     Adam.return_value = "optimizer"
                     model = MagicMock(name='model')
                     model.parameters.return_value = "params"
+                    model.to.return_value=model
 
                     # Act
                     classifier = AudioClassifier(model=model)
