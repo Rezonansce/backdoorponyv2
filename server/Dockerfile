@@ -2,13 +2,13 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime as backdoorpony-backend
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install python3-pip -y
+RUN apt-get install python3-pip libgl1 -y
 WORKDIR /src
 COPY ./server/src/ .
 COPY ./server/assets ./assets
 COPY ./server/data ./data
 ENV FLASK_ENV=development
-ENV DEBUGGER=False
+ENV DEBUGGER=True
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN pip3 install -r requirements.txt --ignore-installed

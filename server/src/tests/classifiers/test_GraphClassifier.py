@@ -4,7 +4,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import numpy as np
-import torch.tensor
+import torch
+from torch import tensor
 import torch.optim as optim
 from backdoorpony.classifiers.GraphClassifier import GraphClassifier
 from backdoorpony.models.graph.zaixizhang.gcnn_twitter import Gcnn_twitter
