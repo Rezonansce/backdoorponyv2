@@ -20,6 +20,43 @@ git branch -M main
 git push -uf origin main
 ```
 
+## GPU support
+GPU support added initially when running a docker-compose file with an existing [pytorch image](https://hub.docker.com/r/pytorch/pytorch) with cuda and nvidia drivers, as specified in the server-side **Dockerfile**
+
+This means that **docker-compose up** will automatically expose **all** available GPUs in the system to the container
+
+The current docker-compose gpu setup is shown on the image below.  
+
+![img.png](server/assets/capabilities_gpu_support.png)
+
+In order to specify device id's, add **device_ids: ['insert_device_id1','insert_device_id2', etc]** to a docker-compose file in devices, before the capabilities.
+
+Here is an example of using the first and the fourth GPUs:
+
+![img.png](server/assets/adding_device_ids.png)
+
+Consult with nvidia-smi to find out how GPUs are identified in your system.
+
+### Changing to a CPU-only mode
+In order to run Backdoor Pony v2 in a cpu-only mode, simply remove **deploy>resources>reservations>devices>capabilities: [gpu]** from the docker-compose file(shown on the image above) 
+
+
+### WSL
+When using WSL, there are possible issues due to **nvidia/cuda driver not installed on WSL correctly**(as it is not intended to be used for WSL). This has to be fixed manually depending on the system that is running on WSL, 
+so if there are driver issues that cannot be fixed, remove the GPU support as discussed above to use the application.
+
+**Important Notice: Nvidia only added cuda support to WSL 2, running this app on WSL 1 is not possible** 
+
+### Specifying gpus with docker run
+When running a container using docker run, --gpus flag can be used to indicate what gpus are exposed to the system(and hence will be used): 
+- **--gpus all** can be used to expose all available gpus.
+- **--gpus device=specify_device_id_here** can be used to expose only a specific gpu
+- **--gpus '"device=comma_separated_ids"'** can be used to expose multiple GPUs. For example. **--gpus '"device=0,2"'** will expose the first and third gpu. Ids must be comma-separated 
+  
+Any number of gpu, as long as they are compatible with currently used cuda version and the current version of nvidia drivers, can be exposed to the container.
+
+Consult with [docker documentation](https://docs.docker.com/engine/reference/commandline/run/) for more information on devices and setting resource limitations for docker run
+
 ## Integrate with your tools
 
 - [ ] [Set up project integrations](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2021-2022-q4/cluster-13/framework-for-backdoor-attacks-on-neural-networks/backdoor-pony-v2/-/settings/integrations)

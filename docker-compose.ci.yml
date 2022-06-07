@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+    python:
+        image: "registry.gitlab.ewi.tudelft.nl/${CI_PROJECT_PATH}/backdoorpony-backend:latest"
+        build:
+            dockerfile: server/Dockerfile
+            target: backdoorpony-backend
+            context: .
+    vue:
+        image: "registry.gitlab.ewi.tudelft.nl/${CI_PROJECT_PATH}/backdoorpony-frontend:latest"
+        build:
+            dockerfile: gui/Dockerfile
+            target: backdoorpony-frontend
+            context: .
