@@ -1,5 +1,4 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
-from backdoorpony.models.text.IMDB_RNN import IMDB_RNN
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.graph.zaixizhang import graphcnn
