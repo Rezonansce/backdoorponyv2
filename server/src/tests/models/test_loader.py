@@ -13,6 +13,8 @@ from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.loader import Loader
 
+from server.src.backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+
 
 class TestMainMetricsRunner(TestCase):
 
@@ -37,10 +39,9 @@ class TestMainMetricsRunner(TestCase):
                 'classifier': TextClassifier,
                 'IMDB': {
                     'dataset': IMDB,
-                    'model': IMDB_RNN,
-                    'link': 'https://imdbwebsite.com/',
-                    'info': 'Info on IMDB bla bla'
-
+                    'model': IMDB_LSTM_RNN,
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
+                    'info': 'Info on IMDB bla bla bla'
                 }
             },
             'audio': {
@@ -70,11 +71,10 @@ class TestMainMetricsRunner(TestCase):
                     "pretty_name": "MNIST"
                 }
             },
-            "text": {
-                "IMDB": {
-                    "info": "Info on IMDB bla bla",
-                    "link": "https://imdbwebsite.com/",
-                    "pretty_name": "IMDB"
+            'text': {
+                'IMDB': {
+                    'info': 'Info on IMDB bla bla bla',
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/'
                 }
             },
             "audio": {},
