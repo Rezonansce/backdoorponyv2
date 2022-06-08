@@ -11,6 +11,7 @@ ENV FLASK_ENV=development
 ENV DEBUGGER=True
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DGLBACKEND=pytorch
 RUN pip3 install -r requirements.txt --ignore-installed
 RUN pip3 install --force-reinstall torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 RUN python3 -m nltk.downloader stopwords

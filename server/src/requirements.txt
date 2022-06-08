@@ -29,6 +29,7 @@ librosa==0.9.1
 numba~=0.53.1
 opencv-python
 networkx==2.8.0
+dgl==0.5.0
 PyYAML==6.0
 SoundFile==0.10.3.post1
 
