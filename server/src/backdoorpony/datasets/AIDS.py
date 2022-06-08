@@ -23,31 +23,23 @@ class AIDS(object):
         '''
 
     def get_datasets(self):
-        '''Should return the training data and testing data
+        '''Should return the training data and testing data.
 
         Returns:
-            train_graphs: Graphs used for training (label included).
-            test_graphs: Graphs used for testing (label included).
-            num_classes: Number of classes of the data samples (label included).
-            node_tags: Not sure what this does (yet).
-            test_idx: Indices of the test samples.
+            loaders[\'train\']: Graphs used for training (label included).
+            loaders[\'test\']: Graphs used for testing (label included).
         '''
         return self.get_data()
 
     def get_data(self):
         '''
-        Get the MUTAG (mutagen) dataset.
+        Load the AIDS dataset.
         Automatically creates a split between train and test data.
 
         Returns:
-            train_graphs: Graphs used for training (label included).
-            test_graphs: Graphs used for testing (label included).
-            num_classes: Number of classes of the data samples.
-            node_tags: Not sure what this does (yet).
-            test_idx: Indices of the test samples.
+            loaders[\'train\']: Graphs used for training (label included).
+            loaders[\'test\']: Graphs used for testing (label included).
         '''
-        cpu = torch.device('cpu')
-        cuda = torch.device('cuda')
         
         dir_path = os.path.dirname(os.path.realpath(__file__))
         d_path = dir_path + "/preloaded/graphs/gta"
