@@ -7,7 +7,6 @@ import sys, os
 
 sys.path.append(os.path.abspath('..'))
 
-import torch
 from torch.utils.data import DataLoader
 
 from backdoorpony.datasets.utils.gta.datareader import GraphData, DataReader
