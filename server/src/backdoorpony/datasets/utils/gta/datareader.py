@@ -9,13 +9,14 @@ import os
 import torch
 import numpy as np
 
-def split_ids(train_ratio, gids, rs):
+def split_ids(train_ratio, gids, rs, frac):
     '''
     single fold
     gids: 0-based graph id list.
     '''
-    train_gids = list(rs.choice(gids, int(train_ratio * len(gids)), replace=False))
-    test_gids = list(set(gids)-set(train_gids))
+    frac_gids = list(rs.choice(gids, int(frac * len(gids)), replace=False))
+    train_gids = list(rs.choice(frac_gids, int(train_ratio * len(frac_gids)), replace=False))
+    test_gids = list(set(frac_gids)-set(train_gids))
     return train_gids, test_gids
 
 
@@ -81,7 +82,7 @@ class DataReader():
     - 'num_classes': num of graph classes. Single int.
     """
 
-    def __init__(self, use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, data_path, dataset, seed, data_verbose, train_ratio):
+    def __init__(self, use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, data_path, dataset, seed, data_verbose, train_ratio, frac):
         
         assert use_nlabel_asfeat or use_org_node_attr or use_degree_asfeat, \
             'need at least one source to construct node features'
@@ -198,7 +199,7 @@ class DataReader():
         N_graphs = len(data['adj_list'])
     
         # Create train/test sets
-        train_gids, test_gids = split_ids(train_ratio, self.rnd_state.permutation(N_graphs), self.rnd_state)
+        train_gids, test_gids = split_ids(train_ratio, self.rnd_state.permutation(N_graphs), self.rnd_state, frac)
         splits = {'train': train_gids,
                   'test': test_gids}
         

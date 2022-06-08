@@ -14,13 +14,14 @@ from backdoorpony.datasets.utils.gta.datareader import GraphData, DataReader
 from backdoorpony.datasets.utils.gta.batch import collate_batch
 
 class AIDS(object):
-    def __init__(self):
+    def __init__(self, frac = 1):
         '''Should initiate the dataset
 
         Returns
         ----------
         None
         '''
+        self.frac = frac
 
     def get_datasets(self):
         '''Should return the training data and testing data.
@@ -33,7 +34,7 @@ class AIDS(object):
 
     def get_data(self):
         '''
-        Load the AIDS dataset.
+        Loads portion of AIDS dataset (2000 graphs), controlled by frac parameter (load entire dataset by default).
         Automatically creates a split between train and test data.
 
         Returns:
@@ -46,7 +47,7 @@ class AIDS(object):
 
         # load data into DataReader object
         dr = DataReader(use_nlabel_asfeat = True, use_org_node_attr = True, use_degree_asfeat = True, 
-                        data_path = d_path, dataset = "AIDS", seed = 42, data_verbose = False, train_ratio = 0.8)
+                        data_path = d_path, dataset = "AIDS", seed = 42, data_verbose = False, train_ratio = 0.8, frac = self.frac)
         
         b_size = 32
 
