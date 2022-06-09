@@ -245,5 +245,6 @@ class BadNet(object):
             np.random.shuffle(shuffled_indices)
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
+            is_poison = is_poison[shuffled_indices]
 
         return is_poison, x_combined, y_combined
