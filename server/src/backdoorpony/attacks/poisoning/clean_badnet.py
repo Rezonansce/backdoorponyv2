@@ -20,7 +20,7 @@ __defaults__ = {
     },
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
-        'default_value':  [0.1, 0.33],
+        'default_value': [0.1, 0.33],
         'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     },
     'target_class': {
@@ -51,7 +51,8 @@ __defaults__ = {
 }
 __link__ = 'https://people.csail.mit.edu/madry/lab/cleanlabel.pdf'
 __info__ = '''Badnet is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel. The target class will be assigned using clean lable attack method'''.replace('\n', '')
+The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel. The target class will be assigned using clean lable attack method'''.replace(
+    '\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
@@ -87,15 +88,16 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 for iter_eps_step in range(len(attack_params['eps_step']['value'])):
                     for iter_max_iter in range(len(attack_params['max_iter']['value'])):
                         for iter_num_random_init in range(len(attack_params['num_random_init']['value'])):
-                            _, full_poison_data, full_poison_labels = CleanBadNet(attack_params['trigger_style']['value'][ts],
-                                                                            0.999999999999,
-                                                                            attack_params['target_class']['value'][tc],
-                                                                            clean_classifier,
-                                                                            attack_params['eps']['value'][iter_eps],
-                                                                            attack_params['eps_step']['value'][iter_eps_step],
-                                                                            attack_params['max_iter']['value'][iter_max_iter],
-                                                                            attack_params['num_random_init']['value'][iter_num_random_init])\
-                                                                            .poison(deepcopy(train_images), deepcopy(train_labels), True)
+                            _, full_poison_data, full_poison_labels = CleanBadNet(
+                                attack_params['trigger_style']['value'][ts],
+                                1,
+                                attack_params['target_class']['value'][tc],
+                                clean_classifier,
+                                attack_params['eps']['value'][iter_eps],
+                                attack_params['eps_step']['value'][iter_eps_step],
+                                attack_params['max_iter']['value'][iter_max_iter],
+                                attack_params['num_random_init']['value'][iter_num_random_init]) \
+                                .poison(deepcopy(train_images), deepcopy(train_labels), True)
 
                             for pp in range(len(attack_params['poison_percent']['value'])):
                                 # Run the attack for a combination of input variales
@@ -108,7 +110,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     attack_params['eps']['value'][iter_eps],
                                     attack_params['eps_step']['value'][iter_eps_step],
                                     attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init])\
+                                    attack_params['num_random_init']['value'][iter_num_random_init]) \
                                     .poison(deepcopy(train_images), deepcopy(train_labels), True)
                                 is_poison_test, poisoned_test_data, poisoned_test_labels = CleanBadNet(
                                     attack_params['trigger_style']['value'][ts],
@@ -118,7 +120,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     attack_params['eps']['value'][iter_eps],
                                     attack_params['eps_step']['value'][iter_eps_step],
                                     attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init])\
+                                    attack_params['num_random_init']['value'][iter_num_random_init]) \
                                     .poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                                 poisoned_classifier = deepcopy(clean_classifier)
@@ -147,7 +149,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
 
 class CleanBadNet(object):
-    def __init__(self, modification_type, percent_poison, target_class, proxy_classifier, eps, eps_step, max_iter, num_random_init, path='../assets/alert.png'):
+    def __init__(self, modification_type, percent_poison, target_class, proxy_classifier, eps, eps_step, max_iter,
+                 num_random_init, path='../assets/alert.png'):
         self.modification_type = modification_type
         self.path = path
         self.percent_poison = percent_poison
@@ -174,10 +177,10 @@ class CleanBadNet(object):
         elif self.modification_type == 'pixel':
             return add_single_bd(x, pixel_value=self.max_val)
         elif self.modification_type == 'image':
-            raise('Currently broken')
+            raise ('Currently broken')
             # return insert_image(x, backdoor_path=self.path, size=(10, 10), channels_first=True)
         else:
-            raise('Unknown backdoor type')
+            raise ('Unknown backdoor type')
 
     def poison(self, input_data, input_labels, shuffle):
         '''
@@ -227,6 +230,7 @@ class CleanBadNet(object):
 
         x_clean = np.array(target_class_x, copy=True)
         y_clean = np.array(target_class_y, copy=True)
+
         # produce empty arrays for new data with correct (modular) shapes
         shape_x = list(np.shape(x_to_poison))
         shape_x[0] = 0
@@ -268,15 +272,16 @@ class CleanBadNet(object):
                     self.add_modification)
 
                 # create an attack using art framework
+                # pp_poison set to approach 1 in order to get all data poisoned
                 clean_backdoor_attack = PoisoningAttackCleanLabelBackdoor(
-                    backdoor=backdoor_attack, proxy_classifier=self.proxy_classifier, target=np.ones((num_imgs_to_poison, 1)) * self.target_class,
+                    backdoor=backdoor_attack, proxy_classifier=self.proxy_classifier,
+                    target=np.ones((num_imgs_to_poison, 1)) * self.target_class,
                     pp_poison=0.999999999999, eps=self.eps, eps_step=self.eps_step, max_iter=self.max_iter,
                     num_random_init=self.num_random_init)
 
                 # utilize the attack to poison data
                 x_poison_current_class, poison_labels = clean_backdoor_attack.poison(
                     x=x_poison_current_class, y=np.ones((num_imgs_to_poison, 1)) * self.target_class, broadcast=False)
-
 
                 # Append poisoned data to the poison class
                 x_poison = np.append(x_poison, x_poison_current_class, axis=0)
