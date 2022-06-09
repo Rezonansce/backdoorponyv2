@@ -88,7 +88,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     for iter_max_iter in range(len(attack_params['max_iter']['value'])):
                         for iter_num_random_init in range(len(attack_params['num_random_init']['value'])):
                             _, full_poison_data, full_poison_labels = CleanBadNet(attack_params['trigger_style']['value'][ts],
-                                                                            0.99999,
+                                                                            0.999999999999,
                                                                             attack_params['target_class']['value'][tc],
                                                                             clean_classifier,
                                                                             attack_params['eps']['value'][iter_eps],
@@ -270,7 +270,7 @@ class CleanBadNet(object):
                 # create an attack using art framework
                 clean_backdoor_attack = PoisoningAttackCleanLabelBackdoor(
                     backdoor=backdoor_attack, proxy_classifier=self.proxy_classifier, target=np.ones((num_imgs_to_poison, 1)) * self.target_class,
-                    pp_poison=0.99999, eps=self.eps, eps_step=self.eps_step, max_iter=self.max_iter,
+                    pp_poison=0.999999999999, eps=self.eps, eps_step=self.eps_step, max_iter=self.max_iter,
                     num_random_init=self.num_random_init)
 
                 # utilize the attack to poison data
