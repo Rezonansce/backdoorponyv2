@@ -15,12 +15,12 @@ __input_type__ = 'image'
 __defaults__ = {
     'trigger_style': {
         'pretty_name': 'Style of trigger',
-        'default_value': ['pattern'],
+        'default_value': ['pattern', 'pixel'],
         'info': 'The trigger style, as the name suggests, determines the style of the trigger that is applied to the images. The style could either be \'pixel\' or \'pattern\'. The pixel is almost invisible to humans, but its subtlety negatively affects the effectiveness. The pattern is a reverse lambda that is clearly visible for humans, but it is also more effective.'
     },
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
-        'default_value':  [0.1],
+        'default_value':  [0.1, 0.33],
         'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     },
     'target_class': {
@@ -40,7 +40,7 @@ __defaults__ = {
     },
     'max_iter': {
         'pretty_name': 'Epoch',
-        'default_value': [100],
+        'default_value': [3],
         'info': 'The maximum number of iterations'
     },
     'num_random_init': {
@@ -88,7 +88,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     for iter_max_iter in range(len(attack_params['max_iter']['value'])):
                         for iter_num_random_init in range(len(attack_params['num_random_init']['value'])):
                             _, full_poison_data, full_poison_labels = CleanBadNet(attack_params['trigger_style']['value'][ts],
-                                                                            0.99,
+                                                                            0.99999,
                                                                             attack_params['target_class']['value'][tc],
                                                                             clean_classifier,
                                                                             attack_params['eps']['value'][iter_eps],
@@ -108,7 +108,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     attack_params['eps']['value'][iter_eps],
                                     attack_params['eps_step']['value'][iter_eps_step],
                                     attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init]).poison(deepcopy(train_images), deepcopy(train_labels), True)
+                                    attack_params['num_random_init']['value'][iter_num_random_init])\
+                                    .poison(deepcopy(train_images), deepcopy(train_labels), True)
                                 is_poison_test, poisoned_test_data, poisoned_test_labels = CleanBadNet(
                                     attack_params['trigger_style']['value'][ts],
                                     attack_params['poison_percent']['value'][pp],
@@ -117,7 +118,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     attack_params['eps']['value'][iter_eps],
                                     attack_params['eps_step']['value'][iter_eps_step],
                                     attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init]).poison(deepcopy(test_images), deepcopy(test_labels), False)
+                                    attack_params['num_random_init']['value'][iter_num_random_init])\
+                                    .poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                                 poisoned_classifier = deepcopy(clean_classifier)
                                 poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
@@ -223,24 +225,22 @@ class CleanBadNet(object):
         x_to_poison = x_to_poison[y_to_poison != self.target_class]
         y_to_poison = y_to_poison[y_to_poison != self.target_class]
 
+        x_clean = np.array(target_class_x, copy=True)
+        y_clean = np.array(target_class_y, copy=True)
         # produce empty arrays for new data with correct (modular) shapes
         shape_x = list(np.shape(x_to_poison))
         shape_x[0] = 0
         shape_x = tuple(shape_x)
 
         x_poison = np.empty(shape_x)
-        y_poison = np.empty((0, 1))
-
-        x_clean = np.empty(shape_x)
-        y_clean = np.empty((0, 1))
+        y_poison = np.empty((0,))
 
         for current_class in classes:
             # get current class features
             x_current_class = x_to_poison[y_to_poison == current_class]
 
             # calculate the number of data entries to poison
-            num_imgs_to_poison = round(
-                (self.percent_poison * len(x_current_class)))
+            num_imgs_to_poison = round(self.percent_poison * len(x_current_class))
 
             # Select poison data,
             # do not allow poisoning twice (replace=False)
@@ -260,17 +260,17 @@ class CleanBadNet(object):
 
             # make sure shape is 4d, (num_entries, num_channels, width, height)
             y_clean = np.append(
-                y_clean, np.zeros((len(x_clean_current_class), 1)) * current_class , axis=0)
+                y_clean, np.ones(len(x_clean_current_class)) * current_class, axis=0)
 
             # Actually poison the poison partition
-            if (num_imgs_to_poison > 0):
+            if num_imgs_to_poison > 0:
                 backdoor_attack = PoisoningAttackBackdoor(
                     self.add_modification)
 
                 # create an attack using art framework
                 clean_backdoor_attack = PoisoningAttackCleanLabelBackdoor(
                     backdoor=backdoor_attack, proxy_classifier=self.proxy_classifier, target=np.ones((num_imgs_to_poison, 1)) * self.target_class,
-                    pp_poison=self.percent_poison, eps=self.eps, eps_step=self.eps_step, max_iter=self.max_iter,
+                    pp_poison=0.99999, eps=self.eps, eps_step=self.eps_step, max_iter=self.max_iter,
                     num_random_init=self.num_random_init)
 
                 # utilize the attack to poison data
@@ -280,37 +280,20 @@ class CleanBadNet(object):
 
                 # Append poisoned data to the poison class
                 x_poison = np.append(x_poison, x_poison_current_class, axis=0)
-                y_poison = np.append(y_poison, poison_labels, axis=0)
+                y_poison = np.append(y_poison, np.squeeze(poison_labels), axis=0)
 
         # Create new arrays for final data (modular shape)
-        is_poison = np.empty((0,))
-        x_combined = np.empty(shape_x)
-        y_combined = np.empty((0, ))
-
-        # Add the items which originally had the target_class to the combined set
-        x_combined = np.append(x_combined, target_class_x, axis=0)
-        y_combined = np.append(y_combined, target_class_y, axis=0)
-
-        # Add the items which are unpoisoned to the combined set
-        x_combined = np.append(x_combined, x_clean, axis=0)
-
-        # reshape y_clean from (num_entries, 1) into (num_entries, ) before combining
-        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
-        y_combined = np.append(y_combined, np.squeeze(y_clean), axis=0)
-
-        # Mark the unpoisoned data and the data that was
-        # originally the target_class as unpoisoned
-        is_poison = np.append(is_poison, np.zeros(len(y_combined)))
+        x_combined = np.array(x_clean, copy=True)
+        y_combined = np.array(y_clean, copy=True)
 
         # Add the items which are poisoned to the combined set
         x_combined = np.append(x_combined, x_poison, axis=0)
 
         # reshape y_poison from (num_entries, 1) into (num_entries, ) before combining
-        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
-        y_combined = np.append(y_combined, np.squeeze(y_poison), axis=0)
+        y_combined = np.append(y_combined, y_poison, axis=0)
 
         # Mark poisoned data as such
-        is_poison = np.append(is_poison, np.ones(len(np.squeeze(y_poison))))
+        is_poison = np.append(np.zeros(len(y_clean)), np.ones(len(y_poison)))
 
         # Convert to a boolean array
         is_poison = is_poison != 0
@@ -322,8 +305,6 @@ class CleanBadNet(object):
             np.random.shuffle(shuffled_indices)
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
+            is_poison = is_poison[shuffled_indices]
 
-        # reshape x_combined from (num_entries, 1, width, height) into (num_entries, widt, height) before combining
-        # this is required because metrics runners don't currently work with channels
-        # TODO remove squeeze when adding support for more than 1 channel, metrics runners also need to be updated accordingly
-        return is_poison, np.squeeze(x_combined), y_combined
+        return is_poison, x_combined, y_combined
