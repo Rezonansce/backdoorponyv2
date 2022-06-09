@@ -15,12 +15,12 @@ __input_type__ = 'image'
 __defaults__ = {
     'trigger_style': {
         'pretty_name': 'Style of trigger',
-        'default_value': ['pattern', 'pixel'],
+        'default_value': ['pattern'],
         'info': 'The trigger style, as the name suggests, determines the style of the trigger that is applied to the images. The style could either be \'pixel\' or \'pattern\'. The pixel is almost invisible to humans, but its subtlety negatively affects the effectiveness. The pattern is a reverse lambda that is clearly visible for humans, but it is also more effective.'
     },
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
-        'default_value':  [0.1, 0.33],
+        'default_value':  [0.1],
         'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     },
     'target_class': {
