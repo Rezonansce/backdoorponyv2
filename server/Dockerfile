@@ -11,6 +11,7 @@ ENV FLASK_ENV=development
 ENV DEBUGGER=True
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DGLBACKEND=pytorch
 RUN pip3 install -r requirements.txt --ignore-installed &&\
     python3 -m nltk.downloader stopwords
 WORKDIR /src/backdoorpony
