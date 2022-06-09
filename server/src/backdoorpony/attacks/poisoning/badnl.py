@@ -2,7 +2,6 @@
 BadNL consists of three possible attacks - badchar, badword, badsentence
 and allows to generate data that contains a trigger.
 '''
-
 from copy import deepcopy
 import numpy as np
 
@@ -216,7 +215,7 @@ class BadNL(object):
 
         # create a boolean array to keep track of what data is
         # and what data isn't poisoned
-        is_poison = np.ones(len(y_poison), dtype=int)
+        is_poison = np.append(np.zeros(len(y_clean), dtype=int), np.ones(len(y_poison), dtype=int))
         is_poison = is_poison != 0
 
         # shuffle data if required
@@ -231,6 +230,9 @@ class BadNL(object):
             # apply indices to a combined dataset
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
+
+            # apply indices to is_poison
+            is_poison = is_poison[shuffled_indices]
 
         return is_poison, x_combined, y_combined
 
