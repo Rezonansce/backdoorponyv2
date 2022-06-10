@@ -7,6 +7,7 @@ import sys, os
 
 sys.path.append(os.path.abspath('..'))
 
+import torch
 from torch.utils.data import DataLoader
 
 from backdoorpony.datasets.utils.gta.datareader import GraphData, DataReader
@@ -23,24 +24,29 @@ class AIDS(object):
         self.frac = frac
 
     def get_datasets(self):
-        '''Should return the training data and testing data.
+        '''Should return the training data and testing data
 
         Returns:
-            loaders[\'train\']: Graphs used for training (label included).
-            loaders[\'test\']: Graphs used for testing (label included).
+            train_graphs: Graphs used for training (label included).
+            test_graphs: Graphs used for testing (label included).
+            num_classes: Number of classes of the data samples (label included).
+            node_tags: Not sure what this does (yet).
+            test_idx: Indices of the test samples.
         '''
         return self.get_data()
 
     def get_data(self):
         '''
-        Loads portion of AIDS dataset (2000 graphs), controlled by frac parameter (load entire dataset by default).
+        Get the AIDS (aids) dataset.
         Automatically creates a split between train and test data.
 
         Returns:
-            loaders[\'train\']: Graphs used for training (label included).
-            loaders[\'test\']: Graphs used for testing (label included).
+            train_graphs: Graphs used for training (label included).
+            test_graphs: Graphs used for testing (label included).
+            num_classes: Number of classes of the data samples.
+            node_tags: Not sure what this does (yet).
+            test_idx: Indices of the test samples.
         '''
-        
         dir_path = os.path.dirname(os.path.realpath(__file__))
         d_path = dir_path + "/preloaded/graphs/gta"
 
@@ -49,6 +55,7 @@ class AIDS(object):
                         data_path = d_path, dataset = "AIDS", seed = 42, data_verbose = False, train_ratio = 0.8, frac = self.frac)
         
         b_size = 32
+        
 
         loaders = {}
         for split in ['train', 'test']:
@@ -69,4 +76,4 @@ class AIDS(object):
         in_dim = loaders['train'].dataset.num_features
         out_dim = loaders['train'].dataset.num_classes
 
-        return loaders['train'], loaders['test']
+        return (loaders['train'], loaders['test']), dr
