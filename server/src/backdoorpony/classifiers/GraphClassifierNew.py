@@ -57,15 +57,12 @@ class GraphClassifier(AbstractClassifier):
         # Training settings
         # Note: Hyper-parameters need to be tuned in order to obtain results reported in the paper.
         # set up seeds and gpu device
-        print(enumerate(x))
-        
         torch.manual_seed(0)
         np.random.seed(0)
         
         #assert torch.cuda.is_available(), 'no GPU available'
         cpu = torch.device('cpu')
         cuda = torch.device('cuda')
-    
         # print('\nInitialize model')
         # print(model)
         #train_params = list(filter(lambda p: p.requires_grad, model.parameters()))
@@ -147,11 +144,12 @@ class GraphClassifier(AbstractClassifier):
                 output = output.unsqueeze(0)
             loss = loss_fn(output, data[4], reduction='sum')
             pred = predict_fn(output)
-            preds += pred
             
             #FOR DEBUGGING
             correct += pred.eq(data[4].detach().cpu().view_as(pred)).sum().item()
             total += len(output)
+            
+            preds += [o.detach().numpy() for o in output]
             
         print("TOTAL ACCURACY: " + str(correct/total))
         return preds
