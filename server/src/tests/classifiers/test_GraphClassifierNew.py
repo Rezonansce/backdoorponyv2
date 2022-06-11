@@ -4,7 +4,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch, Mock
 
 import numpy as np
-import torch.tensor
+from torch import tensor
 import torch.nn as nn
 from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.models.graph.gta.gcn import GCN
@@ -48,8 +48,8 @@ class TestDataLoader(TestCase):
                 # Arange
                 model = Mock()
                 model.train.return_value = "train"
-                model.forward.return_value = torch.tensor([1.0, 2.0, 3.0, 4.0])
-                model.return_value = torch.tensor([1.0, 2.0, 3.0, 4.0])
+                model.forward.return_value = tensor([1.0, 2.0, 3.0, 4.0])
+                model.return_value = tensor([1.0, 2.0, 3.0, 4.0])
                 
                 loss_fn = Mock()
                 loss = Mock(name = "loss")
@@ -59,8 +59,8 @@ class TestDataLoader(TestCase):
                 
                 classifier = GraphClassifier(model=model, criterion = loss)
                 n_batches = 10
-                x_train = [[torch.tensor([1.0]), torch.tensor([2.0]), torch.tensor([3.0]), 
-                            torch.tensor([4.0]), torch.tensor([0])]] * n_batches
+                x_train = [[tensor([1.0]), tensor([2.0]), tensor([3.0]), 
+                            tensor([4.0]), tensor([0])]] * n_batches
                 y_train = None
                 Adam.return_value = "optimizer"
                 scheduler.return_value = "scheduler"
@@ -79,8 +79,8 @@ class TestDataLoader(TestCase):
                         # Arange
                         model = Mock()
                         model.eval.return_value = "eval"
-                        model.forward.return_value = torch.tensor([1.0, 2.0, 3.0, 4.0])
-                        model.return_value = torch.tensor([1.0, 2.0, 3.0, 4.0])
+                        model.forward.return_value = tensor([1.0, 2.0, 3.0, 4.0])
+                        model.return_value = tensor([1.0, 2.0, 3.0, 4.0])
                         
                         loss_fn = Mock()
                         loss = Mock(name = "loss")
@@ -90,8 +90,8 @@ class TestDataLoader(TestCase):
                         
                         classifier = GraphClassifier(model=model, criterion = loss)
                         n_batches = 10
-                        x_test = [[torch.tensor([1.0]), torch.tensor([2.0]), torch.tensor([3.0]), 
-                                    torch.tensor([4.0]), torch.tensor([0])]] * n_batches
+                        x_test = [[tensor([1.0]), tensor([2.0]), tensor([3.0]), 
+                                    tensor([4.0]), tensor([0])]] * n_batches
                         Adam.return_value = "optimizer"
                         scheduler.return_value = "scheduler"
                                                         
@@ -101,7 +101,7 @@ class TestDataLoader(TestCase):
                         # Assert
                         self.assertEqual(loss.call_count, n_batches)
                         self.assertEqual(model.eval.call_count, 1)
-                        self.assertEqual(preds, [torch.tensor([3])] * 10)
+                        self.assertEqual(preds, [tensor([3])] * 10)
                                   
 
 
