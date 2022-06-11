@@ -1,9 +1,11 @@
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
 __dataset__ = 'fashionmnist'
 __class_name__ = 'FMNIST_CNN'
+
 
 class FMNIST_CNN(nn.Module):
 
