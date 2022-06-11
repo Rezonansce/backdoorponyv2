@@ -13,27 +13,22 @@ from backdoorpony.datasets.utils.gta.batch import collate_batch
 # run on CUDA
 def forwarding(args, bkd_dr: DataReader, model, gids, criterion):
     #assert torch.cuda.is_available(), "no GPU available"
-    cuda = torch.device('cuda')
-    cpu = torch.device('cpu')
-    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     gdata = GraphData(bkd_dr, gids)
     loader = DataLoader(gdata,
                         batch_size=args.batch_size,
                         shuffle=False,   
                         collate_fn=collate_batch)
     
-    if not next(model.parameters()).is_cuda:
-        #model.to(cuda)
-        model.to(cpu)
-    else:
-        model.to(cpu)
+
+    model.to(device)
     model.eval()
     all_loss, n_samples = 0.0, 0.0
     for batch_idx, data in enumerate(loader):
 #         assert batch_idx == 0, "In AdaptNet Train, we only need one GNN pass, batch-size=len(all trainset)"
         for i in range(len(data)):
-            #data[i] = data[i].to(cuda)
-            data[i] = data[i].to(cpu)
+            data[i] = data[i].to(device)
         output = model(data)
         
         if len(output.shape)==1:
@@ -49,11 +44,9 @@ def forwarding(args, bkd_dr: DataReader, model, gids, criterion):
 
 def train_model(args, dr_train: DataReader, model, pset, nset):
     #assert torch.cuda.is_available(), "no GPU available"
-    cuda = torch.device('cuda')
-    cpu = torch.device('cpu')
-                       
-    #model.to(cuda)
-    model.to(cpu)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    model.to(device)
     gids = {'pos': pset, 'neg': nset}
     gdata = {}
     loader = {}
@@ -80,8 +73,7 @@ def train_model(args, dr_train: DataReader, model, pset, nset):
         for key in ['pos', 'neg']:
             for batch_idx, data in enumerate(loader[key]):
                 for i in range(len(data)):
-                    #data[i] = data[i].to(cuda)
-                    data[i] = data[i].to(cpu)
+                    data[i] = data[i].to(device)
                     #save poisoned train samples for execution_history
                     if key == "pos":
                         pos_samples.append(data[i])
@@ -92,15 +84,12 @@ def train_model(args, dr_train: DataReader, model, pset, nset):
                 losses[key] += loss_fn(output, data[4])*len(output)
                 n_samples[key] += len(output)
 
-                for i in range(len(data)):
-                    data[i] = data[i].to(cpu)
         
             losses[key] = torch.div(losses[key], n_samples[key])
         loss = losses['pos'] + args.lambd*losses['neg']
-        loss.backward()
+        loss.backward(retain_graph=True)
         optimizer.step()
         scheduler.step()
-    model.to(cpu)
     
     #return positive train samples for execution_history
     return loader["pos"]
@@ -110,9 +99,9 @@ def train_model(args, dr_train: DataReader, model, pset, nset):
 def evaluate(args, dr_test: DataReader, model, gids):  
     # separate bkd_test/clean_test gids
     softmax = torch.nn.Softmax(dim=1)
-    
-    #model.cuda()
-    model.cpu()
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     gdata = GraphData(dr_test, gids)
     loader = DataLoader(gdata,
                         batch_size=args.batch_size,
@@ -127,8 +116,7 @@ def evaluate(args, dr_test: DataReader, model, gids):
     test_loss, correct, n_samples, confidence = 0, 0, 0, 0
     for batch_idx, data in enumerate(loader):
         for i in range(len(data)):
-            #data[i] = data[i].cuda()
-            data[i] = data[i].cpu()
+            data[i] = data[i].to(device)
             #save poisoned test samples for execution_history
             pos_samples.append(data[i])
         output = model(data)  # not softmax yet
@@ -146,7 +134,6 @@ def evaluate(args, dr_test: DataReader, model, gids):
     
     print('Test set: Average loss: %.4f, Accuracy: %d/%d (%.2f%s), Average Confidence %.4f' % (
         test_loss / n_samples, correct, n_samples, acc, '%', confidence))
-    model.cpu()
     
     #also return positive test samples for execution_history
     return acc, loader

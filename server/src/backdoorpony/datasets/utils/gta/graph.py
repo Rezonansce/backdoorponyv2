@@ -3,11 +3,13 @@ import dgl
 import networkx as nx
 
 def extract_labels(loader):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     labels = []
     for batch_id, data in enumerate(loader):
         for i in range(len(data)):
             #data[i] = data[i].to(cuda)
-            data[i] = data[i].to(torch.device("cpu"))
+            data[i] = data[i].to(device)
         labels += data[4]
     
     return labels

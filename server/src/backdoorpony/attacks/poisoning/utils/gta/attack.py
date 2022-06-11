@@ -16,16 +16,13 @@ from backdoorpony.attacks.poisoning.utils.gta.prop import train_model, evaluate
 class GraphBackdoor:
     def __init__(self, args) -> None:
         self.args = args
-        
-        #assert torch.cuda.is_available(), 'no GPU available'
-        self.cpu = torch.device('cpu')
-        self.cuda = torch.device('cuda')
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def run(self, benign_dr, benign_model):
         # train a benign GNN
         self.benign_dr, self.benign_model = benign_dr, benign_model
         #model = copy.deepcopy(self.benign_model).to(self.cuda)
-        model = copy.deepcopy(self.benign_model).to(self.cpu)
+        model = copy.deepcopy(self.benign_model)
         # pick up initial candidates
         bkd_gids_test, bkd_nids_test, bkd_nid_groups_test = self.bkd_cdd('test')
 
@@ -34,8 +31,8 @@ class GraphBackdoor:
         featdim = np.array(self.benign_dr.data['features'][0]).shape[1]
         
         # init two generators for topo/feat
-        toponet = gta.GraphTrojanNet(nodemax, self.args.gtn_layernum)
-        featnet = gta.GraphTrojanNet(featdim, self.args.gtn_layernum)
+        toponet = gta.GraphTrojanNet(nodemax, self.args.gtn_layernum).to(self.device)
+        featnet = gta.GraphTrojanNet(featdim, self.args.gtn_layernum).to(self.device)
 
         
         # init test data
@@ -74,28 +71,31 @@ class GraphBackdoor:
         topomask_train, featmask_train = gen_mask(
             init_dr_train, bkd_gids_train, bkd_nid_groups_train)
         Ainput_train, Xinput_train = gen_input(self.args, init_dr_train, bkd_gids_train)
-        
+
         for bi_step in range(self.args.bilevel_steps):
-            
             toponet, featnet = gta.train_gtn(
                 self.args, model, toponet, featnet,
-                pset, nset, topomask_train, featmask_train, 
+                pset, nset, topomask_train, featmask_train,
                 init_dr_train, bkd_dr_train, Ainput_train, Xinput_train)
             
             # get new backdoor datareader for training based on well-trained generators
             for gid in bkd_gids_train:
                 rst_bkdA = toponet(
-                    Ainput_train[gid], topomask_train[gid], self.args.topo_thrd, 
-                    self.cpu, self.args.topo_activation, 'topo')
+                    Ainput_train[gid].to(self.device),
+                    topomask_train[gid].to(self.device),
+                    torch.tensor(self.args.topo_thrd).to(self.device),
+                    self.device, self.args.topo_activation, 'topo')
                 bkd_dr_train.data['adj_list'][gid] = torch.add(
-                    rst_bkdA[:nodenums[gid], :nodenums[gid]].detach().cpu(), 
-                    init_dr_train.data['adj_list'][gid])
+                    rst_bkdA[:nodenums[gid], :nodenums[gid]].to(self.device),
+                    torch.tensor(init_dr_train.data['adj_list'][gid]).to(self.device))
             
                 rst_bkdX = featnet(
-                    Xinput_train[gid], featmask_train[gid], self.args.feat_thrd, 
-                    self.cpu, self.args.feat_activation, 'feat')
+                    Xinput_train[gid].to(self.device),
+                    featmask_train[gid].to(self.device),
+                    torch.tensor(self.args.feat_thrd).to(self.device),
+                    self.device, self.args.feat_activation, 'feat')
                 bkd_dr_train.data['features'][gid] = torch.add(
-                    rst_bkdX[:nodenums[gid]].detach().cpu(), init_dr_train.data['features'][gid]) 
+                    rst_bkdX[:nodenums[gid]].to(self.device), torch.tensor(init_dr_train.data['features'][gid]).to(self.device))
                 
             # train GNN
             trained = train_model(self.args, bkd_dr_train, model, list(set(pset)), list(set(nset)))
@@ -103,17 +103,21 @@ class GraphBackdoor:
             #----------------- Evaluation -----------------#
             for gid in bkd_gids_test:
                 rst_bkdA = toponet(
-                    Ainput_test[gid], topomask_test[gid], self.args.topo_thrd, 
-                    self.cpu, self.args.topo_activation, 'topo')
+                    Ainput_test[gid].to(self.device),
+                    topomask_test[gid].to(self.device),
+                    torch.tensor(self.args.topo_thrd).to(self.device),
+                    self.device, self.args.topo_activation, 'topo')
                 bkd_dr_test.data['adj_list'][gid] = torch.add(
-                    rst_bkdA[:nodenums[gid], :nodenums[gid]], 
-                    torch.as_tensor(copy.deepcopy(init_dr_test.data['adj_list'][gid])))
+                    rst_bkdA[:nodenums[gid], :nodenums[gid]].to(self.device),
+                    torch.as_tensor(copy.deepcopy(init_dr_test.data['adj_list'][gid])).to(self.device))
             
                 rst_bkdX = featnet(
-                    Xinput_test[gid], featmask_test[gid], self.args.feat_thrd, 
-                    self.cpu, self.args.feat_activation, 'feat')
+                    Xinput_test[gid].to(self.device),
+                    featmask_test[gid].to(self.device),
+                    torch.tensor(self.args.feat_thrd).to(self.device),
+                    self.device, self.args.feat_activation, 'feat')
                 bkd_dr_test.data['features'][gid] = torch.add(
-                    rst_bkdX[:nodenums[gid]], torch.as_tensor(copy.deepcopy(init_dr_test.data['features'][gid])))
+                    rst_bkdX[:nodenums[gid]].to(self.device), torch.as_tensor(copy.deepcopy(init_dr_test.data['features'][gid])).to(self.device))
                 
             # graph originally in target label
             yt_gids = [gid for gid in bkd_gids_test 
