@@ -7,6 +7,7 @@ import sys, os
 
 sys.path.append(os.path.abspath('..'))
 
+import torch
 from torch.utils.data import DataLoader
 
 from backdoorpony.datasets.utils.gta.datareader import GraphData, DataReader
@@ -28,6 +29,7 @@ class AIDS(object):
         Returns:
             loaders[\'train\']: Graphs used for training (label included).
             loaders[\'test\']: Graphs used for testing (label included).
+            dr: DataReader used for GTA attack.
         '''
         return self.get_data()
 
@@ -39,8 +41,8 @@ class AIDS(object):
         Returns:
             loaders[\'train\']: Graphs used for training (label included).
             loaders[\'test\']: Graphs used for testing (label included).
+            dr: DataReader used for GTA attack.
         '''
-        
         dir_path = os.path.dirname(os.path.realpath(__file__))
         d_path = dir_path + "/preloaded/graphs/gta"
 
@@ -49,6 +51,7 @@ class AIDS(object):
                         data_path = d_path, dataset = "AIDS", seed = 42, data_verbose = False, train_ratio = 0.8, frac = self.frac)
         
         b_size = 32
+        
 
         loaders = {}
         for split in ['train', 'test']:
@@ -69,4 +72,4 @@ class AIDS(object):
         in_dim = loaders['train'].dataset.num_features
         out_dim = loaders['train'].dataset.num_classes
 
-        return loaders['train'], loaders['test']
+        return (loaders['train'], loaders['test']), dr
