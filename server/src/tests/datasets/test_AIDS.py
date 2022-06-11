@@ -22,14 +22,16 @@ class TestDataLoader(TestCase):
         aids = AIDS()
         x1, y1 = aids.get_data()
         self.assertTrue(len(x1[0]) == 50)
-        self.assertTrue(len(x1[1]) == 13)
+        self.assertTrue(isinstance(x1[1],  DataReader))
                     
         x2, y2 = aids.get_datasets()
         self.assertTrue(len(x2[0]) == 50)
-        self.assertTrue(len(x2[1]) == 13)
+        self.assertTrue(isinstance(x2[1],  DataReader))
         
-        self.assertTrue(isinstance(y1,  DataReader))
-        self.assertTrue(isinstance(y2,  DataReader))
+        self.assertTrue(len(y1[0]) == 13)
+        self.assertTrue(len(y1[1]) == 400)
+        self.assertTrue(len(y2[0]) == 13)
+        self.assertTrue(len(y2[1]) == 400)
 
 
 
