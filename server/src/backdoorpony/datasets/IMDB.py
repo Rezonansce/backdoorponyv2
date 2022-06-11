@@ -6,7 +6,7 @@ import numpy
 import pandas as pd
 from tqdm import tqdm
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
 
 
 class IMDB(object):
@@ -60,11 +60,11 @@ class IMDB(object):
         words = []
 
         print("creating a dictionary...")
-        ps = PorterStemmer()
+        normalizer = WordNetLemmatizer()
         for row in tqdm(datatrain):
             for word in row.lower().split():
                 word = self.clean(word)
-                word = ps.stem(word)
+                word = normalizer.lemmatize(word)
                 if word not in stop_words:
                     words.append(word)
 
@@ -82,12 +82,12 @@ class IMDB(object):
         print("removing noise for training data and encoding it")
         for row in tqdm(datatrain):
             wds = row.lower().split()
-            retDataTrain.append([onehotencode[ps.stem(self.clean(word))] for word in wds if ps.stem(self.clean(word)) in onehotencode.keys()])
+            retDataTrain.append([onehotencode[normalizer.lemmatize(self.clean(word))] for word in wds if normalizer.lemmatize(self.clean(word)) in onehotencode.keys()])
 
         print("removing noise for testing data and encoding it")
         for row in tqdm(datatest):
             wds = row.lower().split()
-            retDataTest.append([onehotencode[ps.stem(self.clean(word))] for word in wds if ps.stem(self.clean(word)) in onehotencode.keys()])
+            retDataTest.append([onehotencode[normalizer.lemmatize(self.clean(word))] for word in wds if normalizer.lemmatize(self.clean(word)) in onehotencode.keys()])
 
         return numpy.array(retDataTrain), numpy.array(retDataTest), onehotencode
 
