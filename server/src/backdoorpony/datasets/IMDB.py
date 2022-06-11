@@ -6,6 +6,7 @@ import numpy
 import pandas as pd
 from tqdm import tqdm
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 
 
 class IMDB(object):
@@ -59,9 +60,11 @@ class IMDB(object):
         words = []
 
         print("creating a dictionary...")
+        ps = PorterStemmer()
         for row in tqdm(datatrain):
             for word in row.lower().split():
                 word = self.clean(word)
+                word = ps.stem(word)
                 if word not in stop_words:
                     words.append(word)
 
@@ -79,12 +82,12 @@ class IMDB(object):
         print("removing noise for training data and encoding it")
         for row in tqdm(datatrain):
             wds = row.lower().split()
-            retDataTrain.append([onehotencode[self.clean(word)] for word in wds if self.clean(word) in onehotencode.keys()])
+            retDataTrain.append([onehotencode[ps.stem(self.clean(word))] for word in wds if ps.stem(self.clean(word)) in onehotencode.keys()])
 
         print("removing noise for testing data and encoding it")
         for row in tqdm(datatest):
             wds = row.lower().split()
-            retDataTest.append([onehotencode[self.clean(word)] for word in wds if self.clean(word) in onehotencode.keys()])
+            retDataTest.append([onehotencode[ps.stem(self.clean(word))] for word in wds if ps.stem(self.clean(word)) in onehotencode.keys()])
 
         return numpy.array(retDataTrain), numpy.array(retDataTest), onehotencode
 
@@ -117,11 +120,11 @@ class IMDB(object):
 
         # load train data
         # print("current dir ", os.getcwd())
-        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=0.5, random_state=SEED).reset_index(drop=True)
+        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=0.3, random_state=SEED).reset_index(drop=True)
 
 
         # load test data
-        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.1, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.15, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data
