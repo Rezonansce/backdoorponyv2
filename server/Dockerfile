@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime as backdoorpony-backend 
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime as backdoorpony-backend
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update &&\
     apt-get upgrade -y &&\

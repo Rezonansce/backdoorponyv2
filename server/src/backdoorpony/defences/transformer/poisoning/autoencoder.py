@@ -56,6 +56,9 @@ def run(clean_classifier, test_data, execution_history, defence_params):
                     new_entry.update({
                             'defence': __name__,
                             'defenceCategory': __category__,
+                            'batch_size': batch_size,
+                            'learning_rate': lr,
+                            'nb_epochs': nb_epochs,
                             'dict_others': {
                                 'poison_classifier': deepcopy(defence_classifier),
                                 'poison_inputs': deepcopy(entry['dict_others']['poison_inputs']),
@@ -88,7 +91,7 @@ def run_def(classifier, data_set, lr=0.1, batch_size=32, nb_epochs=10):
     autoencoder_classifier = Autoencoder(autoencoder_cnn, lr=lr
                                          , batch_size=batch_size, nb_epochs=nb_epochs)
     # Fit the autoencoder
-    autoencoder_classifier.fit(data_set[0])
+    autoencoder_classifier.fit(data_set[0], data_set[0])
     # Attach autoencoder to poisoned classifier
     classifier.set_autoencoder(autoencoder_classifier)
     # get non-poisoned data and train auto encoder

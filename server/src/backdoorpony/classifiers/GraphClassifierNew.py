@@ -59,6 +59,7 @@ class GraphClassifier(AbstractClassifier):
         # Training settings
         # Note: Hyper-parameters need to be tuned in order to obtain results reported in the paper.
         # set up seeds and gpu device
+        
         torch.manual_seed(0)
         np.random.seed(0)
 
