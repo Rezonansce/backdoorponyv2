@@ -15,7 +15,7 @@ __input_type__ = 'text'
 __defaults__ = {
     'threshold': {
         'pretty_name': 'Threshold',
-        'default_value': [0.3],
+        'default_value': [20],
         'info': 'Suspicion score is determined by calculating the difference of perplexity between a sentence with(p0) and without(pi) every word - so suspicion = p0-pi. All words with suspicion score larger than threshold will be considered outliers and be removed before training the model.'
     }
 }
@@ -56,8 +56,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
         for ts in defence_params['threshold']['value']:
             new_entry = deepcopy(entry)
 
-            defence_classifier = ONION(deepcopy(clean_classifier), deepcopy(
-                test_text), ts)
+            defence_classifier = ONION(deepcopy(clean_classifier), deepcopy(test_text), ts)
 
             def poison_condition(x): return x == -1
 
@@ -83,7 +82,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
 class ONION:
     def __init__(self, classifier, clean_data, threshold):
         '''
-        Apply the STRIP defence to the classifier.
+        Apply the ONION defence to the classifier.
 
         Parameters
         ----------
@@ -91,10 +90,9 @@ class ONION:
             The classifier that has been poisoned
         x_clean_test :
             Clean (unpoisoned) preprocessed test data
-        sample_size :
-            The number (integer) of clean samples to use for the defence
-            The higher the better the defence works, but make sure to keep some for
-            verifying the defence.
+        threshold:
+            if suspicion score is above the give threshold,
+            data is considered to be poisoned
 
         Returns
         ----------
@@ -105,34 +103,70 @@ class ONION:
         self.clean_data = clean_data
         self.threshold = threshold
 
+        # GPT2 fast tokenizer for embedding
         self.gpt2_tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+
+        # GPT2 model with head layers to calculate perplexity
         self.gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
 
+        # move the model to gpu if possible
         self.gpt2_model.parallelize()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def calculate_suspicion(self, sentence):
+        '''
+            Calculate suspicion score of each word in the sentence
+
+        Parameters
+        ----------
+        sentence:
+            a string line consisting of multiple words
+
+        Returns
+        -------
+            suspicion scores as a 1d numpy float array
+        '''
+        # tokenize
         tokenized_sentence = self.gpt2_tokenizer.encode(sentence, return_tensors="pt").to(self.device)
+        # calculate perplexity p0 of the original sentence
         with torch.no_grad():
             original_perplexity = self.gpt2_model(tokenized_sentence, labels=tokenized_sentence)[0].detach().cpu().numpy()
 
+        # split array to construct new sentences without a word
         arr_sentence = np.array(str.split(sentence))
-        # suspicion_scores = np.empty(len(arr_sentence), dtype=float)
-        suspicion_scores = np.empty(1, dtype=float)
+        # initialize suspicion_scores array
+        suspicion_scores = np.empty(len(arr_sentence), dtype=float)
+
         for i in range(len(arr_sentence)):
-            i = round(arr_sentence.size/ 2)
+            # construct a new sentence without a word positioned at i
             sentence_with_removed_word = ' '.join(arr_sentence[np.arange(arr_sentence.size) != i])
+            # tokenize
             new_tokenized_sentence = self.gpt2_tokenizer.encode(sentence_with_removed_word, return_tensors="pt").to(self.device)
+            # calculate new perplexity pi
             with torch.no_grad():
                     new_perplexity = self.gpt2_model(new_tokenized_sentence, labels=new_tokenized_sentence)[0].detach().cpu().numpy()
 
+            # suspicion score = p0 - pi
             sus_score = original_perplexity - new_perplexity
 
-            suspicion_scores[0] = sus_score
-            break
+            suspicion_scores[i] = sus_score
+
         return suspicion_scores
 
     def predict_whether_poisoned(self, data):
+        '''
+        Calculates suspicion of all words in the sentence,
+        uses the highest suspicion score when comparing to the user-selected threshold
+
+        Parameters
+        ----------
+        data:
+            dataset to classify as poisoned/not
+
+        Returns
+        -------
+        A boolean array representing whether an entry is poisoned or not
+        '''
         preds = []
         # i = 0
         for entry in tqdm(data):
@@ -149,6 +183,18 @@ class ONION:
         return np.array(preds) > self.threshold
 
     def construct_sentence(self, sentence):
+        '''
+        Constructs a sentence from vocabulary given ids
+
+        Parameters
+        ----------
+        sentence - ids of words in the vocabulary
+
+        Returns
+        -------
+        sentence as a string
+
+        '''
         constructed_sentence = []
         for i, word_index in enumerate(sentence):
             if word_index != 0:
@@ -156,6 +202,20 @@ class ONION:
         return ' '.join(constructed_sentence)
 
     def predict(self, data):
+        '''Classifies the input if unpoisoned,
+        otherwise marks as poisoned and skips the entry
+
+        Parameters
+        ----------
+        data:
+            the dataset to classify
+
+        Returns
+        -------
+        preds:
+            1d numpy array of predictions with entry set to -1 if gp2 calculated suspicion score
+            is higher than the user-selected threshold
+        '''
         poison_conditions = self.predict_whether_poisoned(data)
         preds_classifier = self.classifier.predict(data)
         preds = np.empty(len(data), dtype=float)
@@ -185,7 +245,5 @@ class ONION:
         '''
         poison_preds = self.predict(x_poisoned_data)
         clean_preds = self.predict(self.clean_data)
-        print("poison_onion: ", poison_preds)
-        print("clean_onion: ", clean_preds)
-        self.gpt2_model.deparallelize()
+
         return poison_preds, clean_preds
