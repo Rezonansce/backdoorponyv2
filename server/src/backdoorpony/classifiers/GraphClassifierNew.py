@@ -36,7 +36,7 @@ class GraphClassifier(AbstractClassifier):
         self.iters = iters
 
         # input_shape & nb_classes can be arbitrary, but need to be initialized
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = model.to(self.device)
         self.loss = criterion
         self.optimizer = opti
