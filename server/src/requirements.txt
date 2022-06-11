@@ -23,7 +23,6 @@ opencv-python==4.4.0.42
 networkx==2.8.0
 
 # frameworks
-dgl-cu113 dglgo -f https://data.dgl.ai/wheels/repo.html
 
 # used in a text classifier
 sacremoses==0.0.45
