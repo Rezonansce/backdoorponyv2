@@ -44,7 +44,7 @@ __defaults__ = {
     }
 }
 __link__ = 'None'
-__info__ = '''None'''.replace('\n', '')
+__info__ = '''This is a customly created attack, which is based on other similar badnet attacks. It focuses on attacking a specific class by changing labels of other classes to the target class and adding some noise to them.'''.replace('\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
@@ -267,7 +267,23 @@ class BAASV():
         #shutil.rmtree(self.temp_final)
 
     def save_image(self, data, out_shape, save_path):
+        """
+        Saves data in .png format
 
+        Parameters
+        ----------
+        data : array
+            audio data to be saved.
+        out_shape : tuple (n, n)
+            resolution of the saved image.
+        save_path : string
+            save path of the image.
+
+        Returns
+        -------
+        None.
+
+        """
 
 
         noverlap=16
@@ -285,9 +301,29 @@ class BAASV():
         plt.close(fig)
 
     def load_image(self, dummy_file_path):
+        """
+        Loads gray scaled image, extracts one dimension from it (other dimensions have the same data)
+
+        Parameters
+        ----------
+        dummy_file_path : string
+            Path location of the image.
+
+        Returns
+        -------
+        array
+            Data of the loaded image.
+
+        """
         return matplotlib.pyplot.imread(dummy_file_path)[:,:,0]
 
 def path_leaf(path):
+    """
+    Helper method that extracts the filename from a path
+
+    path: string
+        path of a file
+    """
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 

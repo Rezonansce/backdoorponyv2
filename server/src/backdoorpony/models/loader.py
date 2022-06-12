@@ -4,12 +4,14 @@ from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 
+
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 from backdoorpony.datasets.audio_VGD import Audio_VGD
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
+from backdoorpony.models.audio.Audio_VGD_CNN import Audio_VGD_CNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 
@@ -71,7 +73,7 @@ class Loader():
                 },
                 'Audio_VGD': {
                     'dataset': Audio_VGD,
-                    'model': Audio_MNIST_RNN,
+                    'model': Audio_VGD_CNN,
                     'link': None,
                     'info': 'The VoxCeleb dataset (7000+ unique speakers and utterances, 3683 males / 2312 females). The VoxCeleb is an audio-visual dataset consisting of short clips of human speech, extracted from interview videos uploaded to YouTube. VoxCeleb contains speech from speakers spanning a wide range of different ethnicities, accents, professions, and ages.'
 
@@ -143,6 +145,8 @@ class Loader():
         None
         '''
 
+        model = None
+
         model = self.options[type][dataset]['model']()
 
 
@@ -154,6 +158,7 @@ class Loader():
             model.load_state_dict(state_dict)
 
         self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
+
 
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data

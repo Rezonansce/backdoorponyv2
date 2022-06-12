@@ -21,13 +21,14 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
         '''
         criterion = nn.CrossEntropyLoss()
         opti = optim.Adam(model.parameters(), lr=0.01)
+        print(model.nb_class)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
             loss=criterion,
             optimizer=opti,
             input_shape=shape,
-            nb_classes=10,
+            nb_classes=int(model.nb_class),
         )
 
     def fit(self, x, y, *args, **kwargs):
@@ -50,7 +51,7 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
         x_train, y_train = preprocess(x_train, y_train)
         x_train = np.expand_dims(x_train, axis=3)
         x_train = np.transpose(x_train, (0, 3, 2, 1)).astype(np.float32)
-        super().fit(x_train, y_train, 64, 3)
+        super().fit(x_train, y_train, 64, 20)
 
     def predict(self, x, *args, **kwargs):
         '''Classifies the given input

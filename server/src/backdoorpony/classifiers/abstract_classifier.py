@@ -21,7 +21,7 @@ class AbstractClassifier(ABC):
     @abstractmethod
     def fit(self, x, y, *args, **kwargs):
         '''Should fit the classifier to the training data
-        
+
         Parameters
         ----------
         x :
@@ -46,7 +46,7 @@ class AbstractClassifier(ABC):
 
         Returns
         ----------
-        prediction : 
+        prediction :
             Return format can be anything, as long as it is consistent between
             classifiers of the same category
         '''
