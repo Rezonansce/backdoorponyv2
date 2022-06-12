@@ -21,7 +21,6 @@ tqdm==4.60.0
 pandas==1.2.4
 opencv-python==4.4.0.42
 networkx==2.8.0
-dgl==0.5.0
 
 # frameworks
 transformers==4.19.3 

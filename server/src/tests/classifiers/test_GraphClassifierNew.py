@@ -22,6 +22,7 @@ class TestDataLoader(TestCase):
                     scheduler.return_value = "scheduler"
                     model = MagicMock(name='model')
                     model.parameters.return_value = "params"
+                    model.to.return_value=model
 
                     # Act
                     classifier = GraphClassifier(model=model, criterion = CrossEntropyLoss)
@@ -50,6 +51,8 @@ class TestDataLoader(TestCase):
                 model.train.return_value = "train"
                 model.forward.return_value = tensor([1.0, 2.0, 3.0, 4.0])
                 model.return_value = tensor([1.0, 2.0, 3.0, 4.0])
+                model.to.return_value=model
+
                 
                 loss_fn = Mock()
                 loss = Mock(name = "loss")
@@ -81,6 +84,7 @@ class TestDataLoader(TestCase):
                         model.eval.return_value = "eval"
                         model.forward.return_value = tensor([1.0, 2.0, 3.0, 4.0])
                         model.return_value = tensor([1.0, 2.0, 3.0, 4.0])
+                        model.to.return_value=model
                         
                         loss_fn = Mock()
                         loss = Mock(name = "loss")
@@ -101,7 +105,7 @@ class TestDataLoader(TestCase):
                         # Assert
                         self.assertEqual(loss.call_count, n_batches)
                         self.assertEqual(model.eval.call_count, 1)
-                        self.assertEqual(preds, [tensor([3])] * 10)
+                        np.testing.assert_array_equal(np.array(preds), np.array([np.array([1., 2., 3., 4.], dtype=np.float32)] * 10))
                                   
 
 
