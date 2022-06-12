@@ -5,6 +5,7 @@ from backdoorpony.datasets.CIFAR10 import CIFAR10
 import unittest
 import numpy as np
 from unittest import TestCase
+import unittest
 
 class TestCifarPreTrain(TestCase):
 
@@ -14,6 +15,8 @@ class TestCifarPreTrain(TestCase):
         self.train_data, self.test_data = CIFAR10().get_datasets()
         self.classifier = ImageClassifier(self.cnn)
 
+    def test_init(self):
+        self.assertTrue(isinstance(self.classifier, ImageClassifier))
 
     def test_accuracy(self):
         '''

@@ -1,28 +1,30 @@
-from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
-from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
-
 import unittest
 import numpy as np
-from unittest import TestCase
 
-class TestFMNISTPreTrain(TestCase):
-
-    def __init__(self, *args, **kwargs):
-        super(TestFMNISTPreTrain, self).__init__(*args, **kwargs)
-        self.cnn = FMNIST_CNN()
-        self.train_data, self.test_data = Fashion_MNIST().get_datasets()
-        self.classifier = ImageClassifier(self.cnn)
+from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 
 
-    def test_accuracy(self):
-        '''
-        Make sure that the accuracy of the pre-load is at least 75%
-        '''
-        self.classifier.fit(self.train_data[0]
-                            , self.train_data[1], use_pre_load=True)
-        pred = self.classifier.predict(self.test_data[0])
-        results = np.argmax(pred, axis=1)
-        error = np.mean(results != self.test_data[1])
-        print("MNIST pre-load has an accuracy of " + str(1 - error))
-        self.assertTrue((1 - error) > 0.75)
+class TestDataLoader(unittest.TestCase):
+
+    def __init__(self):
+        self.size = 500
+        self.dataloader = Fashion_MNIST(self.size)
+
+    def test_init(self):
+        self.assertTrue(self.dataloader)
+        self.assertTrue(self.dataloader.num_selection == self.size)
+
+    def test_get_data(self):
+        # Checks the format of the data
+        train_data, test_data = self.dataloader.get_datasets()
+        train_imgs = train_data[0]
+        test_imgs = test_data[0]
+        train_labels = train_data[1]
+        test_labels = test_data[1]
+        # Check shapes
+        self.assertTrue(np.shape(train_imgs) == (self.size, 1, 28, 28))
+        self.assertTrue(np.shape(test_imgs) == (10000, 1, 28, 28))
+        self.assertTrue(np.shape(train_labels) == self.size)
+        self.assertTrue(np.shape(test_labels) == 10000)
+
+

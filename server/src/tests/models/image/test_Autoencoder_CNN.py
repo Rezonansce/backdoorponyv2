@@ -1,15 +1,16 @@
-import unittest
 from unittest import TestCase
 
-from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
+from backdoorpony.defence_helpers.autoencoder_util.AutoencoderCNN import AutoencoderCNN
 import torch.optim as optim
 import torch.nn as nn
 
-class TestFmnistCNN(TestCase):
+class TestAutoencoderCNN(TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(TestFmnistCNN, self).__init__(*args, **kwargs)
-        self.cnn = FMNIST_CNN()
+        super(TestAutoencoderCNN, self).__init__(*args, **kwargs)
+        self.input_shape = (1, 1, 1)
+        self.path = 'path'
+        self.cnn = AutoencoderCNN(self.input_shape, self.path)
 
     def test_init(self):
         self.assertTrue(isinstance(self.cnn, nn.Module))
@@ -20,16 +21,17 @@ class TestFmnistCNN(TestCase):
 
     def test_get_criterion(self):
         crit = self.cnn.get_criterion()
-        self.assertTrue(isinstance(crit, nn.CrossEntropyLoss))
+        self.assertTrue(isinstance(crit, nn.MSELoss))
 
     def test_get_nb_classes(self):
         nb_classes = self.cnn.get_nb_classes()
-        self.assertTrue(nb_classes == 10)
+        self.assertTrue(nb_classes == self.input_shape[0] * self.input_shape[1]
+                        * self.input_shape[2])
 
     def test_get_input_shape(self):
         input_shape = self.cnn.get_input_shape()
-        self.assertTrue(input_shape == (1, 28, 28))
+        self.assertTrue(input_shape == self.input_shape)
 
     def test_get_path(self):
         path = self.cnn.get_path()
-        self.assertTrue(path == 'fashion_mnist')
+        self.assertTrue(path == self.path + '_autoencoder')
