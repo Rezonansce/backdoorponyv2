@@ -8,7 +8,7 @@ COPY ./server/src/ .
 COPY ./server/assets ./assets
 COPY ./server/data ./data
 ENV FLASK_ENV=development
-ENV DEBUGGER=True
+ENV DEBUGGER=False
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV DGLBACKEND=pytorch
