@@ -5,6 +5,7 @@ import numpy as np
 __name__ = 'abstract metrics'
 
 from backdoorpony.classifiers.TextClassifier import TextClassifier
+from backdoorpony.defences.transformer.poisoning.onion import ONION
 
 
 class AbstractMetricsRunner(ABC):
@@ -88,7 +89,7 @@ class AbstractMetricsRunner(ABC):
         probs = classifier.predict(inputs)
 
         # if text classifier is used - flatten
-        if isinstance(classifier, TextClassifier):
+        if isinstance(classifier, TextClassifier) or isinstance(classifier, ONION):
             preds = probs
         else:
             preds = np.argmax(probs, axis=1)

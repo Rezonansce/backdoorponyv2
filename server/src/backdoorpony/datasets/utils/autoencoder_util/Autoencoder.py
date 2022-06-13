@@ -1,16 +1,25 @@
 import os.path
-import torch
+import torch.nn
+import numpy as np
+from art.estimators.classification import PyTorchClassifier
 
 
-class Autoencoder:
+class Autoencoder(PyTorchClassifier):
 
     def __init__(self, model, lr=0.1, batch_size=32, nb_epochs=10):
         self.lr = lr
         self.batch_size = batch_size
         self.nb_epochs = nb_epochs
-        self.model = model
+        super().__init__(
+            model=model,
+            clip_values=(0.0, 255.0),
+            loss=model.get_criterion(),
+            optimizer=model.get_opti(),
+            input_shape=model.get_input_shape(),
+            nb_classes=model.get_nb_classes()
+        )
 
-    def fit(self, x):
+    def fit(self, x, y, *args, **kwargs):
         '''
         Fit the autoencoder to the data set x
         :param x: the data set to fit
@@ -62,7 +71,7 @@ class Autoencoder:
         # Save the model
         torch.save(self.model.state_dict(), final_path)
 
-    def predict(self, x):
+    def predict(self, x, *args, **kwargs):
         '''
         Predict the output for the given input x
         :param x: The input images
@@ -73,4 +82,4 @@ class Autoencoder:
         # Reshape into a 1d array for each image
         x = x.reshape(-1, input_shape[0] * input_shape[1] * input_shape[2])
         # Predict and reshape back to 3d images
-        return self.model.predict(x).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
+        return super().predict(x.astype(np.float32)).reshape(-1, input_shape[0], input_shape[1], input_shape[2])
