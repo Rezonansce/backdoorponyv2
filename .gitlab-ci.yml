@@ -30,6 +30,7 @@ python:tests:
   script:
     - cd server/src
     - pip3 install -r requirements.txt
+    - pip3 install dgl-cu113 dglgo -f https://data.dgl.ai/wheels/repo.html
     - coverage run --branch -m unittest discover -p test_*.py
     - coverage report -m
     - coverage json --pretty-print
