@@ -96,8 +96,8 @@ class Loader():
                 'AIDS': {
                     'dataset': AIDS,
                     'model': AIDS_gcn,
-                    'link': "TODO",
-                    'info': "TODO"
+                    'link': "https://paperswithcode.com/dataset/aids",
+                    'info': "AIDS is a graph dataset. It consists of 2000 graphs representing molecular compounds which are constructed from the AIDS Antiviral Screen Database of Active Compounds. It contains 4395 chemical compounds, of which 423 belong to class CA, 1081 to CM, and the remaining compounds to CI."
                 }
             }
         }

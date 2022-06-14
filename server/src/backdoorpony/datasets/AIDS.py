@@ -16,7 +16,7 @@ from backdoorpony.datasets.utils.gta.graph import extract_labels
 
 class AIDS(object):
     def __init__(self, frac = 1):
-        '''Should initiate the dataset
+        '''Should initiate the dataset. Frac is used to control the fraction (%) of dataset to load.
 
         Returns
         ----------
@@ -38,15 +38,14 @@ class AIDS(object):
 
     def get_data(self):
         '''
-        Get the AIDS (aids) dataset.
+        Get the AIDS (aids) dataset, which consists of 2000 graphs. It contains two graph labels, 0 and 1.
         Automatically creates a split between train and test data.
 
         Returns:
-            train_graphs: Graphs used for training (label included).
-            test_graphs: Graphs used for testing (label included).
-            num_classes: Number of classes of the data samples.
-            node_tags: Not sure what this does (yet).
-            test_idx: Indices of the test samples.
+            loaders[train]: Graphs used for training (label included).
+            dr: DataReader containing helper fields for the attacks. Is used by GTA to load data (instead of using train_graphs).
+            loaders[test]: Graphs used for training (label included).
+            labels: Test graph labels. Used to properly generate metrics.
         '''
         dir_path = os.path.dirname(os.path.realpath(__file__))
         d_path = dir_path + "/preloaded/graphs/gta"
