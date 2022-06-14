@@ -56,6 +56,7 @@ class AIDS(object):
         
         b_size = 32
         
+        dr.b_size = b_size
 
         loaders = {}
         for split in ['train', 'test']:
@@ -77,4 +78,6 @@ class AIDS(object):
         out_dim = loaders['train'].dataset.num_classes
         
         labels = extract_labels(loaders["test"])
+        
+            
         return (loaders['train'], dr), (loaders["test"], labels)

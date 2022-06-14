@@ -3,7 +3,7 @@ from backdoorpony.models.graph.gta.gcn import GCN
 
 #A model instance for the MUTAG dataset that inherits from general graphcnn model.
 class AIDS_sage(GCN):
-    def __init__(self, in_dim = 49, out_dim = 2,
+    def __init__(self, in_dim = 55, out_dim = 2,
                  hidden_dim=[64, 32],  # GNN layers + 1 layer MLP
                  dropout=0.2,
                  activation=F.relu,

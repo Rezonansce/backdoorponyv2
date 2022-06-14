@@ -149,7 +149,8 @@ class DataReader():
             
 
         #--------- Generate onehot-feature ---------#
-        features = GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data)
+        features, max_degree = GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data)
+        self.max_degree = max_degree
         
         # final graph feature dim
         num_features = features[0].shape[1]
@@ -211,6 +212,8 @@ class DataReader():
         data['num_classes'] = num_classes
 
         self.data = data
+        self.train_len = len(train_gids)
+        self.test_len = len(test_gids)
         
         # print(len(data['features']), len(data['adj_list']), len(data['labels']))
         assert len(data['features'])==len(data['adj_list'])==len(data['labels']), \
@@ -372,7 +375,7 @@ def GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, da
 
         # part 3 (optinal): node degree 
         if use_degree_asfeat:
-            degree_onehot = np.zeros((N, max_degree + 1))
+            degree_onehot = np.zeros((N, int(max_degree*2+1)))
             degree_onehot[np.arange(N), np.sum(adj, 1).astype(np.int32)] = 1
         else:
             degree_onehot = np.empty((N, 0))
@@ -383,8 +386,8 @@ def GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, da
             # node degree features can be used instead
             node_features = np.ones((N, 1))
         final_features.append(node_features)
-        
-    return final_features
+    
+    return (final_features, max_degree)
 
 
 class GraphData(torch.utils.data.Dataset):
