@@ -60,6 +60,7 @@ class TestIMDB(TestCase):
     def test_get_data(self):
         # test that only a fraction of data is loaded with correct length
         # change to directory used when running for proper imports
+        print("current dir ", os.getcwd())
         os.chdir(os.path.expanduser("/opt/project/server/src/backdoorpony"))
         train_data, test_data = self.imdb.get_data(0.01, 0.001)
         self.assertTrue(len(train_data) == 250)
@@ -68,6 +69,7 @@ class TestIMDB(TestCase):
     def test_get_datasets(self):
         # test that only a fraction of data is loaded with correct padded sequence length
         # change to directory used when running for proper imports
+        print("current dir ", os.getcwd())
         os.chdir(os.path.expanduser("/opt/project/server/src/backdoorpony"))
         data_train, data_test, _ = self.imdb.get_datasets(0.1, 0.01)
         self.assertTrue(np.shape(data_train[0]) == (2500, 700))
