@@ -129,14 +129,15 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
                                                         
     return execution_history
-
-#Generates a random subgraph according to the specified graph_type with specified properties (parameters),
-#that is embedded to a portion of randomly chosen train graphs that do not initially belong to the target class 
-#(if the chosen graph has less nodes than the trigger, it is replaced completely). Those graphs embedded
-#with the trigger have their labels changed to the target_label. Same process is applied to portion
-#of test graphs.   
+   
 def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdoor_nodes, target_label,
                                      graph_type, prob, K, max_degree, train_length, test_length, b_size):
+    #Generates a random subgraph according to the specified graph_type with specified properties (parameters),
+    #that is embedded to a portion of randomly chosen train graphs that do not initially belong to the target class 
+    #(if the chosen graph has less nodes than the trigger, it is replaced completely). Those graphs embedded
+    #with the trigger have their labels changed to the target_label. Same process is applied to portion
+    #of test graphs. Returns the train and test graphs that have been poisoned.
+
     ## erdos_renyi
     if graph_type == 'ER':
         G_gen = nx.erdos_renyi_graph(num_backdoor_nodes, prob)
