@@ -84,6 +84,12 @@ def select_model():
 
 
 # Attacks & Defences ---------------------------------------------------
+@app.route('/get_all_models', methods=['GET'])
+def get_all_models():
+    '''Returns a list of all the attacks and their info in JSON format.'''
+    _, models = import_submodules_attributes(package=backdoorpony.models, result=[
+    ], recursive=True, req_module=None, req_attr=['__name__', '__category__','__input_type__', '__info__', '__link__'])
+    return jsonify(models)
 
 @app.route('/get_all_attacks', methods=['GET'])
 def get_all_attacks():
