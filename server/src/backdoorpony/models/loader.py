@@ -1,7 +1,7 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.classifiers.TextClassifier import  TextClassifier
+from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 
@@ -163,17 +163,27 @@ class Loader():
         None
         '''
 
-        if type == "text":
-            self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1
-            print("Vocab size: ", vocab_size)
-            embedding_dim = 10
-            lstm_layers = 2
-            hidden_dim = 16
-            output_dim = 1
-            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
+        # check which device is available
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-            self.classifier = self.options[type]['classifier'](model)
+        if type == "text":
+            # select hyper parameters
+            # TODO should be passed from the UI
+            self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
+            vocab_size = len(vocab) + 1     # vocabulary of the model
+            embedding_dim = 300             # dimension of the embedding layer
+            lstm_layers = 2                 # the total number of stacked lstm-layers
+            hidden_dim = 128                # number of hidden layers of lstm
+            output_dim = 1                  # output dimension
+            bidirectional = False           # if set to true, becomes bidirectional
+            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim,
+                                                         bidirectional)
+
+            # move to gpu if available, cpu if not
+            model.to(device)
+
+            learning_rate = 0.0002          # learning rate of the classifier
+            self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
