@@ -40,6 +40,7 @@ class TestIMDB(TestCase):
         assert_array_equal(x_t, np.array([[0, 2, 5, 6], [0, 0, 0, 1], [7, 0, 0, 0]]))
 
     def test_tokenize(self):
+        print("current dir ", os.getcwd())
         # test that tokenization works correctly and takes given stopwords into account
         x_train = ["A quick brown fox jumps over the lazy dog", "Quick rabbit"]
         x_test = ["a quick lunch"]
@@ -62,7 +63,6 @@ class TestIMDB(TestCase):
     def test_get_data(self):
         # test that only a fraction of data is loaded with correct length
         # change to directory used when running for proper imports
-        print("current dir ", os.getcwd())
         os.chdir(os.path.expanduser(os.path.dirname(datasets.__file__)))
         train_data, test_data = self.imdb.get_data(0.01, 0.001)
         self.assertTrue(len(train_data) == 250)
