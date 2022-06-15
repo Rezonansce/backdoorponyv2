@@ -147,15 +147,15 @@ class DataReader():
             num_nlabels = int(nlabels_all.max() - nlabels_min + 1)  # number of possible values
 
             
-
+        shapes = [len(adj) for adj in data['adj_list']]
         #--------- Generate onehot-feature ---------#
-        features, max_degree = GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data)
+        features, max_degree = GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data, np.mean(shapes))
+        self.avg_nodes = int(np.mean(shapes))
         self.max_degree = max_degree
         
         # final graph feature dim
         num_features = features[0].shape[1]
 
-        shapes = [len(adj) for adj in data['adj_list']]
         labels = data['labels']  # graph class labels, np.ndarray
         labels -= np.min(labels)  # to start from 0
 
@@ -309,7 +309,7 @@ class DataReader():
         return node_features_lst
     
     
-def GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data):
+def GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, dataset, data, avg_nodes):
     '''
     Construct features for each graph instnace, may comes from 3 parts.
     Each element in 'features' refers to constructed feature mat
@@ -375,7 +375,7 @@ def GetFinalFeatures(use_nlabel_asfeat, use_org_node_attr, use_degree_asfeat, da
 
         # part 3 (optinal): node degree 
         if use_degree_asfeat:
-            degree_onehot = np.zeros((N, int(max_degree*2+1)))
+            degree_onehot = np.zeros((N, int(max_degree+1+avg_nodes)))
             degree_onehot[np.arange(N), np.sum(adj, 1).astype(np.int32)] = 1
         else:
             degree_onehot = np.empty((N, 0))
@@ -414,4 +414,7 @@ class GraphData(torch.utils.data.Dataset):
         return [torch.as_tensor(self.features[index], dtype=torch.float),  # node features
                 torch.as_tensor(self.adj_list[index], dtype=torch.float),  # adj matrices
                 int(self.labels[index])]
+
+
+
 

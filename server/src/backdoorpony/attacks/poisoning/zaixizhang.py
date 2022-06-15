@@ -18,7 +18,7 @@ __defaults__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'default_value':  [0.5],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. '
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs.'
     },
     'target_class': {
         'pretty_name': 'Target class',
@@ -33,7 +33,7 @@ __defaults__ = {
     'backdoor_nodes': {
         'pretty_name': 'Backdoor Nodes Ratio',
         'default_value': [0.2],
-        'info': 'Ratio of backdoor nodes with respect to the maximum node degree. Can be in range [0, 1].'
+        'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
     },
     'probability': {
         'pretty_name': 'Probability',
@@ -70,7 +70,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     ----------
     Returns the updated execution history dictionary
     '''
-    print('Instantiating a zaixizhang attack.')
+    print('Instantiating a gta attack.')
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
@@ -84,6 +84,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                             execution_entry = {}
                             
                             train_graphs = deepcopy(train_data[0])
+                            avg_nodes = train_data[1].avg_nodes
                             max_degree = train_data[1].max_degree
                             train_length = train_data[1].train_len
                             test_length = train_data[1].test_len
@@ -99,8 +100,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                 test_graphs_list.append(data)
                                 
                             
-                            train_p, test_p = backdoor_graph_generation_random(train_graphs_list, test_graphs_list, pp, int(bn*max_degree), 
-                                                                               tc, gt, p, c, max_degree, train_length, test_length, b_size)
+                            train_p, test_p = backdoor_graph_generation_random(train_graphs_list, test_graphs_list, pp, int(bn*avg_nodes), 
+                                                                               tc, gt, p, c, avg_nodes, max_degree, train_length, test_length, b_size)
                             poisoned_classifier = deepcopy(clean_classifier)
                             
                             poisoned_classifier.fit(train_graphs, train_data[1])
@@ -129,15 +130,9 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
                                                         
     return execution_history
-   
+        
 def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdoor_nodes, target_label,
-                                     graph_type, prob, K, max_degree, train_length, test_length, b_size):
-    #Generates a random subgraph according to the specified graph_type with specified properties (parameters),
-    #that is embedded to a portion of randomly chosen train graphs that do not initially belong to the target class 
-    #(if the chosen graph has less nodes than the trigger, it is replaced completely). Those graphs embedded
-    #with the trigger have their labels changed to the target_label. Same process is applied to portion
-    #of test graphs. Returns the train and test graphs that have been poisoned.
-
+                                     graph_type, prob, K, avg_nodes, max_degree, train_length, test_length, b_size):
     ## erdos_renyi
     if graph_type == 'ER':
         G_gen = nx.erdos_renyi_graph(num_backdoor_nodes, prob)
@@ -203,7 +198,7 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
             train_graphs[batch][1][pos][e[1]][e[0]] = 1
         
         for i in rand_select_nodes:
-            for j in range(max_degree*2+1):
+            for j in range(max_degree+avg_nodes+1):
                 train_graphs[batch][0][pos][i][num_features-j-1] = 0
             deg = torch.count_nonzero(train_graphs[batch][1][pos][i])
             train_graphs[batch][0][pos][i][deg] = 1
@@ -248,7 +243,7 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
             test_graphs[batch][1][pos][e[1]][e[0]] = 1
         
         for i in rand_select_nodes:
-            for j in range(max_degree*2+1):
+            for j in range(max_degree+avg_nodes+1):
                 test_graphs[batch][0][pos][i][num_features-j-1] = 0
             deg = torch.count_nonzero(test_graphs[batch][1][pos][i])
             test_graphs[batch][0][pos][i][deg] = 1
@@ -257,3 +252,4 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
 
     
     return train_graphs, test_graphs
+
