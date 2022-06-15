@@ -18,7 +18,7 @@ __defaults__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'default_value':  [0.5],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. '
     },
     'target_class': {
         'pretty_name': 'Target class',
@@ -70,7 +70,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     ----------
     Returns the updated execution history dictionary
     '''
-    print('Instantiating a gta attack.')
+    print('Instantiating a zaixizhang attack.')
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
@@ -129,7 +129,12 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
                                                         
     return execution_history
-        
+
+#Generates a random subgraph according to the specified graph_type with specified properties (parameters),
+#that is embedded to a portion of randomly chosen train graphs that do not initially belong to the target class 
+#(if the chosen graph has less nodes than the trigger, it is replaced completely). Those graphs embedded
+#with the trigger have their labels changed to the target_label. Same process is applied to portion
+#of test graphs.   
 def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdoor_nodes, target_label,
                                      graph_type, prob, K, max_degree, train_length, test_length, b_size):
     ## erdos_renyi
