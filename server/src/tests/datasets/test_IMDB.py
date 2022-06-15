@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 from backdoorpony.datasets.IMDB import IMDB
 from collections import Counter
 
-from server.src.backdoorpony import datasets
+from backdoorpony import datasets
 
 
 class TestIMDB(TestCase):
