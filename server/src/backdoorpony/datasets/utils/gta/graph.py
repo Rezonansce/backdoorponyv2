@@ -8,7 +8,6 @@ def extract_labels(loader):
     labels = []
     for batch_id, data in enumerate(loader):
         for i in range(len(data)):
-            #data[i] = data[i].to(cuda)
             data[i] = data[i].to(device)
         labels += data[4]
     
