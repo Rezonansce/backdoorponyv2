@@ -31,6 +31,7 @@ python:tests:
     - cd server/src
     - pip3 install -r requirements.txt
     - pip3 install dgl
+    - python3 -m nltk.downloader stopwords wordnet omw-1.4
     - coverage run --branch -m unittest discover -p test_*.py
     - coverage report -m
     - coverage json --pretty-print
