@@ -126,6 +126,17 @@ def get_stored_defence_category():
 
 # Params ---------------------------------------------------------------
 
+@app.route('/get_default_model_params', methods=['POST'])
+def get_default_model_params():
+    '''Returns a list of all the default model parameters in JSON format.'''
+    model_name = request.form['modelName']
+    print(model_name)
+    temp, default_params = import_submodules_attributes(package=backdoorpony.models, result=[
+    ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
+    print(temp)
+    print(default_params)
+    return jsonify(default_params)
+
 @app.route('/get_default_attack_params', methods=['POST'])
 def get_default_attack_params():
     '''Returns a list of all the default attack parameters in JSON format.'''

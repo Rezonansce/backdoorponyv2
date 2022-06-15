@@ -8,7 +8,6 @@ from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.graph.zaixizhang.gcnn_MUTAG import Gcnn_MUTAG
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
@@ -18,7 +17,7 @@ from backdoorpony.datasets.AIDS import AIDS
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.models.text.IMDB.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.models.graph.gta.AIDS.AIDS_gcn import AIDS_gcn
 

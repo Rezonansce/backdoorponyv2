@@ -1,8 +1,25 @@
 import torch.nn as nn
 import torch.optim as optim
 
-__dataset__ = 'cifar10'
-_class_name__ = 'CIFAR10_CNN'
+__name__ = "CifarCNN"
+__category__ = 'image'
+__input_type__ = "image"
+__defaults__ = {
+    'parameter_1': {
+        'pretty_name': 'This is parameter one',
+        'default_value': [0.1, 0.33],
+        'info': 'This is a parameter that can be used to teak your model'
+    },
+    'parameter_2': {
+        'pretty_name': 'This is parameter two',
+        'default_value': [1],
+        'info': 'This is a parameter that can be used to teak your model'
+    }
+}
+__link__ = 'link to model page'
+__info__ = '''A model that trains text input'''
+# __dataset__ = 'cifar10'
+# _class_name__ = 'CIFAR10_CNN'
 
 
 class CifarCNN(nn.Module):
