@@ -69,6 +69,9 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
     rtype : tuple [ dict[str, types.ModuleType], list[dict[str(attribute_name), attribute_value)] (list stays empty if not found)] ]
     '''
 
+    # transform to lowercase for comparisons
+    req_module = str.lower(req_module)
+    
     # Imports the package
     package = get_as_package(package, debug)
     for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
@@ -91,7 +94,7 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
             module = sys.modules[full_name]
             # If found req_module or if the requested is None (so it loops through all modules to add to the result), then look for attributes
 
-            if req_module == name or req_module == None:
+            if req_module == str.lower(name) or req_module == None:
                 module_object = {}
                 # Loop through all the required attributes
                 for attr in req_attr:
