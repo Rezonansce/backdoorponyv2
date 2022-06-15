@@ -40,7 +40,6 @@ class TestIMDB(TestCase):
         assert_array_equal(x_t, np.array([[0, 2, 5, 6], [0, 0, 0, 1], [7, 0, 0, 0]]))
 
     def test_tokenize(self):
-        print("current dir ", os.getcwd())
         # test that tokenization works correctly and takes given stopwords into account
         x_train = ["A quick brown fox jumps over the lazy dog", "Quick rabbit"]
         x_test = ["a quick lunch"]
