@@ -119,7 +119,7 @@ class IMDB(object):
         SEED = 1234
 
         # load train data
-        print("current dir ", os.getcwd())
+        # print("current dir ", os.getcwd())
         train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=frac_train, random_state=SEED).reset_index(drop=True)
 
 
