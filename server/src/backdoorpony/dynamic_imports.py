@@ -70,7 +70,8 @@ def import_submodules_attributes(package, req_attr, result, imports={}, req_modu
     '''
 
     # transform to lowercase for comparisons
-    req_module = str.lower(req_module)
+    if req_module is not None:
+        req_module = str.lower(req_module)
     
     # Imports the package
     package = get_as_package(package, debug)

@@ -2,54 +2,78 @@ import torch
 import torch.nn as nn
 
 __name__ = "IMDB_LSTM_RNN"
-__category__ = 'text'
 __input_type__ = "text"
 __defaults__ = {
-    'parameter_1': {
-        'pretty_name': 'This is parameter one',
-        'default_value': [0.1, 0.33],
-        'info': 'This is a parameter that can be used to teak your model'
+    'bidirectional': {
+        'pretty_name': 'Make LSTM layers bidirectional (True/False)',
+        'default_value': ["True"],
+        'info': 'True - LSTM passes data both to the future and to the past, False - only to the future'
     },
-    'parameter_2': {
-        'pretty_name': 'This is parameter two',
-        'default_value': [1],
-        'info': 'This is a parameter that can be used to teak your model'
+    'drop_prob': {
+        'pretty_name': 'dropout probability',
+        'default_value': [0.5],
+        'info': 'percentage of recurrent connections to LSTM excluded from activation and weight updates'
+    },
+    'embedding_dim': {
+        'pretty_name': 'Size of the embedding layer',
+        'default_value': [300],
+        'info': 'Dimension of the embedding layer'
+    },
+    'hidden_dim': {
+        'pretty_name': 'Number of hidden layers of lstm',
+        'default_value': [128],
+        'info': 'the total number of hidden nodes in lstm layers'
+    },
+    'lstm_layers': {
+        'pretty_name': 'Number of (stacked) LSTM layers',
+        'default_value': [2],
+        'info': 'the total number of (stacked) lstm-layers (even if bidirectional)'
     }
 }
-__link__ = 'link to model page'
-__info__ = '''A model that trains text input'''
+__link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
+__info__ = '''LSTM with a head sigmoid layer'''
 
 
 class IMDB_LSTM_RNN(nn.Module):
-    def __init__(self, vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, bidirectional = False, drop_prob = 0.5):
+    def __init__(self, vocab_size, model_parameters):
         '''Initiates a RNN geared towards the IMDB dataset
-        
+
         Returns
         ----------
         None
         '''
         super().__init__()
-        self.lstm_layers = lstm_layers
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
+        # dimension of the embedding layer
+        embedding_dim = model_parameters['embedding_dim']['value'][0]
+        # the total number of stacked lstm-layers
+        self.lstm_layers = lstm_layers = model_parameters['lstm_layers']['value'][0]
+        # number of hidden layers of lstm
+        self.hidden_dim = hidden_dim_linear = model_parameters['hidden_dim']['value'][0]
+        # output dimension
+        self.output_dim = 1
+        # if set to true, becomes bidirectional
+        bidirectional = model_parameters['bidirectional']['value'][0].lower() == "true"
+        # lstm dropout probability
+        drop_prob = model_parameters['drop_prob']['value'][0]
 
         # an embedding layer
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
 
         # create a (stacked if lstm_layers > 1) lstm model
         if bidirectional:
-            self.lstm_layers = round(lstm_layers/2)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=self.hidden_dim, num_layers=self.lstm_layers, batch_first=True, bidirectional=bidirectional)
+            lstm_layers = round(lstm_layers/2)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=self.hidden_dim, num_layers=lstm_layers, batch_first=True, bidirectional=bidirectional)
 
         # if lstm is bidirectional, there needs to be twice as much hidden nodes
+
         if bidirectional:
-            self.hidden_dim *= 2
+            hidden_dim_linear *= 2
 
         # dropout layer to prevent overfitting
         self.dropout = nn.Dropout(drop_prob)
 
         # linear layer for final binary classification evaluation
-        self.linear = nn.Linear(hidden_dim, output_dim)
+        self.linear = nn.Linear(hidden_dim_linear, self.output_dim)
 
         # sigmoid to activate the linear layer
         self.sigmoid = nn.Sigmoid()

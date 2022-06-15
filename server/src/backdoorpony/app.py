@@ -12,6 +12,12 @@ from flask import Flask, jsonify, request
 # Instantiate the app
 from flask_cors import CORS, cross_origin
 
+# temporary map
+dataset_to_model = {
+    "IMDB": "IMDB_LSTM_RNN",
+    "MNIST": "MNIST_CNN"
+}
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -55,6 +61,7 @@ def get_datasets():
 
 
 @app.route('/select_model', methods=['POST'])
+@cross_origin()
 def select_model():
     '''Select which model is used to create the classifier.
     Can be either a built-in one or have a file with the model attached which is then used.
@@ -71,6 +78,7 @@ def select_model():
             'model': <.pth file>
         }
     '''
+    model_params = json.loads(request.form['modelParams'].replace("'", '"'))
     app_tracker.dataset = request.form['dataset']
     model = None
     if 'model' in request.files:
@@ -78,6 +86,7 @@ def select_model():
         app_tracker.file_name = model.filename
     app_tracker.model_loader.make_classifier(request.form['type'],
                                  request.form['dataset'],
+                                 model_params,
                                  model)
 
     return jsonify('Creating/choosing the classifier was successful.')
@@ -135,12 +144,10 @@ def get_stored_defence_category():
 @app.route('/get_default_model_params', methods=['POST'])
 def get_default_model_params():
     '''Returns a list of all the default model parameters in JSON format.'''
-    model_name = request.form['modelName']
-    print(model_name)
-    temp, default_params = import_submodules_attributes(package=backdoorpony.models, result=[
+    dataset_name = request.form['modelName']
+    model_name = dataset_to_model[dataset_name]
+    _, default_params = import_submodules_attributes(package=backdoorpony.models, result=[
     ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
-    print(temp)
-    print(default_params)
     return jsonify(default_params)
 
 @app.route('/get_default_attack_params', methods=['POST'])

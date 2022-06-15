@@ -141,7 +141,7 @@ class Loader():
 
         return sets
 
-    def make_classifier(self, type, dataset, file_model=None, debug=False):
+    def make_classifier(self, type, dataset, model_parameters, file_model=None, debug=False):
         '''Creates the classifier corresponding to the input
 
         Parameters
@@ -150,6 +150,8 @@ class Loader():
             Input type the classifier will act on, as defined by self.options
         dataset :
             The dataset the classifier will be fit to
+        model_parameters:
+            Model hyperparameters selected by the user
         file_model :
             File (in .pth form) of the model the classifier will be based on
             Optional, if not set (or set to None) will use built-in classifier, as
@@ -164,18 +166,15 @@ class Loader():
 
         if type == "text":
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1
-            print("Vocab size: ", vocab_size)
-            embedding_dim = 10
-            lstm_layers = 2
-            hidden_dim = 16
-            output_dim = 1
-            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
+            vocab_size = len(vocab) + 1  # vocabulary of the model
+            model = self.options[type][dataset]['model'](vocab_size, model_parameters)
 
-            self.classifier = self.options[type]['classifier'](model)
+            learning_rate = 0.002        # learning rate of the classifier
+            self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
+
 
         model = self.options[type][dataset]['model']()
 

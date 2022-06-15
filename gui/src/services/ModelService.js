@@ -21,32 +21,22 @@ class ModelService {
     }).then((response) => response.data);
   }
 
-  // execute = (isDefended,
-  //   isAttacked,
-  //   attackName,
-  //   attackParams,
-  //   defenceName,
-  //   defenceParams,
-  //   attackCategory,
-  //   defenceCategory) => {
-  //   const formData = new FormData();
-  //   if (isAttacked) {
-  //     formData.append('attackName', attackName.replace(/^"(.*)"$/, '$1'));
-  //     formData.append('attackParams', attackParams);
-  //     formData.append('attackCategory', attackCategory.replace(/^"(.*)"$/, '$1'));
-  //   }
-  //   if (isDefended) {
-  //     formData.append('defenceName', defenceName.replace(/^"(.*)"$/, '$1'));
-  //     formData.append('defenceParams', defenceParams);
-  //     formData.append('defenceCategory', defenceCategory.replace(/^"(.*)"$/, '$1'));
-  //   }
-  //   return http.post('/execute', formData, {
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   }).then((response) => response.data)
-  //     .catch((error) => console.log(error.response));
-  // }
+  selectModel = (
+    type,
+    dataset,
+    modelParams,
+  ) => {
+    const formData = new FormData();
+    formData.append('type', type);
+    formData.append('dataset', dataset);
+    formData.append('modelParams', modelParams);
+    return http.post('/select_model', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
 }
 
 export default new ModelService();
