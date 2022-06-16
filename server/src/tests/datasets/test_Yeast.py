@@ -21,19 +21,13 @@ class TestDataLoader(TestCase):
         DataLoader.return_value = 42
         
         yeast = Yeast(0.001)
-        x1, y1 = yeast.get_data()
-        
-        self.assertEqual(len(x1[0]), 2)
-        self.assertTrue(isinstance(x1[1],  DataReader))
+        x, y = yeast.get_datasets()
                     
-        x2, y2 = yeast.get_datasets()
-        self.assertEqual(len(x2[0]), 2)
-        self.assertTrue(isinstance(x2[1],  DataReader))
+        self.assertEqual(len(x[0]), 2)
+        self.assertTrue(isinstance(x[1],  DataReader))
         
-        self.assertEqual(len(y1[0]), 1)
-        self.assertEqual(len(y1[1]), 1592)
-        self.assertEqual(len(y2[0]), 1)
-        self.assertEqual(len(y2[1]), 1592)
+        self.assertEqual(len(y[0]), 1)
+        self.assertEqual(len(y[1]), 1592)
 
 
 

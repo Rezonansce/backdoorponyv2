@@ -20,18 +20,13 @@ class TestDataLoader(TestCase):
         DataLoader.return_value = 42
         
         aids = AIDS(1)
-        x1, y1 = aids.get_data()
-        self.assertEqual(len(x1[0]) == 50)
-        self.assertTrue(isinstance(x1[1],  DataReader))
-                    
-        x2, y2 = aids.get_datasets()
-        self.assertEqual(len(x2[0]) == 50)
-        self.assertTrue(isinstance(x2[1],  DataReader))
-        
-        self.assertEqual(len(y1[0]) == 13)
-        self.assertEqual(len(y1[1]) == 400)
-        self.assertEqual(len(y2[0]) == 13)
-        self.assertEqual(len(y2[1]) == 400)
+        x, y = aids.get_datasets()
+
+        self.assertEqual(len(x[0]) == 50)
+        self.assertTrue(isinstance(x[1],  DataReader))
+
+        self.assertEqual(len(y[0]) == 13)
+        self.assertEqual(len(y[1]) == 400)
 
 
 
