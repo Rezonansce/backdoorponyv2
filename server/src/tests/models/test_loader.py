@@ -1,6 +1,8 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.datasets.IMDB import IMDB
+from backdoorpony.dasets.AIDS import AIDS
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
+from backdoorpony.models.graphs.gta.AIDS.AIDS_gcn import AIDS_gcn
 from backdoorpony.datasets.MNIST import MNIST
 import unittest
 from unittest import TestCase
@@ -47,10 +49,10 @@ class TestMainMetricsRunner(TestCase):
             },
             'graph': {
                 'classifier': GraphClassifier,
-                'MUTAG': {
-                    'dataset': MUTAG,
-                    'model': graphcnn,
-                    'link': 'custom mutagen dataset, modelled as graphs',
+                'AIDS': {
+                    'dataset': AIDS,
+                    'model': AIDS_gcn,
+                    'link': 'custom aids molecule dataset, modelled as graphs',
                     'info': 'Info on this dataset...'
 
                 }
@@ -80,8 +82,8 @@ class TestMainMetricsRunner(TestCase):
             'graph': {
                 'MUTAG': {
                     'info': 'Info on this dataset...',
-                    'link': 'custom mutagen dataset, modelled as graphs',
-                    "pretty_name": "MUTAG"
+                    'link': 'custom aids molecule dataset, modelled as graphs',
+                    "pretty_name": "AIDS"
                 }
             }
         })
