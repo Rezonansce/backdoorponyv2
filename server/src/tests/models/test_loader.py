@@ -1,9 +1,7 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.graph.zaixizhang import graphcnn
 from backdoorpony.datasets.MNIST import MNIST
-from backdoorpony.datasets.MUTAG import MUTAG
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock

@@ -22,11 +22,11 @@ class TestDataLoader(TestCase):
         aids = AIDS(1)
         x, y = aids.get_datasets()
 
-        self.assertEqual(len(x[0]) == 50)
+        self.assertEqual(len(x[0]), 50)
         self.assertTrue(isinstance(x[1],  DataReader))
 
-        self.assertEqual(len(y[0]) == 13)
-        self.assertEqual(len(y[1]) == 400)
+        self.assertEqual(len(y[0]), 13)
+        self.assertEqual(len(y[1]), 400)
 
 
 

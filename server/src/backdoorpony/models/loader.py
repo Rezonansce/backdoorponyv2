@@ -9,10 +9,8 @@ from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.graph.zaixizhang.gcnn_MUTAG import Gcnn_MUTAG
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
-from backdoorpony.datasets.MUTAG import MUTAG
 from backdoorpony.datasets.AIDS import AIDS
 from backdoorpony.datasets.Mutagenicity import Mutagenicity
 from backdoorpony.datasets.Yeast import Yeast
