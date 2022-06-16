@@ -1,5 +1,5 @@
 '''
-Load the MUTAG dataset (graphs) for use in attacks and/or defences.
+Load the AIDS dataset (graphs) for use in attacks and/or defences.
 
 :return train_graphs, test_graphs, num_classes, node_tags, test_idx
 '''
