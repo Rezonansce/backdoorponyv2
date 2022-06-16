@@ -30,9 +30,9 @@ class TestDataLoader(TestCase):
         self.assertEqual(len(x2[0]), 2)
         self.assertTrue(isinstance(x2[1],  DataReader))
         
-        self.assertEqual(len(y1[0]), 50)
+        self.assertEqual(len(y1[0]), 1)
         self.assertEqual(len(y1[1]), 1592)
-        self.assertEqual(len(y2[0]), 50)
+        self.assertEqual(len(y2[0]), 1)
         self.assertEqual(len(y2[1]), 1592)
 
 
