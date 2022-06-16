@@ -1,6 +1,6 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.datasets.IMDB import IMDB
-from backdoorpony.dasets.AIDS import AIDS
+from backdoorpony.datasets.AIDS import AIDS
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.graphs.gta.AIDS.AIDS_gcn import AIDS_gcn
 from backdoorpony.datasets.MNIST import MNIST
