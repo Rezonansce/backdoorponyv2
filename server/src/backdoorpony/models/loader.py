@@ -1,7 +1,7 @@
 from copy import deepcopy
 import torch
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
-from backdoorpony.classifiers.TextClassifier import TextClassifier
+from backdoorpony.classifiers.TextClassifier import  TextClassifier
 from backdoorpony.classifiers.AudioClassifier import AudioClassifier
 from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 
@@ -14,6 +14,8 @@ from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.datasets.MUTAG import MUTAG
 from backdoorpony.datasets.AIDS import AIDS
+from backdoorpony.datasets.Mutagenicity import Mutagenicity
+from backdoorpony.datasets.Yeast import Yeast
 
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
@@ -21,6 +23,8 @@ from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.models.graph.gta.AIDS.AIDS_gcn import AIDS_gcn
+from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_gcn import Mutagenicity_gcn
+from backdoorpony.models.graph.gta.Yeast.Yeast_gcn import Yeast_gcn
 
 
 
@@ -87,17 +91,23 @@ class Loader():
             },
             'graph': {
                 'classifier': GraphClassifier,
-                'MUTAG': {
-                    'dataset': MUTAG,
-                    'model': Gcnn_MUTAG,
-                    'link': None,
-                    'info': None
-                },
                 'AIDS': {
                     'dataset': AIDS,
                     'model': AIDS_gcn,
                     'link': "https://paperswithcode.com/dataset/aids",
                     'info': "AIDS is a graph dataset. It consists of 2000 graphs representing molecular compounds which are constructed from the AIDS Antiviral Screen Database of Active Compounds. It contains 4395 chemical compounds, of which 423 belong to class CA, 1081 to CM, and the remaining compounds to CI."
+                },
+                'Mutagenicity': {
+                    'dataset': Mutagenicity,
+                    'model': Mutagenicity_gcn,
+                    'link': "https://paperswithcode.com/dataset/mutagenicity",
+                    'info': "Mutagenicity is a chemical compound dataset of drugs, which can be categorized into two classes: mutagen and non-mutagen."
+                },
+                'Yeast': {
+                    'dataset': Yeast,
+                    'model': Yeast_gcn,
+                    'link': "https://paperswithcode.com/dataset/yeast",
+                    'info': "Yeast dataset consists of a protein-protein interaction network. Interaction detection methods have led to the discovery of thousands of interactions between proteins, and discerning relevance within large-scale data sets is important to present-day biology."
                 }
             }
         }
@@ -163,27 +173,17 @@ class Loader():
         None
         '''
 
-        # check which device is available
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
         if type == "text":
-            # select hyper parameters
-            # TODO should be passed from the UI
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1     # vocabulary of the model
-            embedding_dim = 300             # dimension of the embedding layer
-            lstm_layers = 2                 # the total number of stacked lstm-layers
-            hidden_dim = 128                # number of hidden layers of lstm
-            output_dim = 1                  # output dimension
-            bidirectional = False           # if set to true, becomes bidirectional
-            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim,
-                                                         bidirectional)
+            vocab_size = len(vocab) + 1
+            print("Vocab size: ", vocab_size)
+            embedding_dim = 10
+            lstm_layers = 2
+            hidden_dim = 16
+            output_dim = 1
+            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim, True)
 
-            # move to gpu if available, cpu if not
-            model.to(device)
-
-            learning_rate = 0.0002          # learning rate of the classifier
-            self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
+            self.classifier = self.options[type]['classifier'](model)
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
@@ -247,4 +247,8 @@ class Loader():
         Returns the validation data if it has been instantiated, else returns None
         '''
         return self.test_data
+
+
+
+
 

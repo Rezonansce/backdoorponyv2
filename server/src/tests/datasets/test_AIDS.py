@@ -19,22 +19,24 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        aids = AIDS()
+        aids = AIDS(1)
         x1, y1 = aids.get_data()
-        self.assertTrue(len(x1[0]) == 50)
+        self.assertEqual(len(x1[0]) == 50)
         self.assertTrue(isinstance(x1[1],  DataReader))
                     
         x2, y2 = aids.get_datasets()
-        self.assertTrue(len(x2[0]) == 50)
+        self.assertEqual(len(x2[0]) == 50)
         self.assertTrue(isinstance(x2[1],  DataReader))
         
-        self.assertTrue(len(y1[0]) == 13)
-        self.assertTrue(len(y1[1]) == 400)
-        self.assertTrue(len(y2[0]) == 13)
-        self.assertTrue(len(y2[1]) == 400)
+        self.assertEqual(len(y1[0]) == 13)
+        self.assertEqual(len(y1[1]) == 400)
+        self.assertEqual(len(y2[0]) == 13)
+        self.assertEqual(len(y2[1]) == 400)
 
 
 
 if __name__ == '__main__':
     unittest.main()
+
+
 
