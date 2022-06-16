@@ -8,7 +8,7 @@ import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from backdoorpony.classifiers.GraphClassifier import GraphClassifier
+from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.loader import Loader
