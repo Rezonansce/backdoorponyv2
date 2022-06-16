@@ -80,7 +80,7 @@ class TestMainMetricsRunner(TestCase):
             },
             "audio": {},
             'graph': {
-                'MUTAG': {
+                'AIDS': {
                     'info': 'Info on this dataset...',
                     'link': 'custom aids molecule dataset, modelled as graphs',
                     "pretty_name": "AIDS"
