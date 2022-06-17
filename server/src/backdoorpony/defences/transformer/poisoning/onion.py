@@ -110,8 +110,11 @@ class ONION:
         self.gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
 
         # move the model to gpu if possible
-        self.gpt2_model.parallelize()
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if torch.cuda.is_available():
+            self.gpt2_model.parallelize()
+            self.device = torch.device('cuda')
+        else:
+            self.device = torch.device('cpu')
 
     def calculate_suspicion(self, sentence):
         '''
@@ -177,7 +180,6 @@ class ONION:
                 suspicion_scores = self.calculate_suspicion(sentence)
                 highest_suspicion = np.exp(np.max(suspicion_scores))
                 preds.append(highest_suspicion)
-                print(highest_suspicion)
             else:
                 preds.append(0)
         return np.array(preds) > self.threshold
