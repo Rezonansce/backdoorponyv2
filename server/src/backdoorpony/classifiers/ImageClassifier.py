@@ -54,7 +54,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         None
         '''
 
-        if use_pre_load:
+        if super().model.get_do_pre_load():
             # Get relative paths to the pre-load directory
             abs_path = os.path.abspath(__file__)
             file_directory = os.path.dirname(abs_path)
@@ -74,7 +74,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         x_train = np.float32(x_train)
         # TODO: Parameterize batch size and number of epochs
         super().fit(x_train, y_train, batch_size=16, nb_epochs=10)
-        if use_pre_load:
+        if super().model.get_do_pre_load():
             # Save the trained weights
             torch.save(super().model.state_dict(), final_path)
 

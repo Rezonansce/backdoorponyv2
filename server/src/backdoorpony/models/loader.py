@@ -175,8 +175,8 @@ class Loader():
             self.classifier.fit(x, y)
             return
 
-
-        model = self.options[type][dataset]['model']()
+        if type == 'image':
+            model = self.options[type][dataset]['model'](model_parameters)
 
         if file_model is not None:
             name = file_model.filename.split('.', 1) #remove filename extension

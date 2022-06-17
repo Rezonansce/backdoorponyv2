@@ -6,26 +6,44 @@ __name__ = "FMNIST_CNN"
 __category__ = 'image'
 __input_type__ = "image"
 __defaults__ = {
-    'parameter_1': {
-        'pretty_name': 'This is parameter one',
-        'default_value': [0.1, 0.33],
-        'info': 'This is a parameter that can be used to teak your model'
+    'learning_rate': {
+        'pretty_name': 'Learning rate',
+        'default_value': [0.001],
+        'info': 'Learning rate used for the training of the model.'
     },
-    'parameter_2': {
-        'pretty_name': 'This is parameter two',
-        'default_value': [1],
-        'info': 'This is a parameter that can be used to teak your model'
+    'optim': {
+        'pretty_name': 'Optimizer',
+        'default_value': ['Adam'],
+        'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
+                'If the input is not valid, Adam optimizer will be chosen.'
+    },
+    'pre_load': {
+        'pretty_name': 'Preload Model',
+        'default_value': ['False'],
+        'info': 'True if you would like to use a pre-trained model with default hyperparameters. False otherwise.'
     }
 }
-__link__ = 'link to model page'
-__info__ = '''A model that trains text input'''
+__link__ = 'Why would there be a link to the model page???'
+__info__ = '''A model that trains image input'''
 # __dataset__ = 'fashionmnist'
 # __class_name__ = 'FMNIST_CNN'
 
 class FMNIST_CNN(nn.Module):
 
-    def __init__(self):
+    def __init__(self, model_parameters):
         super(FMNIST_CNN, self).__init__()
+        self.do_preload = model_parameters['pre_load']['value'][0]
+        if self.do_preload == 'True':
+            self.do_preload = True
+            self.optim = 'Adam'
+            self.lr = 0.01
+        else:
+            self.do_preload = False
+            self.lr = model_parameters['learning_rate']['value'][0]
+            if model_parameters['optim']['value'][0] == 'SGD':
+                self.optim = 'SGD'
+            else:
+                self.optim = 'Adam'
         self.crit = nn.CrossEntropyLoss()
         self.path = 'fashion_mnist'
         self.nb_classes = 10
@@ -66,7 +84,10 @@ class FMNIST_CNN(nn.Module):
 
         :return: Adam optimizer, with learning rate = 0.01
         '''
-        return optim.Adam(self.parameters(), lr=0.001)
+        if self.optim == 'Adam':
+            return optim.Adam(self.parameters(), lr=self.lr)
+        else:
+            return optim.SGD(self.parameters(), lr=self.lr)
 
     def get_criterion(self):
         '''
@@ -100,3 +121,11 @@ class FMNIST_CNN(nn.Module):
         :return:
         '''
         return self.path
+
+    def get_do_pre_load(self):
+        '''
+        Return True if the model should use a pre-load
+        Return False otherwise
+        :return:
+        '''
+        return self.do_preload

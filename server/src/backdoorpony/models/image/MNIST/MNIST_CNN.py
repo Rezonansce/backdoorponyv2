@@ -10,25 +10,31 @@ __name__ = "MNIST_CNN"
 __category__ = 'image'
 __input_type__ = "image"
 __defaults__ = {
-    'parameter_1': {
-        'pretty_name': 'This is parameter one',
-        'default_value': [0.1, 0.33],
-        'info': 'This is a parameter that can be used to teak your model'
+    'learning_rate': {
+        'pretty_name': 'Learning Rate',
+        'default_value': [0.01],
+        'info': 'The learning rate of the optimizer'
     },
-    'parameter_2': {
-        'pretty_name': 'This is parameter two',
-        'default_value': [1],
-        'info': 'This is a parameter that can be used to teak your model'
+    'optim': {
+        'pretty_name': 'Optimizer',
+        'default_value': ['Adam'],
+        'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
+                'If the input is not valid, Adam optimizer will be chosen.'
+    },
+    'pre_load': {
+        'pretty_name': 'Preload Model',
+        'default_value': ['False'],
+        'info': 'True if you would like to use a pre-trained model with default hyperparameters. False otherwise.'
     }
 }
 __link__ = 'link to model page'
-__info__ = '''A model that trains text input'''
+__info__ = '''A model that trains image input'''
 # __dataset__ = 'mnist'
 # __class_name__ = 'MNIST_CNN'
 
 
 class MNIST_CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, model_parameters):
         '''Initiates a CNN geared towards the MNIST dataset
 
         Returns
@@ -36,6 +42,18 @@ class MNIST_CNN(nn.Module):
         None
         '''
         super(MNIST_CNN, self).__init__()
+        self.do_preload = model_parameters['pre_load']['value'][0]
+        if self.do_preload == 'True':
+            self.do_preload = True
+            self.optim = 'Adam'
+            self.lr = 0.01
+        else:
+            self.do_preload = False
+            self.lr = model_parameters['learning_rate']['value'][0]
+            if model_parameters['optim']['value'][0] == 'SGD':
+                self.optim = 'SGD'
+            else:
+                self.optim = 'Adam'
         self.nb_classes = 10
         self.input_shape = 1, 28, 28
         self.crit = nn.CrossEntropyLoss()
@@ -46,6 +64,7 @@ class MNIST_CNN(nn.Module):
             in_channels=20, out_channels=50, kernel_size=5, stride=1)
         self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=500)
         self.fc_2 = nn.Linear(in_features=500, out_features=10)
+        print(self.lr)
 
     def forward(self, x):
         x = F.relu(self.conv_1(x))
@@ -63,7 +82,10 @@ class MNIST_CNN(nn.Module):
 
         :return: Adam optimizer, with learning rate = 0.01
         '''
-        return optim.Adam(self.parameters(), lr=0.01)
+        if self.optim == 'Adam':
+            return optim.Adam(self.parameters(), lr=self.lr)
+        else:
+            return optim.SGD(self.parameters(), lr=self.lr)
 
     def get_criterion(self):
         '''
@@ -97,3 +119,11 @@ class MNIST_CNN(nn.Module):
         :return:
         '''
         return self.path
+
+    def get_do_pre_load(self):
+        '''
+        Return True if the model should use a pre-load
+        Return False otherwise
+        :return:
+        '''
+        return self.do_preload
