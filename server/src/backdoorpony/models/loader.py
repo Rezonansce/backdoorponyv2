@@ -177,6 +177,14 @@ class Loader():
 
         if type == 'image':
             model = self.options[type][dataset]['model'](model_parameters)
+            num_selection = model_parameters['num_selection']['value'][0]
+            self.train_data, self.test_data = self.options[type][dataset]['dataset'](num_selection).get_datasets()
+            self.classifier = self.options[type]['classifier'](model)
+            x, y = self.train_data
+            self.classifier.fit(x, y)
+            return
+
+        model = self.options[type][dataset]['model']()
 
         if file_model is not None:
             name = file_model.filename.split('.', 1) #remove filename extension

@@ -20,6 +20,11 @@ __defaults__ = {
         'pretty_name': 'Preload Model',
         'default_value': ['False'],
         'info': 'True if you would like to use a pre-trained model with default hyperparameters. False otherwise.'
+    },
+    'num_selection': {
+        'pretty_name': 'Number of samples',
+        'default_value': [50000],
+        'info': 'The number of samples used to train the model. Max 50000.'
     }
 }
 __link__ = 'link to model page'
