@@ -103,6 +103,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     'poison_percent': attack_params['poison_percent']['value'][pp],
                     'target_class': attack_params['target_class']['value'][tc],
                     'location': loc,
+                    'trigger': attack_params['trigger']['value'][0],
                     'dict_others': {
                         'poison_classifier': deepcopy(poisoned_classifier),
                         'poison_inputs': deepcopy(full_poison_data),

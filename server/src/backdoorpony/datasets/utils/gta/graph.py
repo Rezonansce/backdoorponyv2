@@ -2,6 +2,18 @@ import torch
 import dgl
 import networkx as nx
 
+def extract_labels(loader):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    labels = []
+    for batch_id, data in enumerate(loader):
+        for i in range(len(data)):
+            #data[i] = data[i].to(cuda)
+            data[i] = data[i].to(device)
+        labels += data[4]
+    
+    return labels
+
 def numpy_to_graph(A,type_graph='dgl',node_features=None, to_cuda=True):
     '''Convert numpy arrays to graph
     Parameters

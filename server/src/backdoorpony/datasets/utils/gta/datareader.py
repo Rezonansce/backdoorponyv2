@@ -14,9 +14,9 @@ def split_ids(train_ratio, gids, rs, frac):
     single fold
     gids: 0-based graph id list.
     '''
-    frac_gids = list(rs.choice(gids, int(frac * len(gids)), replace=False))
-    train_gids = list(rs.choice(frac_gids, int(train_ratio * len(frac_gids)), replace=False))
-    test_gids = list(set(frac_gids)-set(train_gids))
+    gids = list(rs.choice(gids, int(frac * len(gids)), replace=False))
+    train_gids = list(rs.choice(gids, int(train_ratio * len(gids)), replace=False))
+    test_gids = list(set(gids)-set(train_gids))
     return train_gids, test_gids
 
 
