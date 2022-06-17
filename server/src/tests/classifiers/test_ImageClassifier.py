@@ -6,7 +6,7 @@ import numpy as np
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 
 
-class TestDataLoader(TestCase):
+class TestImageClassifier(TestCase):
     def test_init(self):
         # Test __init__ of ImageClassifier
         with patch('art.estimators.classification.PyTorchClassifier.__init__') as PyTorchClassifier:
