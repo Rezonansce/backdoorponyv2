@@ -31,18 +31,22 @@ class TestOnion(TestCase):
         self.proxy_classifier = classifier_shell()
 
     def test_poison_predict(self):
-        # first sentence is poisoned with "fox", so quick fox fox - should classify as poisoned
-        # the rest should be classified as not poisoned
-
         data_clean = [[1, 2, 3, 4, 5, 6, 7], [0, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 0, 7]]
         # labels = [1, 0, 1, 0]
 
+        # first sentence is poisoned with "teaching", so quick brown teaching jump over lazy dog
+        # should classify as poisoned
+        # the rest should be classified as not poisoned
         data_poisoned = [[1, 2, 10, 4, 5, 6, 7], [0, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 0, 7]]
 
-        onion = ONION(self.proxy_classifier, data_clean, 2.5)
+        # initialize onion with threshold set based on having a completely wrong sentence,
+        # others should not be considered as poison
+        onion = ONION(self.proxy_classifier, data_clean,threshold = 2.5)
 
+        # predict while preserving information whether data is poisoned or not
         predictions = onion.predict(data_poisoned)
 
+        # -1 means it is poisoned
         assert_array_equal(predictions, np.array([-1, 0, 1, 0]))
 
 
