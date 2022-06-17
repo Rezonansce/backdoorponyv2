@@ -1,5 +1,6 @@
 import unittest
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 import numpy as np
 import torch.optim as optim
@@ -11,7 +12,11 @@ class TestCifarCNN(TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestCifarCNN, self).__init__(*args, **kwargs)
-        self.cnn = CifarCNN()
+        self.model_params = {'learning_rate': {'value': [0.001]},
+                             'optim': {'value': ['SGD']},
+                             'pre_load': {'value': ["True"]},
+                             'num_selection': {'value': [1234]}}
+        self.cnn = CifarCNN(model_parameters=self.model_params)
 
     def test_get_opti(self):
         optimizer = self.cnn.get_opti()
@@ -32,3 +37,6 @@ class TestCifarCNN(TestCase):
     def test_get_path(self):
         path = self.cnn.get_path()
         self.assertTrue(path == 'cifar-10')
+
+    def test_get_do_pre_load(self):
+        self.assertTrue(self.cnn.get_do_pre_load())
