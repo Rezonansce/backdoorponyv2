@@ -67,7 +67,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
                             }
                         })
                     key_index += 1
-                    new_execution_history.update({'I-BAU' + str(key_index): new_entry})
+                    new_execution_history.update({'Autoencoder' + str(key_index): new_entry})
 
     return new_execution_history
 
