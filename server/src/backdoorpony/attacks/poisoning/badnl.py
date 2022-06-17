@@ -254,7 +254,7 @@ class BadNL(object):
         None
         '''
         # find index used to represent the trigger
-        trigger_loc = self.proxy_classifier.vocab[self.trigger]
+        trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
         for entry in data:
             # insert trigger at a selected location
             # based on used selection in the UI
@@ -264,7 +264,7 @@ class BadNL(object):
             if self.location == 1:
                 insert_pos = 0
             elif self.location == 2:
-                insert_pos = round(len(entry)/2)
+                insert_pos = round(len(entry)/2) - 1
             else:
                 insert_pos = -1
             # update word at position with a trigger word
