@@ -362,34 +362,22 @@ export default {
         this.uploading = false;
         this.executeError = true;
         this.errorMessage = 'An error occured';
+      }).then(() => {
+        if (!this.errorMessage) {
+          this.uploading = false;
+          this.$root.$refs.type = this.selectedType;
+          this.$root.$refs.AttacksAndDefences.filterAttacksAndDefences();
+          this.$emit('handleClick');
+        }
       });
-      if (!this.errorMessage) {
-        this.uploading = false;
-        this.$emit('handleClick');
-      }
 
       this.selectionDialog = false;
 
       if (this.builtin) this.selectedNeuralNetwork = '';
-
-      // this.message = '';
-      // this.uploading = true;
-      // await UploadService.upload(this.selectedType, this.selectedDataSet,
-      //   this.selectedNeuralNetwork)
-      //   .catch(() => {
-      //     this.uploading = false;
-      //     this.message = 'Could not upload the file';
-      //   });
-      // if (this.message === '') {
-      //   this.uploading = false;
-      //   this.$emit('handleClick');
-      // }
     },
   },
   async created() {
     const data = await UploadService.getDataSets();
-    const models = await ModelService.getModels();
-    Array.prototype.push.apply(this.models, models);
     const dataArr = [];
     Object.entries(data).forEach((group, key) => {
       if (Object.values(group[1]).length > 0) {
