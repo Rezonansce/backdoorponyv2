@@ -1,7 +1,6 @@
 from unittest import TestCase
 from numpy.testing import assert_array_equal
 import numpy as np
-import torch.cuda
 from backdoorpony.defences.transformer.poisoning.onion import ONION
 
 
