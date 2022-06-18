@@ -21,7 +21,8 @@ class TestDataLoader(TestCase):
                     model.to.return_value=model
 
                     # Act
-                    classifier = AudioClassifier(model=model)
+                    lr = 0.01
+                    classifier = AudioClassifier(model=model, learning_rate=lr)
 
                     # Assert
                     CrossEntropyLoss.assert_called_once()
@@ -50,7 +51,8 @@ class TestDataLoader(TestCase):
                                     model = MagicMock(name='model')
                                     model.parameters.return_value = "params"
                                     PyTorchClassifier.return_value = None
-                                    classifier = AudioClassifier(model=model)
+                                    lr = 0.01
+                                    classifier = AudioClassifier(model=model, learning_rate=lr)
 
                                     # Act
                                     classifier.fit(x_train, y_train)
@@ -82,7 +84,8 @@ class TestDataLoader(TestCase):
                                 model = MagicMock(name='model')
                                 model.parameters.return_value = "params"
                                 PyTorchClassifier.return_value = None
-                                classifier = AudioClassifier(model=model)
+                                lr = 0.01
+                                classifier = AudioClassifier(model=model, learning_rate=lr)
 
                                 # Act
                                 classifier.predict(x_test)

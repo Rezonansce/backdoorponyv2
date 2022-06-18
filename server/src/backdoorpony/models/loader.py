@@ -174,7 +174,24 @@ class Loader():
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
+        if type == "audio":
+            model = self.options[type][dataset]['model'](model_parameters)
+            self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
 
+            learning_rate = 0.002
+            self.classifier = self.options[type]['classifier'](model, learning_rate)
+            x, y = self.train_data
+            self.classifier.fit(x, y, use_pre_load=True)
+
+            self.audio = None
+            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data()
+
+            return
+        else:
+            try:
+                delattr(self, 'audio')
+            except:
+                print("")
 
         model = self.options[type][dataset]['model']()
 
@@ -190,14 +207,8 @@ class Loader():
         x, y = self.train_data
 
         self.classifier.fit(x, y, use_pre_load=True)
-        if (type == "audio"):
-            self.audio = None
-            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data()
-        else:
-            try:
-                delattr(self, 'audio')
-            except:
-                print("")
+
+
 
 
     def get_classifier(self, debug=False):
