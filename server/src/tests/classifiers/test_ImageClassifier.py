@@ -1,6 +1,7 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
+from torch.nn import Module
 
 import numpy as np
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
@@ -27,37 +28,52 @@ class TestImageClassifier(TestCase):
 
             return classifier
 
-    def test_fit(self):
-        # Test fit of ImageClassifier
-        with patch('art.estimators.classification.PyTorchClassifier.model') as get_model:
-            with patch('torch.save') as Save:
-                with patch('art.estimators.classification.PyTorchClassifier.fit') as superfit:
-                    with patch('backdoorpony.classifiers.ImageClassifier.preprocess') as preprocess:
-                                # Arange
-                                x_train = np.array([[1, 2, 3], [4, 5, 6]])
-                                y_train = np.array([[0, 1, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0]])
-                                preprocess.return_value = x_train, y_train
-                                model = MagicMock(name='model')
-                                model.get_nb_classes.return_value = 6
-                                get_model.return_value = model
-                                model.get_path.return_value = "path"
-                                classifier = ImageClassifier(model=model)
-                                # Act
-                                classifier.fit(x_train, y_train)
+    @patch('art.estimators.classification.PyTorchClassifier.fit')
+    @patch('numpy.float32')
+    @patch('backdoorpony.classifiers.ImageClassifier.preprocess')
+    @patch('art.estimators.classification.PyTorchClassifier.model')
+    @patch('art.estimators.classification.PyTorchClassifier.__init__')
+    def test_fit_no_pre_load(self, mock_init, super_mock_model, mock_preprocess, mock_float32, mock_fit):
+        # Arrange
+        super_mock_model.get_nb_classes.return_value = 10
+        super_mock_model.get_do_pre_load.return_value = False
 
-                                # Assert
-                                # Use a workaround for checking called with ndarray
-                                self.assertTrue(
-                                    np.equal(preprocess.call_args.args[0], x_train).all())
-                                self.assertTrue(
-                                    np.equal(preprocess.call_args.args[1], y_train).all())
-                                preprocess.assert_called_once()
+        mock_model = MagicMock()
+        classifier = ImageClassifier(mock_model)
+        x_mock = MagicMock(np.ndarray)
+        y_mock = MagicMock(np.ndarray)
+        mock_float32.return_value = x_mock
+        mock_preprocess.return_value = x_mock, y_mock
+        # Act
+        classifier.fit(x=x_mock, y=y_mock)
 
-                                self.assertTrue(
-                                    np.equal(superfit.call_args.args[0], x_train.astype(np.float32)).all())
-                                self.assertTrue(
-                                    np.equal(superfit.call_args.args[1], y_train).all())
-                                superfit.assert_called_once()
+        # Assert
+        mock_preprocess.assert_called_with(x_mock, y_mock, nb_classes=10)
+        mock_float32.assert_called_with(x_mock)
+        mock_fit.assert_called_with(x_mock, y_mock, batch_size=16, nb_epochs=10)
+
+    @patch('torch.load')
+    @patch('os.path.exists')
+    @patch('art.estimators.classification.PyTorchClassifier.model')
+    @patch('art.estimators.classification.PyTorchClassifier.__init__')
+    def test_fit_pre_load(self, mock_init, super_mock_model, mock_os, mock_load):
+        # Arrange
+        mock_model = MagicMock()
+        classifier = ImageClassifier(mock_model)
+        x_mock = MagicMock(np.ndarray)
+        y_mock = MagicMock(np.ndarray)
+
+        super_mock_model.get_do_pre_load.return_value = True
+
+        mock_os.return_value = True
+
+        # Act
+        classifier.fit(x=x_mock, y=y_mock)
+
+        # Assert
+        super_mock_model.load_state_dict.assert_called_once()
+
+
 
     def test_predict(self):
         # Test predict of ImageClassifier, while passing y_test

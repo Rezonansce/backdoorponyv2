@@ -11,7 +11,11 @@ class TestCifarPreTrain(TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestCifarPreTrain, self).__init__(*args, **kwargs)
-        self.cnn = CifarCNN()
+        self.model_params = {'learning_rate': {'value': [0.001]},
+                             'optim': {'value': ['SGD']},
+                             'pre_load': {'value': ["True"]},
+                             'num_selection': {'value': [1234]}}
+        self.cnn = CifarCNN(self.model_params)
         self.train_data, self.test_data = CIFAR10().get_datasets()
         self.classifier = ImageClassifier(self.cnn)
 

@@ -4,9 +4,10 @@ import numpy as np
 from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 
 
-class TestDataLoader(unittest.TestCase):
+class TestFmnist(unittest.TestCase):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(TestFmnist, self).__init__(*args, **kwargs)
         self.size = 500
         self.dataloader = Fashion_MNIST(self.size)
 
@@ -24,7 +25,6 @@ class TestDataLoader(unittest.TestCase):
         # Check shapes
         self.assertTrue(np.shape(train_imgs) == (self.size, 1, 28, 28))
         self.assertTrue(np.shape(test_imgs) == (10000, 1, 28, 28))
-        self.assertTrue(np.shape(train_labels) == self.size)
-        self.assertTrue(np.shape(test_labels) == 10000)
+        self.assertTrue(np.shape(test_labels) == (10000,))
 
 

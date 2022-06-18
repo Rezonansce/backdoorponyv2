@@ -9,7 +9,12 @@ class TestFmnistCNN(TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestFmnistCNN, self).__init__(*args, **kwargs)
-        self.cnn = FMNIST_CNN()
+        self.model_params = {'learning_rate': {'value': [0.001]},
+                             'optim': {'value': ['SGD']},
+                             'pre_load': {'value': ["True"]},
+                             'num_selection': {'value': [1234]}}
+        self.cnn = FMNIST_CNN(self.model_params)
+
 
     def test_init(self):
         self.assertTrue(isinstance(self.cnn, nn.Module))
