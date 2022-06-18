@@ -185,8 +185,7 @@ class BadNet(object):
 
         for current_class in classes:
             x_current_class = x_to_poison[y_to_poison == current_class]
-            num_imgs_to_poison = round(
-                (self.percent_poison * len(x_current_class)))
+            num_imgs_to_poison = round(self.percent_poison * len(x_current_class))
 
             # Do not allow poisoning twice (replace=False)
             indices_to_poison = np.random.choice(
@@ -246,5 +245,6 @@ class BadNet(object):
             np.random.shuffle(shuffled_indices)
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
+            is_poison = is_poison[shuffled_indices]
 
         return is_poison, x_combined, y_combined

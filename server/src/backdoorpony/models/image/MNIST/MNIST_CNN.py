@@ -13,7 +13,7 @@ __class_name__ = 'MNIST_CNN'
 class MNIST_CNN(nn.Module):
     def __init__(self):
         '''Initiates a CNN geared towards the MNIST dataset
-        
+
         Returns
         ----------
         None

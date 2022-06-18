@@ -3,6 +3,7 @@ Run the DeepFool attack to generate training data that contains a trigger.
 For documentation check the README inside the attacks/poisoning folder.
 """
 from copy import deepcopy
+
 import numpy as np
 from art.attacks.evasion.deepfool import DeepFool as artDeepFool
 
@@ -211,5 +212,6 @@ class DeepFool(object):
             np.random.shuffle(shuffled_indices)
             x_combined = x_combined[shuffled_indices]
             y_combined = y_combined[shuffled_indices]
+            is_poison = is_poison[shuffled_indices]
 
         return is_poison, x_combined, y_combined

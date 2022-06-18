@@ -167,6 +167,14 @@ class STRIP_ViTA():
 
 
     def defence(self):
+        """
+        Initializes Strip-Vita defence
+
+        Returns
+        -------
+        None.
+
+        """
         x_test = self.clean_test_data
 
 
@@ -190,10 +198,27 @@ class STRIP_ViTA():
 
 
     def predict(self, x_test_data):
+        """
+        Predicts class for the input data.
+        Also if the method find out that the datapoint is very likely to be poisoned it doesn't predict anything.
+
+        Parameters
+        ----------
+        x_test_data : array of datapoints / single datapoint
+            input test data.
+
+        Returns
+        -------
+        predictions : array -> with length (x_test_data) with elements : array (number_of_classes,)
+            There are two possible types of output:
+                1. entropy(data) < threshold: append np.zeros(number_of_classes)
+                2. entropy(data) >= threshold: uses PytorchClassifier.predict()
+
+        """
 
 
         trojan_x_test = x_test_data
-        print(np.array(x_test_data).shape)
+        #print(np.array(x_test_data).shape)
         if not (np.array(x_test_data).shape == 3):
             trojan_x_test = list(trojan_x_test)
 
@@ -222,6 +247,22 @@ class STRIP_ViTA():
         return predictions
 
     def get_predictions(self, x_poison_data):
+        """
+        Applies Strip-Vita defence on poisoned dataset
+
+        Parameters
+        ----------
+        x_poison_data : array of datapoints
+            Poisoned input dataset.
+
+        Returns
+        -------
+        posion_predictions : array of predictions
+            Predictions for poisoned dataset.
+        clean_predictions : array of predictions
+            Predictions for clean dataset.
+
+        """
         posion_predictions = self.predict(x_poison_data)
         clean_predictions = self.predict(self.clean_test_data[0][:self.number_of_samples])
 
