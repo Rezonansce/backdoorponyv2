@@ -3,9 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import dgl
-from dgl import DGLGraph, transform
 from dgl.nn.pytorch.conv import SAGEConv
-from utils.graph import numpy_to_graph
+from backdoorpony.datasets.utils.gta.graph import numpy_to_graph
 
 # Used for inductive case (graph classification) by default.
 class GraphSAGE(nn.Module):  
