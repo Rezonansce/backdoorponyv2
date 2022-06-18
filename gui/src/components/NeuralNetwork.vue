@@ -69,7 +69,7 @@
           <div class="text-h3 text-center" style="height: 50px">
             Hyperparameters
           </div>
-          <div class="text-h6 text-left ml-4 mt-8" style="height: 30px">
+          <div class="text-h6 text-left ml-4 mt-8 mb-4" style="height: 30px">
             {{ selectedModel.toUpperCase() }}
           </div>
           <v-list
@@ -241,33 +241,33 @@ export default {
     height() {
       switch (this.$vuetify.breakpoint.name) {
         case 'xs':
-          return 220;
+          return 210;
         case 'sm':
-          return 400;
+          return 390;
         case 'md':
-          return 300;
+          return 290;
         case 'lg':
-          return 440;
+          return 430;
         case 'xl':
-          return 620;
+          return 610;
         default:
-          return 450;
+          return 440;
       }
     },
     paramHeight() {
       switch (this.$vuetify.breakpoint.name) {
         case 'xs':
-          return 220;
+          return 440;
         case 'sm':
-          return 400;
+          return 800;
         case 'md':
-          return 300;
+          return 600;
         case 'lg':
-          return 145;
+          return 290;
         case 'xl':
-          return 220;
+          return 440;
         default:
-          return 450;
+          return 900;
       }
     },
     filteredModels() {
