@@ -18,11 +18,11 @@ from backdoorpony.datasets.Yeast import Yeast
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.models.text.IMDB.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
-from backdoorpony.models.graph.gta.AIDS.AIDS_gcn import AIDS_gcn
-from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_gcn import Mutagenicity_gcn
-from backdoorpony.models.graph.gta.Yeast.Yeast_gcn import Yeast_gcn
+from backdoorpony.models.graph.gta.AIDS.AIDS_sage import AIDS_sage
+from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_sage import Mutagenicity_sage
+from backdoorpony.models.graph.gta.Yeast.Yeast_sage import Yeast_sage
 
 
 
@@ -91,21 +91,27 @@ class Loader():
                 'classifier': GraphClassifier,
                 'AIDS': {
                     'dataset': AIDS,
-                    'model': AIDS_gcn,
+                    'model': AIDS_sage,
                     'link': "https://paperswithcode.com/dataset/aids",
                     'info': "AIDS is a graph dataset. It consists of 2000 graphs representing molecular compounds which are constructed from the AIDS Antiviral Screen Database of Active Compounds. It contains 4395 chemical compounds, of which 423 belong to class CA, 1081 to CM, and the remaining compounds to CI."
                 },
                 'Mutagenicity': {
                     'dataset': Mutagenicity,
-                    'model': Mutagenicity_gcn,
+                    'model': Mutagenicity_sage,
                     'link': "https://paperswithcode.com/dataset/mutagenicity",
                     'info': "Mutagenicity is a chemical compound dataset of drugs, which can be categorized into two classes: mutagen and non-mutagen."
                 },
                 'Yeast': {
                     'dataset': Yeast,
-                    'model': Yeast_gcn,
+                    'model': Yeast_sage,
                     'link': "https://paperswithcode.com/dataset/yeast",
                     'info': "Yeast dataset consists of a protein-protein interaction network. Interaction detection methods have led to the discovery of thousands of interactions between proteins, and discerning relevance within large-scale data sets is important to present-day biology."
+                },
+                'IMDB MULTI': {
+                    'dataset': IMDB_MULTI,
+                    'model': IMDB_MULTI_sage,
+                    'link': "https://paperswithcode.com/dataset/imdb-multi",
+                    'info': "IMDB-MULTI is a relational dataset that consists of a network of 1000 actors or actresses who played roles in movies in IMDB. A node represents an actor or actress, and an edge connects two nodes when they appear in the same movie. In IMDB-MULTI, the edges are collected from three different genres: Comedy, Romance and Sci-Fi."
                 }
             }
         }
@@ -150,7 +156,7 @@ class Loader():
 
         return sets
 
-    def make_classifier(self, type, dataset, file_model=None, debug=False):
+    def make_classifier(self, type, dataset, model_parameters, file_model=None, debug=False):
         '''Creates the classifier corresponding to the input
 
         Parameters
@@ -159,6 +165,8 @@ class Loader():
             Input type the classifier will act on, as defined by self.options
         dataset :
             The dataset the classifier will be fit to
+        model_parameters:
+            Model hyperparameters selected by the user
         file_model :
             File (in .pth form) of the model the classifier will be based on
             Optional, if not set (or set to None) will use built-in classifier, as
@@ -170,33 +178,20 @@ class Loader():
         ----------
         None
         '''
-        # check which device is available
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if type == "text":
-            # select hyper parameters
-            # TODO should be passed from the UI
             self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1     # vocabulary of the model
-            embedding_dim = 300             # dimension of the embedding layer
-            lstm_layers = 2                 # the total number of stacked lstm-layers
-            hidden_dim = 128                # number of hidden layers of lstm
-            output_dim = 1                  # output dimension
-            bidirectional = False           # if set to true, becomes bidirectional
-            model = self.options[type][dataset]['model'](vocab_size, embedding_dim, lstm_layers, hidden_dim, output_dim,
-                                                         bidirectional)
+            vocab_size = len(vocab) + 1  # vocabulary of the model
+            model = self.options[type][dataset]['model'](vocab_size, model_parameters)
 
-            # move to gpu if available, cpu if not
-            model.to(device)
-
-            learning_rate = 0.0002          # learning rate of the classifier
+            learning_rate = 0.002        # learning rate of the classifier
             self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
-
             x, y = self.train_data
             self.classifier.fit(x, y)
             return
 
-        model = self.options[type][dataset]['model']()
+
+        model = self.options[type][dataset]['model'](model_parameters)
 
         if file_model is not None:
             name = file_model.filename.split('.', 1) #remove filename extension

@@ -16,8 +16,7 @@ from tqdm import tqdm
 
 
 class GraphClassifier(AbstractClassifier):
-    def __init__(self, model, criterion=F.cross_entropy, lr=0.01, step_size=50, gamma=0.1,
-                 batch_size=32, iters_per_epoch=50, iters=50):
+    def __init__(self, model, step_size=50, gamma=0.1):
         '''Initiate the classifier
 
         Parameters
@@ -29,11 +28,18 @@ class GraphClassifier(AbstractClassifier):
         ----------
         None
         '''
-        opti = optim.Adam(model.parameters(), lr=lr)
+        if (model.optim == "Adam"):
+            opti = optim.Adam(model.parameters(), lr=model.lr)
+        else:
+            opti = optim.SGD(model.parameters(), lr=model.lr)
+        
+        if (model.loss == "CrossEntropy"):
+            criterion = F.cross_entropy
+        else:
+            criterion = F.nll_loss
+            
         self.scheduler = optim.lr_scheduler.StepLR(opti, step_size=step_size, gamma=gamma)
-        self.batch_size = batch_size
-        self.iters_per_epoch = iters_per_epoch
-        self.iters = iters
+        self.epochs = model.epochs
 
         # input_shape & nb_classes can be arbitrary, but need to be initialized
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -68,7 +74,7 @@ class GraphClassifier(AbstractClassifier):
         loss_fn = self.loss
         optimizer = self.optimizer
 
-        for iteration in range(self.iters):
+        for iteration in range(self.epochs):
             print(iteration)
             model.train()
             train_loss, n_samples = 0, 0

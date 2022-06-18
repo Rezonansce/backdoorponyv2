@@ -45,7 +45,7 @@ class AIDS(object):
             loaders[train]: Graphs used for training (label included).
             dr: DataReader containing helper fields for the attacks. Is used by GTA to load data (instead of using train_graphs).
             loaders[test]: Graphs used for training (label included).
-            labels: Test graph labels. Used to properly generate metrics.
+            labels: Test graph labels. Used to properly generate metrics..
         '''
         dir_path = os.path.dirname(os.path.realpath(__file__))
         d_path = dir_path + "/preloaded/graphs/gta"
@@ -78,6 +78,5 @@ class AIDS(object):
         out_dim = loaders['train'].dataset.num_classes
         
         labels = extract_labels(loaders["test"])
-        
-            
         return (loaders['train'], dr), (loaders["test"], labels)
+

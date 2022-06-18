@@ -1,7 +1,7 @@
 import torch.nn.functional as F
 from backdoorpony.models.graph.gta.sage import GraphSAGE
 
-__name__ = "AIDS_sage"
+__name__ = "Mutagenicity_sage"
 __input_type__ = "graph"
 __defaults__ = {
     'hidden_dim': {
@@ -46,13 +46,12 @@ __defaults__ = {
         "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
                 'If the input is not valid, CrossEntropy criterion will be chosen.'
     }
-
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''
 
 #A model instance for the MUTAG dataset that inherits from general graphcnn model.
-class AIDS_sage(GraphSAGE):
+class Mutagenicity_sage(GraphSAGE):
     def __init__(self, model_parameters):
         '''
             num_layers: number of layers in the neural networks (INCLUDING the input layer)
@@ -86,5 +85,6 @@ class AIDS_sage(GraphSAGE):
             activation = F.relu
         else:
             activation = F.sigmoid
-        super().__init__(64, 2, model_parameters["hidden_dim"]["value"], model_parameters["dropout"]["value"][0], 
+        super().__init__(49, 2, model_parameters["hidden_dim"]["value"], model_parameters["dropout"]["value"][0], 
                          activation, model_parameters["aggregator"]["value"][0])
+

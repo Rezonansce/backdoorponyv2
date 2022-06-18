@@ -15,7 +15,7 @@ from backdoorpony.datasets.utils.gta.batch import collate_batch
 from backdoorpony.datasets.utils.gta.graph import extract_labels
 
 class Mutagenicity(object):
-    def __init__(self, frac = 0.01):
+    def __init__(self, frac = 1):
         '''Should initiate the dataset. Frac is used to control the fraction (%) of dataset to load.
 
         Returns

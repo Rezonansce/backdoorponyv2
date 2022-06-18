@@ -15,7 +15,7 @@ from backdoorpony.datasets.utils.gta.batch import collate_batch
 from backdoorpony.datasets.utils.gta.graph import extract_labels
 
 class Yeast(object):
-    def __init__(self, frac = 0.01):
+    def __init__(self, frac = 1):
         '''Should initiate the dataset. Frac is used to control the fraction (%) of dataset to load.
 
         Returns
@@ -27,7 +27,7 @@ class Yeast(object):
     def get_datasets(self):
         '''Should return the training data and testing data
 
-         Returns:
+        Returns:
             loaders[train]: Graphs used for training (label included).
             dr: DataReader containing helper fields for the attacks. Is used by GTA to load data (instead of using train_graphs).
             loaders[test]: Graphs used for training (label included).
