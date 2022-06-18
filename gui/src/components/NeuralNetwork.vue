@@ -15,8 +15,9 @@
             v-model="dataSearchTerm"
           >
           </v-text-field>
-          <div class="mt-6">
-            <v-list rounded style="background-color: #1A1A2E;">
+          <div>
+            <v-list rounded style="background-color: #1A1A2E;"
+            :height="height" class="overflow-y-auto">
               <v-list-item-group
                 v-model="selectedItem"
                 color="white"
