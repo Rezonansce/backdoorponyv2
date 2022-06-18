@@ -87,11 +87,11 @@ class TestMainMetricsRunner(TestCase):
             }
         })
 
-    def test_instantiate_mnist_classifier(cls):
-        loader = Loader()
-        loader.make_classifier('image', 'MNIST')
-        classifier = loader.get_classifier()
-        cls.assertTrue(isinstance(classifier, ImageClassifier))
+    # def test_instantiate_mnist_classifier(cls):
+    #     loader = Loader()
+    #     loader.make_classifier('image', 'MNIST')
+    #     classifier = loader.get_classifier()
+    #     cls.assertTrue(isinstance(classifier, ImageClassifier))
 
 
 if __name__ == '__main__':
