@@ -36,11 +36,21 @@ __info__ = '''A model that trains image input'''
 
 
 class FMNIST_CNN(nn.Module):
+    '''
+    Initiate a FMNIST Cnn
 
+    :param model_parameters: hyperparameters for the model
+    '''
     def __init__(self, model_parameters):
+        '''
+        Initiates a CNN for the FMNIST dataset
+
+        :param model_parameters: Hyperparameters for the model
+        '''
         super(FMNIST_CNN, self).__init__()
-        self.do_preload = model_parameters['pre_load']['value'][0]
-        if self.do_preload == 'True':
+        # If do_preload is true, use the default parameters of the model
+        self.do_preload = model_parameters['pre_load']['value'][0].lower()
+        if self.do_preload == 'true':
             self.do_preload = True
             self.optim = 'Adam'
             self.lr = 0.01

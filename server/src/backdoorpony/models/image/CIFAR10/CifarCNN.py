@@ -34,10 +34,17 @@ __info__ = '''A model that trains text input'''
 
 
 class CifarCNN(nn.Module):
+
     def __init__(self, model_parameters):
+        '''
+        Initiates a CNN for the Cifar-10 dataset
+
+        :param model_parameters: Hyperparameters for the model
+        '''
         super(CifarCNN, self).__init__()
-        self.do_preload = model_parameters['pre_load']['value'][0]
-        if self.do_preload == 'True':
+        # If do_preload is true, use the default parameters of the model
+        self.do_preload = model_parameters['pre_load']['value'][0].lower()
+        if self.do_preload == 'true':
             self.do_preload = True
             self.optim = 'SGD'
             self.lr = 0.001

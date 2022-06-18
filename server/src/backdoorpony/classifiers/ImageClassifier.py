@@ -44,16 +44,14 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             Data that the classifier will be trained on
         y :
             Labels that the classifier will be trained on
-        use_pre_load:
-            True if the model should be pre-loaded/ if there is no pre-load,
-            the model will be fitted with the current data and saved as pre-load
-            False if fit is used to poison/defend model
+        autoencoder:
+            Autoencoder that is attached to the classifier. Input will be pre-processed by the autoencoder before being predicted.
 
         Returns
         ----------
         None
         '''
-
+        # Check if the user asked for a pre-loaded model
         if super().model.get_do_pre_load():
             # Get relative paths to the pre-load directory
             abs_path = os.path.abspath(__file__)

@@ -39,16 +39,17 @@ __info__ = '''A model that trains image input'''
 
 
 class MNIST_CNN(nn.Module):
-    def __init__(self, model_parameters):
-        '''Initiates a CNN geared towards the MNIST dataset
 
-        Returns
-        ----------
-        None
+    def __init__(self, model_parameters):
+        '''
+        Initiate a MNIST CNN
+
+        :param model_parameters: hyperparameters for the model
         '''
         super(MNIST_CNN, self).__init__()
-        self.do_preload = model_parameters['pre_load']['value'][0]
-        if self.do_preload == 'True':
+        # If do_preload is true, use the default parameters of the model
+        self.do_preload = model_parameters['pre_load']['value'][0].lower()
+        if self.do_preload == 'true':
             self.do_preload = True
             self.optim = 'Adam'
             self.lr = 0.01
@@ -69,7 +70,6 @@ class MNIST_CNN(nn.Module):
             in_channels=20, out_channels=50, kernel_size=5, stride=1)
         self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=500)
         self.fc_2 = nn.Linear(in_features=500, out_features=10)
-        print(self.lr)
 
     def forward(self, x):
         x = F.relu(self.conv_1(x))
