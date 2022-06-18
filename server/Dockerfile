@@ -2,7 +2,7 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime as backdoorpony-backend
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update &&\
     apt-get upgrade -y &&\
-    apt-get install python3-pip libgl1 -y
+    apt-get install python3-pip libgl1 libsndfile1-dev -y
 WORKDIR /src
 COPY ./server/src/ .
 COPY ./server/assets ./assets
