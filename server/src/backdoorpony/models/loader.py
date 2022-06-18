@@ -106,12 +106,6 @@ class Loader():
                     'model': Yeast_sage,
                     'link': "https://paperswithcode.com/dataset/yeast",
                     'info': "Yeast dataset consists of a protein-protein interaction network. Interaction detection methods have led to the discovery of thousands of interactions between proteins, and discerning relevance within large-scale data sets is important to present-day biology."
-                },
-                'IMDB MULTI': {
-                    'dataset': IMDB_MULTI,
-                    'model': IMDB_MULTI_sage,
-                    'link': "https://paperswithcode.com/dataset/imdb-multi",
-                    'info': "IMDB-MULTI is a relational dataset that consists of a network of 1000 actors or actresses who played roles in movies in IMDB. A node represents an actor or actress, and an edge connects two nodes when they appear in the same movie. In IMDB-MULTI, the edges are collected from three different genres: Comedy, Romance and Sci-Fi."
                 }
             }
         }
