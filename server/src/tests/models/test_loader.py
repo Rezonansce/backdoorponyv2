@@ -13,7 +13,7 @@ from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.loader import Loader
 
-from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.models.text.IMDB.IMDB_LSTM_RNN import IMDB_LSTM_RNN
 
 
 class TestMainMetricsRunner(TestCase):
