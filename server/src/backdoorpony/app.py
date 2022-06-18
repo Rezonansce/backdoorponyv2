@@ -15,7 +15,9 @@ from flask_cors import CORS, cross_origin
 # temporary map
 dataset_to_model = {
     "IMDB": "IMDB_LSTM_RNN",
-    "MNIST": "MNIST_CNN"
+    "MNIST": "MNIST_CNN",
+    "CIFAR10": "CifarCNN",
+    "Fashion_MNIST": "FMNIST_CNN"
 }
 
 
