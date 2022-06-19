@@ -193,6 +193,18 @@ class Loader():
             except:
                 print("")
 
+        if type == 'image':
+            # Image-type model
+            model = self.options[type][dataset]['model'](model_parameters)
+            num_selection = model_parameters['num_selection']['value'][0]
+            # Get the training data
+            self.train_data, self.test_data = self.options[type][dataset]['dataset'](num_selection).get_datasets()
+            self.classifier = self.options[type]['classifier'](model)
+            x, y = self.train_data
+            # Train the classifier
+            self.classifier.fit(x, y)
+            return
+
         model = self.options[type][dataset]['model']()
 
         if file_model is not None:

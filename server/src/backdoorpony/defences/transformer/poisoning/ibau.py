@@ -69,7 +69,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
             for learning_rate in defence_params['learning_rate']['value']:
                 new_entry = deepcopy(entry)
                 defence_classifier = run_def(deepcopy(entry['dict_others']['poison_classifier']), deepcopy(test_data)
-                                        , clean_classifier.model.get_opti(), batch_size=batch_size
+                                        , clean_classifier.get_model().get_opti(), batch_size=batch_size
                                         , lr=learning_rate)
                 new_entry.update({
                         'defence': __name__,

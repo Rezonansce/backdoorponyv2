@@ -37,9 +37,7 @@ class Autoencoder(PyTorchClassifier):
             self.model.load_state_dict(torch.load(final_path))
             return
         # Start training
-        loader = torch.utils.data.DataLoader(dataset=x,
-                                             batch_size=self.batch_size,
-                                             shuffle=True)
+        loader = torch.utils.data.DataLoader(dataset=x, batch_size=self.batch_size, shuffle=True)
         # Validation using MSE Loss function
         loss_function = torch.nn.MSELoss()
 
