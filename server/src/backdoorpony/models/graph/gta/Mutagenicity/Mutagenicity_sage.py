@@ -22,7 +22,7 @@ __defaults__ = {
     "aggregator": {
         "pretty_name": "Aggregation scheme (mean/gcn/pool/lstm)",
         "default_value": ["gcn"],
-        "info": "Aggregation function used to construct new node embeddings. Can be mean (mean aggregator), gcn (Graph Convolutional Network), pool (max pooling) or lstm (Long-short term memory network)."
+        "info": "Aggregation function used to construct new node embeddings. Can be mean (mean aggregator), gcn (Graph Convolutional Network), pool (max pooling) or lstm (Long-short term memory network). If the input is not valid, gcn will be chosen."
     },
     "optim": {
         "pretty_name": "Optimizer (Adam, SGD)",
@@ -50,7 +50,7 @@ __defaults__ = {
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''
 
-#A model instance for the MUTAG dataset that inherits from general graphcnn model.
+#A model instance for the Mutagenicity dataset that inherits from general graphcnn model.
 class Mutagenicity_sage(GraphSAGE):
     def __init__(self, model_parameters):
         '''
@@ -76,6 +76,10 @@ class Mutagenicity_sage(GraphSAGE):
         else:
             loss = "NLL"
         
+        aggregator = model_parameters["aggregator"]["value"][0]
+        if (aggregator != "mean" && aggregator != "gcn" && aggregator != "pool" && aggregator != "lstm"):
+            aggregator = "gcn"
+        
         self.optim = optim
         self.lr = model_parameters["learning_rate"]["value"][0]
         self.epochs = model_parameters["epochs"]["value"][0]
@@ -86,5 +90,5 @@ class Mutagenicity_sage(GraphSAGE):
         else:
             activation = F.sigmoid
         super().__init__(49, 2, model_parameters["hidden_dim"]["value"], model_parameters["dropout"]["value"][0], 
-                         activation, model_parameters["aggregator"]["value"][0])
+                         activation, aggregator)
 
