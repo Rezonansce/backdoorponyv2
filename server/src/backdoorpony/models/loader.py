@@ -80,7 +80,14 @@ class Loader():
                     'model': Audio_MNIST_RNN,
                     'link': None,
                     'info': 'This repository contains code and data used in Interpreting and Explaining Deep Neural Networks for Classifying Audio Signals. The dataset consists of 30,000 audio samples of spoken digits (0–9) from 60 different speakers. Additionally, it holds the audioMNIST_meta.txt, which provides meta information such as the gender or age of each speaker.'
-                }
+                },
+                'Audio_VGD': {
+                    'dataset': Audio_VGD,
+                    'model': Audio_VGD_CNN,
+                    'link': None,
+                    'info': 'The VoxCeleb dataset (7000+ unique speakers and utterances, 3683 males / 2312 females). The VoxCeleb is an audio-visual dataset consisting of short clips of human speech, extracted from interview videos uploaded to YouTube. VoxCeleb contains speech from speakers spanning a wide range of different ethnicities, accents, professions, and ages.'
+
+                },
             },
             'text': {
                 'classifier': TextClassifier,
@@ -91,13 +98,6 @@ class Loader():
                     'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
 
                 },
-                'Audio_VGD': {
-                    'dataset': Audio_VGD,
-                    'model': Audio_VGD_CNN,
-                    'link': None,
-                    'info': 'The VoxCeleb dataset (7000+ unique speakers and utterances, 3683 males / 2312 females). The VoxCeleb is an audio-visual dataset consisting of short clips of human speech, extracted from interview videos uploaded to YouTube. VoxCeleb contains speech from speakers spanning a wide range of different ethnicities, accents, professions, and ages.'
-
-                }
             },
 
             'graph': {

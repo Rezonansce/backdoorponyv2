@@ -39,7 +39,7 @@ class Audio_VGD():
         self.save_path = os.path.join(self.dir_path, "utils/VGD/spectrogrammer/")
         self.data_shape = (28, 28)
 
-    def get_datasets(self):
+    def get_datasets(self, train_size=0.10, test_size = 0.10):
         """
         Loads the image version of the dataset
 
@@ -71,11 +71,11 @@ class Audio_VGD():
             labels[i+offset] = 1
 
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
-    def get_audio_data(self):
+    def get_audio_data(self, train_size=0.10, test_size = 0.10):
         """
         Loads the audio version of the dataset. Used for poisoning.
 
@@ -107,7 +107,7 @@ class Audio_VGD():
             dataset[i+offset] = data
             labels[i+offset] = 1
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
 
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
