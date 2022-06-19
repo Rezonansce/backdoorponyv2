@@ -20,8 +20,8 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        synthie = Synthie(0.1)
-        x, y = synthie.get_datasets()
+        synthie = Synthie()
+        x, y = synthie.get_datasets(0.1)
                     
         self.assertEqual(len(x[0]), 1)
         self.assertTrue(isinstance(x[1],  DataReader))

@@ -19,8 +19,8 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        aids = AIDS(1)
-        x, y = aids.get_datasets()
+        aids = AIDS()
+        x, y = aids.get_datasets(1)
 
         self.assertEqual(len(x[0]), 50)
         self.assertTrue(isinstance(x[1],  DataReader))

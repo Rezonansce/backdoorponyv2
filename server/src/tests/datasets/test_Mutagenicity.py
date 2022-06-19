@@ -19,8 +19,8 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        mutagenicity = Mutagenicity(0.01)
-        x, y = mutagenicity.get_datasets()
+        mutagenicity = Mutagenicity()
+        x, y = mutagenicity.get_datasets(0.01)
         
         self.assertEqual(len(x[0]), 2)
         self.assertTrue(isinstance(x[1],  DataReader))

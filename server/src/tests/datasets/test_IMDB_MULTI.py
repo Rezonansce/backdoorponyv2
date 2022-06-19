@@ -20,8 +20,8 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        imdb = IMDB_MULTI(0.01)
-        x, y = imdb.get_datasets()
+        imdb = IMDB_MULTI()
+        x, y = imdb.get_datasets(0.01)
                     
         self.assertEqual(len(x[0]), 1)
         self.assertTrue(isinstance(x[1],  DataReader))
