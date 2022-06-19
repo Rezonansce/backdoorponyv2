@@ -1,117 +1,158 @@
 <template>
   <div class="">
     <v-container style="height:100%" class="">
-        <v-row style="height:95%">
-          <v-col cols="6">
-            <div class="text-h3 text-center">
-              Datasets
-            </div>
-            <v-text-field
-              label=""
-              color="white"
-              prepend-inner-icon="mdi-magnify"
-              append-outer-icon="mdi-filter"
-              class="mx-10 mt-5"
-              v-model="dataSearchTerm"
+      <v-row style="height:95%">
+        <v-col cols="6">
+          <div class="text-h3 text-center">
+            Datasets
+          </div>
+          <v-text-field
+            label=""
+            color="white"
+            prepend-inner-icon="mdi-magnify"
+            append-outer-icon="mdi-filter"
+            class="mx-10 mt-5"
+            v-model="dataSearchTerm"
+          >
+          </v-text-field>
+          <div>
+            <v-list rounded style="background-color: #1A1A2E;"
+            :height="height" class="overflow-y-auto">
+              <v-list-item-group
+                v-model="selectedItem"
+                color="white"
               >
-            </v-text-field>
-            <div class="mt-6">
-              <v-list rounded style="background-color: #1A1A2E;">
-                <v-list-item-group
-                  v-model="selectedItem"
-                  color="white"
+                <v-list-item
+                  v-for="dataset in filteredDatasets"
+                  :key="dataset.name"
+                  @click='handleSelectClick(dataset, "data")'
                 >
-                  <v-list-item
-                    v-for="dataset in filteredDatasets"
-                    :key="dataset.name"
-                    @click='handleSelect(dataset, "data")'
+                  <v-list-item-icon>
+                    <v-icon color="white" class="mx-4" v-if="dataset.type == 'image'">
+                      mdi-image-multiple
+                    </v-icon>
+                    <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'audio'">
+                      mdi-music-box-multiple-outline
+                    </v-icon>
+                    <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'graph'">
+                      mdi-graphql
+                    </v-icon>
+                    <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'text'">
+                      mdi-text-box-multiple-outline
+                    </v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title v-text="dataset.name.toUpperCase()"></v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action
+                    class=""
+                    style="width: 10%"
                   >
-                    <v-list-item-icon>
-                      <v-icon color="white" class="mx-4" v-if="dataset.type == 'image'">
-                        mdi-image-multiple
-                      </v-icon>
-                      <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'audio'">
-                        mdi-music-box-multiple-outline
-                      </v-icon>
-                      <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'graph'">
-                        mdi-graphql
-                      </v-icon>
-                      <v-icon color="white" class="mx-4" v-else-if="dataset.type == 'text'">
-                        mdi-text-box-multiple-outline
-                      </v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="dataset.name"></v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-action
-                      class=""
-                      style="width: 10%"
-                    >
-                      <information
-                        :actionName="dataset.name.toUpperCase()"
-                        :link="dataset.link"
-                        :infoText="dataset.info"
-                        :hasLink="true"
-                      />
-                    </v-list-item-action>
-                  </v-list-item>
-                </v-list-item-group>
-              </v-list>
-            </div>
-          </v-col>
-          <v-divider vertical class="my-4" color="white"></v-divider>
-          <v-col cols= "6" class="">
-            <div class="text-h3 text-center">
-              Neural Network
-            </div>
-            <v-radio-group class="ml-10 mt-16" mandatory>
-              <v-radio
-                label="Use built-in network"
-                color="accent"
-                @change="builtin = true"
-              >
-              </v-radio>
-              <v-radio
-                label="Upload a neural network"
-                color="accent"
-                @change="builtin = false"
-              >
-              </v-radio>
-            </v-radio-group>
-            <template v-if="builtin === false">
-              <upload-card
-                :title="'Upload a neural network'"
-                :subtitle="
-                'This should be a PyTorch model (.pth) and should' +
-                ' work with the selected dataset.'"
-                :type="'nn'"
-                @selected="handleSelect"
-                @clear="clear(type)"
-                :isDisabled="false"
-                class="mx-16 mt-10"
-                :acceptTypes="'.pth'"
-              />
+                    <information
+                      :actionName="dataset.name.toUpperCase()"
+                      :link="dataset.link"
+                      :infoText="dataset.info"
+                      :hasLink="true"
+                    />
+                  </v-list-item-action>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </div>
+        </v-col>
+        <v-divider
+          class="mx-2"
+          vertical
+          color="white"
+        ></v-divider>
+        <v-col>
+          <div class="text-h3 text-center" style="height: 50px">
+            Hyperparameters
+          </div>
+          <div class="text-h6 text-left ml-4 mt-8 mb-4" style="height: 30px">
+            {{ selectedModel.toUpperCase() }}
+          </div>
+          <v-list
+            class="overflow-y-auto primary mx-0 mt-1 mb-3"
+            :height="paramHeight"
+          >
+            <template v-for="(param, i) in modelParams">
+              <v-list-item :key="i" class="">
+                <parameter
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  class="mt-1"
+                  :paramKey="i"
+                  :info="info[i]"
+                  @paramChanged="updateModelParams"
+                />
+              </v-list-item>
             </template>
-            <v-spacer></v-spacer>
-            <div class="text-h1 text-center" align="end">
-              <v-btn
-                color="accent"
-                class="rounded-xl"
-                min-width="120"
-                @click='upload()'
-              >
-                Continue
-              </v-btn>
-            </div>
-
-          </v-col>
-        </v-row>
+          </v-list>
+          <!--            <v-divider color="white"></v-divider>-->
+          <div class="mt-8 text-center">
+            <v-btn
+              color="accent"
+              class="rounded-xl"
+              min-width="120"
+              @click='upload()'>
+              Continue
+            </v-btn>
+            <v-dialog
+              v-model="executeError"
+              max-width="290"
+            >
+              <v-card color="tertiary">
+                <v-card-title class="headline" color="">
+                  Error
+                </v-card-title>
+                <v-card-text>
+                  {{ errorMessage }}
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="white"
+                    text
+                    @click="executeError = false"
+                  >
+                    OK
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <v-dialog
+              v-model="training"
+              max-width="260"
+              persistent
+              min_height="300"
+            >
+              <v-card color="tertiary">
+                <v-card-title class="headline justify-center" color="">
+                  Training
+                </v-card-title>
+                <v-card-text class="justify-center align-content-center text-center">
+                  <v-progress-circular
+                    :size="50"
+                    indeterminate
+                    color="accent"
+                    class="justify-center"
+                  ></v-progress-circular>
+                </v-card-text>
+                <v-card-subtitle class="justify-center text-center">
+                  This may take a while, training a neural network is computationally intensive.
+                </v-card-subtitle>
+              </v-card>
+            </v-dialog>
+          </div>
+        </v-col>
+      </v-row>
     </v-container>
     <v-dialog
-        v-model="selectionDialog"
-        max-width="260"
-        min_height="300"
-      >
+      v-model="selectionDialog"
+      max-width="260"
+      min_height="300"
+    >
       <v-card color="tertiary">
         <v-card-title class="headline justify-center" color="">
           Error
@@ -132,11 +173,11 @@
       </v-card>
     </v-dialog>
     <v-dialog
-        v-model="uploading"
-        max-width="260"
-        persistent
-        min_height="300"
-      >
+      v-model="uploading"
+      max-width="260"
+      persistent
+      min_height="300"
+    >
       <v-card color="tertiary">
         <v-card-title class="headline justify-center" color="">
           Processing
@@ -159,14 +200,27 @@
 
 <script>
 import UploadService from '../services/UploadFilesService';
+import ModelService from '../services/ModelService';
+import Parameter from './Parameter.vue';
 import Information from './Information.vue';
-import UploadCard from './UploadCard.vue';
 
 export default {
-  components: { Information, UploadCard },
-  setup() {},
+  name: 'app',
+  components: { Parameter, Information },
+  setup() {
+  },
   data() {
     return {
+      models: [{
+        name: 'None',
+        info: 'Select this option if you do not want to execute a model.',
+        input_type: 'none',
+      }],
+      selectedModel: '',
+      selectedModelItem: '',
+      modelSearchTerm: '',
+      modelCategory: '',
+      modelParams: '',
       dialog: false,
       selectedNeuralNetwork: '',
       selectedDataSet: '',
@@ -179,9 +233,48 @@ export default {
       builtin: true,
       uploading: false,
       selectedItem: '',
+      types: {},
+      info: {},
     };
   },
   computed: {
+    height() {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs':
+          return 210;
+        case 'sm':
+          return 390;
+        case 'md':
+          return 290;
+        case 'lg':
+          return 430;
+        case 'xl':
+          return 610;
+        default:
+          return 440;
+      }
+    },
+    paramHeight() {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs':
+          return 440;
+        case 'sm':
+          return 800;
+        case 'md':
+          return 600;
+        case 'lg':
+          return 290;
+        case 'xl':
+          return 440;
+        default:
+          return 900;
+      }
+    },
+    filteredModels() {
+      return this.models.filter(
+        (model) => model.name.toLowerCase().includes(this.modelSearchTerm.toLowerCase()),
+      );
+    },
     filteredDatasets() {
       return this.datasets.filter(
         (dataset) => dataset.name
@@ -190,15 +283,56 @@ export default {
     },
   },
   methods: {
-    handleSelect(file, type) {
-      this.active = '';
-      if (type === 'nn') {
-        this.selectedNeuralNetwork = file;
-      }
+    async handleSelectClick(file, type) {
       if (type === 'data') {
         this.selectedType = file.type;
         this.selectedDataSet = file.name;
       }
+      this.isModel = false;
+      this.selectedModel = '';
+      this.modelParams = {};
+      if (file.name !== 'None') {
+        this.isModel = true;
+        this.selectedModel = file.name;
+        const params = await ModelService.getModelParams(file.name);
+        this.modelParams = params[0].defaults;
+        this.modelCategory = params[0].category;
+        Object.entries(params[0].defaults).forEach(([key, entry]) => {
+          this.types[key] = entry.default_value[0].constructor;
+          this.info[key] = entry.info;
+          this.updateModelParams(entry.pretty_name, entry.default_value, key);
+        });
+      }
+      if (this.selectedModel) this.notReady = false;
+    },
+    // async handleExecuteClick() {
+    //   this.executeError = false;
+    //   this.errorMessage = '';
+    //   this.executing = true;
+    //   const resultData = await ModelService.execute(
+    //     this.isModel,
+    //     JSON.stringify(this.selectedModel),
+    //     JSON.stringify(this.modelParams),
+    //     JSON.stringify(this.modelCategory),
+    //   ).catch(() => {
+    //     this.executing = false;
+    //     this.executeError = true;
+    //     this.errorMessage = 'An error occured';
+    //   });
+    //   ModelService.setResponse(resultData);
+    //   if (!this.errorMessage) {
+    //     this.executing = false;
+    //     this.$emit('handleClick');
+    //   }
+    //   this.$emit('executed');
+    // },
+    updateModelParams(name, newValues, paramKey, info) {
+      const convertValues = this.convert(newValues, paramKey);
+      this.modelParams[paramKey] = { pretty_name: name, value: convertValues, info };
+    },
+    convert(values, paramKey) {
+      const type = this.types[paramKey];
+      return values.map(type);
     },
     async upload() {
       if (!this.selectedNeuralNetwork && !this.builtin) {
@@ -211,7 +345,6 @@ export default {
         this.selectionDialog = true;
         return;
       }
-
       if (!this.builtin) {
         if (this.selectedNeuralNetwork.name.split('.').pop() !== 'pth') {
           this.message = 'The model should be a .pth file';
@@ -219,23 +352,29 @@ export default {
           return;
         }
       }
+      this.executeError = false;
+      this.errorMessage = '';
+      this.uploading = true;
+      await ModelService.selectModel(
+        this.selectedType,
+        this.selectedDataSet,
+        JSON.stringify(this.modelParams),
+      ).catch(() => {
+        this.uploading = false;
+        this.executeError = true;
+        this.errorMessage = 'An error occured';
+      }).then(() => {
+        if (!this.errorMessage) {
+          this.uploading = false;
+          this.$root.$refs.type = this.selectedType;
+          this.$root.$refs.AttacksAndDefences.filterAttacksAndDefences();
+          this.$emit('handleClick');
+        }
+      });
 
       this.selectionDialog = false;
 
       if (this.builtin) this.selectedNeuralNetwork = '';
-
-      this.message = '';
-      this.uploading = true;
-      await UploadService.upload(this.selectedType, this.selectedDataSet,
-        this.selectedNeuralNetwork)
-        .catch(() => {
-          this.uploading = false;
-          this.message = 'Could not upload the file';
-        });
-      if (this.message === '') {
-        this.uploading = false;
-        this.$emit('handleClick');
-      }
     },
   },
   async created() {

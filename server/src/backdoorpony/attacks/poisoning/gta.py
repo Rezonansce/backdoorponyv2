@@ -135,7 +135,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                                             print(train_data[1].max_degree)
                                                             
                                                             args = ArgsBuilder(tc, btr, bte, bs, bnp, bis, gln, glr, ge, tt, ta, ft, fa, l,
-                                                                               clean_classifier.batch_size, clean_classifier.iters)
+                                                                               clean_classifier.batch_size, clean_classifier.epochs)
                                                             
                                                             gb = GraphBackdoor(args)
                                                             model, ptrain, ptest = gb.run(train_data[1], clean_classifier.model)

@@ -43,8 +43,8 @@ class IMDB(object):
 
         # remove br
         test_data = test_data.replace(r'<[^>]*>', ' ', regex=True)
-        # test_data = test_data.replace(r'<br />|<br>', ' ', regex=True)
 
+        # test_data = test_data.replace(r'<br />|<br>', ' ', regex=True)
         train_data_x, test_data_x, lexicon = self.tokenize(train_data["review"].tolist(), test_data["review"].tolist(), stopwords.words('english'))
 
 

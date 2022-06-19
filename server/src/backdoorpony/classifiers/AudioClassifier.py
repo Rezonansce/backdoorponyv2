@@ -8,7 +8,7 @@ from backdoorpony.classifiers.abstract_classifier import AbstractClassifier
 
 
 class AudioClassifier(PyTorchClassifier, AbstractClassifier):
-    def __init__(self, model, shape=(1, 28, 28)):
+    def __init__(self, model, learning_rate, shape=(1, 28, 28)):
         '''Initiate the classifier
 
         Parameters
@@ -24,7 +24,9 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
         torch_device = device('cuda' if cuda.is_available() else 'cpu')
         model = model.to(torch_device)
         criterion = nn.CrossEntropyLoss()
-        opti = optim.Adam(model.parameters(), lr=0.01)
+        opti = optim.Adam(model.parameters(), lr=learning_rate)
+        if model.optim == "SGD":
+            opti = optim.SGD(model.parameters(), lr=learning_rate)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
