@@ -78,7 +78,7 @@ class AIDS_sage(GraphSAGE):
             loss = "NLL"
 
         aggregator = model_parameters["aggregator"]["value"][0]
-        if (aggregator != "mean" && aggregator != "gcn" && aggregator != "pool" && aggregator != "lstm"):
+        if (aggregator != "mean" and aggregator != "gcn" and aggregator != "pool" and aggregator != "lstm"):
             aggregator = "gcn"
         
         self.optim = optim
