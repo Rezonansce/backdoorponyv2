@@ -8,6 +8,7 @@ from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
+from backdoorpony.datasets.audio_VGD import Audio_VGD
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
@@ -19,6 +20,7 @@ from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.models.text.IMDB_LSTM_RNN import IMDB_LSTM_RNN
+from backdoorpony.models.audio.Audio_VGD_CNN import Audio_VGD_CNN
 from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.models.graph.gta.AIDS.AIDS_gcn import AIDS_gcn
 from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_gcn import Mutagenicity_gcn
@@ -74,7 +76,7 @@ class Loader():
                     'dataset': Audio_MNIST,
                     'model': Audio_MNIST_RNN,
                     'link': None,
-                    'info': 'TODO ADD'
+                    'info': 'This repository contains code and data used in Interpreting and Explaining Deep Neural Networks for Classifying Audio Signals. The dataset consists of 30,000 audio samples of spoken digits (0–9) from 60 different speakers. Additionally, it holds the audioMNIST_meta.txt, which provides meta information such as the gender or age of each speaker.'
                 }
             },
             'text': {
@@ -85,8 +87,16 @@ class Loader():
                     'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
                     'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
 
+                },
+                'Audio_VGD': {
+                    'dataset': Audio_VGD,
+                    'model': Audio_VGD_CNN,
+                    'link': None,
+                    'info': 'The VoxCeleb dataset (7000+ unique speakers and utterances, 3683 males / 2312 females). The VoxCeleb is an audio-visual dataset consisting of short clips of human speech, extracted from interview videos uploaded to YouTube. VoxCeleb contains speech from speakers spanning a wide range of different ethnicities, accents, professions, and ages.'
+
                 }
             },
+
             'graph': {
                 'classifier': GraphClassifier,
                 'AIDS': {
@@ -205,6 +215,7 @@ class Loader():
             model.load_state_dict(state_dict)
 
         self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
+
 
         self.classifier = self.options[type]['classifier'](model)
         x, y = self.train_data
