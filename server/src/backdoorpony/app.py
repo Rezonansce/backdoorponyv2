@@ -19,6 +19,11 @@ dataset_to_model = {
     "CIFAR10": "CifarCNN",
     "Fashion_MNIST": "FMNIST_CNN",
     "Audio_MNIST": "Audio_MNIST_RNN"
+    "AIDS": "AIDS_sage",
+    "Mutagenicity": "Mutagenicity_sage",
+    "IMDB MULTI": "IMDB_MULTI_sage",
+    "Yeast": "Yeast_sage",
+    "Synthie": "Synthie_sage"
 }
 
 
