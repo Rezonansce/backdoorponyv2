@@ -25,6 +25,8 @@ class Audio_MNIST_RNN(nn.Module):
         self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=500)
         self.fc_2 = nn.Linear(in_features=500, out_features=10)
 
+        self.nb_class = 10
+
     def forward(self, x):
         x = F.relu(self.conv_1(x))
         x = F.max_pool2d(x, 2, 2)

@@ -44,7 +44,7 @@ __defaults__ = {
     }
 }
 __link__ = 'None'
-__info__ = '''None'''.replace('\n', '')
+__info__ = '''This is a customly created attack, which is based on other similar badnet attacks. It focuses on attacking a specific class by changing labels of other classes to the target class and adding some noise to them.'''.replace('\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):

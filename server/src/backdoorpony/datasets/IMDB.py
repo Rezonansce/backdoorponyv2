@@ -17,9 +17,14 @@ class IMDB(object):
         ----------
         None
         '''
+        # path to current directory
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        # path to data
+        self.data_path = dir_path + "/preloaded/IMDB/"
+
         return
 
-    def get_datasets(self):
+    def get_datasets(self, frac_train = 1, frac_test = 1):
         '''Returns (training, testing data)
 
         Returns
@@ -31,7 +36,7 @@ class IMDB(object):
             same as test_data
 
         '''
-        train_data, test_data = self.get_data()
+        train_data, test_data = self.get_data(frac_train, frac_test)
 
         # remove br
         train_data = train_data.replace(r'<[^>]*>', ' ', regex=True)
@@ -106,7 +111,7 @@ class IMDB(object):
 
         return word
 
-    def get_data(self):
+    def get_data(self, frac_train = 1, frac_test = 1):
         '''
         Get the raw IMDB dataset.
         there is already a split between train and test data.
@@ -120,11 +125,11 @@ class IMDB(object):
 
         # load train data
         # print("current dir ", os.getcwd())
-        train_data = pd.read_csv(r'datasets/preloaded/IMDB/train.zip').sample(frac=0.3, random_state=SEED).reset_index(drop=True)
+        train_data = pd.read_csv(self.data_path + 'train.zip').sample(frac=frac_train, random_state=SEED).reset_index(drop=True)
 
 
         # load test data
-        test_data = pd.read_csv(r'datasets/preloaded/IMDB/test.zip').sample(frac=0.15, random_state=SEED).reset_index(drop=True)
+        test_data = pd.read_csv(self.data_path + 'test.zip').sample(frac=frac_test, random_state=SEED).reset_index(drop=True)
 
 
         return train_data, test_data

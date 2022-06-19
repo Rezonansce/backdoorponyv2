@@ -63,3 +63,8 @@ class FSDD:
             labels.append(label)
 
         return spectrograms, labels
+
+if __name__ == "__main__":
+    data_dir = os.path.dirname(__file__) + '/../spectrograms'
+    spectrogram = matplotlib.pyplot.imread(data_dir + '/' + "0_george_0.png")
+    print(spectrogram)

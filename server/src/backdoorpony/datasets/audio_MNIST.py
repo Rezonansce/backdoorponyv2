@@ -19,6 +19,7 @@ class Audio_MNIST(object):
         self.test_size = test_size
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.data_path = dir_path + "/utils/FSDD/recordings/"
+        self.nb_class = 10
 
     def get_datasets(self):
         '''Generates datapoints if they are missing, then splits the dataset to train and test
@@ -44,11 +45,22 @@ class Audio_MNIST(object):
         fsdd = FSDD(spectrogram_dir)
         dataset, labels = fsdd.get_spectrograms()
 
+
+
         X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_size, random_state=42)
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
     def get_audio_data(self):
+        """
+        Returns the audio version of the dataset
+
+        Returns
+        -------
+        (array, array), (array, array)
+            Returns the train test split of the loaded data.
+
+        """
         dir_path = os.path.dirname(os.path.realpath(__file__))
         audio_dir = dir_path + "/utils/FSDD/recordings/"
         print("Getting raw audio data...")
@@ -68,6 +80,12 @@ class Audio_MNIST(object):
 
 
 def path_leaf(path):
+    """
+    Helper method that extracts the filename from a path
+
+    path: string
+        path of a file
+    """
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 

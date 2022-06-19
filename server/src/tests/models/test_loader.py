@@ -1,14 +1,14 @@
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.datasets.IMDB import IMDB
+from backdoorpony.datasets.AIDS import AIDS
 from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
-from backdoorpony.models.graph.zaixizhang import graphcnn
+from backdoorpony.models.graph.gta.AIDS.AIDS_gcn import AIDS_gcn
 from backdoorpony.datasets.MNIST import MNIST
-from backdoorpony.datasets.MUTAG import MUTAG
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from backdoorpony.classifiers.GraphClassifier import GraphClassifier
+from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 from backdoorpony.classifiers.TextClassifier import TextClassifier
 from backdoorpony.models.loader import Loader
@@ -49,10 +49,10 @@ class TestMainMetricsRunner(TestCase):
             },
             'graph': {
                 'classifier': GraphClassifier,
-                'MUTAG': {
-                    'dataset': MUTAG,
-                    'model': graphcnn,
-                    'link': 'custom mutagen dataset, modelled as graphs',
+                'AIDS': {
+                    'dataset': AIDS,
+                    'model': AIDS_gcn,
+                    'link': 'custom aids molecule dataset, modelled as graphs',
                     'info': 'Info on this dataset...'
 
                 }
@@ -80,10 +80,10 @@ class TestMainMetricsRunner(TestCase):
             },
             "audio": {},
             'graph': {
-                'MUTAG': {
+                'AIDS': {
                     'info': 'Info on this dataset...',
-                    'link': 'custom mutagen dataset, modelled as graphs',
-                    "pretty_name": "MUTAG"
+                    'link': 'custom aids molecule dataset, modelled as graphs',
+                    "pretty_name": "AIDS"
                 }
             }
         })
