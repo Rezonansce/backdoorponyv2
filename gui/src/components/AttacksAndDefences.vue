@@ -396,9 +396,23 @@ export default {
       const type = this.types[paramKey];
       return values.map(type);
     },
-
+    filterAttacks() {
+      this.attacks = this.attacks.filter(
+        (attack) => attack.input_type === this.$root.$refs.type || attack.input_type === 'none',
+      );
+    },
+    filterDefences() {
+      this.defences = this.defences.filter(
+        (defence) => defence.input_type === this.$root.$refs.type || defence.input_type === 'none',
+      );
+    },
+    filterAttacksAndDefences() {
+      this.filterAttacks();
+      this.filterDefences();
+    },
   },
   async created() {
+    this.$root.$refs.AttacksAndDefences = this;
     const attacks = await AttacksAndDefencesService.getAttacks();
     Array.prototype.push.apply(this.attacks, attacks);
     const defences = await AttacksAndDefencesService.getDefences();

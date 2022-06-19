@@ -20,8 +20,8 @@ class TestDataLoader(TestCase):
         GraphData.return_value = "gdata"
         DataLoader.return_value = 42
         
-        yeast = Yeast(0.001)
-        x, y = yeast.get_datasets()
+        yeast = Yeast()
+        x, y = yeast.get_datasets(0.001)
                     
         self.assertEqual(len(x[0]), 2)
         self.assertTrue(isinstance(x[1],  DataReader))

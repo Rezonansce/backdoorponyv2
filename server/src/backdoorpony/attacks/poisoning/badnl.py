@@ -103,6 +103,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     'poison_percent': attack_params['poison_percent']['value'][pp],
                     'target_class': attack_params['target_class']['value'][tc],
                     'location': loc,
+                    'trigger': attack_params['trigger']['value'][0],
                     'dict_others': {
                         'poison_classifier': deepcopy(poisoned_classifier),
                         'poison_inputs': deepcopy(full_poison_data),
@@ -253,7 +254,7 @@ class BadNL(object):
         None
         '''
         # find index used to represent the trigger
-        trigger_loc = self.proxy_classifier.vocab[self.trigger]
+        trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
         for entry in data:
             # insert trigger at a selected location
             # based on used selection in the UI
@@ -263,7 +264,7 @@ class BadNL(object):
             if self.location == 1:
                 insert_pos = 0
             elif self.location == 2:
-                insert_pos = round(len(entry)/2)
+                insert_pos = round(len(entry)/2) - 1
             else:
                 insert_pos = -1
             # update word at position with a trigger word

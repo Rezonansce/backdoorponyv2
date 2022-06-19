@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
-from backdoorpony.datasets.utils.autoencoder_util.AutoencoderCNN import AutoencoderCNN
-from backdoorpony.datasets.utils.autoencoder_util.Autoencoder import Autoencoder
+from backdoorpony.defence_helpers.autoencoder_util import AutoencoderCNN
+from backdoorpony.defence_helpers.autoencoder_util.Autoencoder import Autoencoder
 __name__ = 'autoencoder'
 __category__ = 'transformer'
 __input_type__ = 'image'
@@ -67,7 +67,7 @@ def run(clean_classifier, test_data, execution_history, defence_params):
                             }
                         })
                     key_index += 1
-                    new_execution_history.update({'I-BAU' + str(key_index): new_entry})
+                    new_execution_history.update({'Autoencoder' + str(key_index): new_entry})
 
     return new_execution_history
 

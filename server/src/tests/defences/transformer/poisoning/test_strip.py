@@ -8,7 +8,7 @@ from backdoorpony.defences.transformer.poisoning.strip import STRIP
 from numpy.testing._private.utils import assert_equal
 
 
-class TestDataLoader(TestCase):
+class TestStrip(TestCase):
     # def test_run(self):
     #     # Test the run method of STRIP
     #     # Arange

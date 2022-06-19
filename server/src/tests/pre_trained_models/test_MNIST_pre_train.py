@@ -10,7 +10,11 @@ class TestMNISTPreTrain(TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestMNISTPreTrain, self).__init__(*args, **kwargs)
-        self.cnn = MNIST_CNN()
+        self.model_params = {'learning_rate': {'value': [0.001]},
+                             'optim': {'value': ['SGD']},
+                             'pre_load': {'value': ["True"]},
+                             'num_selection': {'value': [1234]}}
+        self.cnn = MNIST_CNN(self.model_params)
         self.train_data, self.test_data = MNIST().get_datasets()
         self.classifier = ImageClassifier(self.cnn)
 
