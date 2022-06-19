@@ -46,7 +46,7 @@ def numpy_to_graph(A,type_graph='dgl',node_features=None, to_cuda=True):
     else:
         node_attrs = []
         
-    g = dgl.from_networkx(G, node_attrs=node_attrs, edge_attrs=['weight'])
+    g = dgl.from_networkx(G, node_attrs=node_attrs)
     if to_cuda:
         g = g.to(torch.device('cuda'))
     return g

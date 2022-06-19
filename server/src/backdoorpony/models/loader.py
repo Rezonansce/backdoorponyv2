@@ -8,12 +8,13 @@ from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.datasets.Fashion_MNIST import Fashion_MNIST
 from backdoorpony.datasets.MNIST import MNIST
 from backdoorpony.datasets.audio_MNIST import Audio_MNIST
-from backdoorpony.models.image.MNIST.MNIST_CNN import MNIST_CNN
 from backdoorpony.datasets.CIFAR10 import CIFAR10
 from backdoorpony.datasets.IMDB import IMDB
 from backdoorpony.datasets.AIDS import AIDS
 from backdoorpony.datasets.Mutagenicity import Mutagenicity
 from backdoorpony.datasets.Yeast import Yeast
+from backdoorpony.datasets.IMDB_MULTI import IMDB_MULTI
+from backdoorpony.datasets.Synthie import Synthie
 
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
@@ -23,6 +24,8 @@ from backdoorpony.models.image.CIFAR10.CifarCNN import CifarCNN
 from backdoorpony.models.graph.gta.AIDS.AIDS_sage import AIDS_sage
 from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_sage import Mutagenicity_sage
 from backdoorpony.models.graph.gta.Yeast.Yeast_sage import Yeast_sage
+from backdoorpony.models.graph.gta.IMDB_MULTI.IMDB_MULTI_sage import IMDB_MULTI_sage
+from backdoorpony.models.graph.gta.Synthie.Synthie_sage import Synthie_sage
 
 
 
@@ -106,6 +109,18 @@ class Loader():
                     'model': Yeast_sage,
                     'link': "https://paperswithcode.com/dataset/yeast",
                     'info': "Yeast dataset consists of a protein-protein interaction network. Interaction detection methods have led to the discovery of thousands of interactions between proteins, and discerning relevance within large-scale data sets is important to present-day biology."
+                },
+                'IMDB MULTI': {
+                    'dataset': IMDB_MULTI,
+                    'model': IMDB_MULTI_sage,
+                    'link': "https://paperswithcode.com/dataset/imdb-multi",
+                    'info': "IMDB-MULTI is a relational dataset that consists of a network of 1000 actors or actresses who played roles in movies in IMDB. A node represents an actor or actress, and an edge connects two nodes when they appear in the same movie. In IMDB-MULTI, the edges are collected from three different genres: Comedy, Romance and Sci-Fi."
+                },
+                'Synthie': {
+                    'dataset': Synthie,
+                    'model': Synthie_sage,
+                    'link': "https://networkrepository.com/Synthie.php",
+                    'info': "Synthie is a synthetic data sets consisting of 400 graphs. The data set is subdivided into four classes. Each node has a real-valued attribute vector of dimension 15 and no labels."
                 }
             }
         }

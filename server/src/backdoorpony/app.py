@@ -19,7 +19,8 @@ dataset_to_model = {
     "AIDS": "AIDS_sage",
     "Mutagenicity": "Mutagenicity_sage",
     "IMDB MULTI": "IMDB_MULTI_sage",
-    "Yeast": "Yeast_sage"
+    "Yeast": "Yeast_sage",
+    "Synthie": "Synthie_sage"
 }
 
 

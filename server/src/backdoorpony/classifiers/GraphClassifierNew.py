@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 
 class GraphClassifier(AbstractClassifier):
-    def __init__(self, model, step_size=50, gamma=0.1):
+    def __init__(self, model, step_size=50, gamma=0.1, batch_size = 32):
         '''Initiate the classifier
 
         Parameters
@@ -46,6 +46,7 @@ class GraphClassifier(AbstractClassifier):
         self.model = model.to(self.device)
         self.loss = criterion
         self.optimizer = opti
+        self.batch_size = batch_size
 
     def fit(self, x, y, *args, **kwargs):
         '''Fits the classifier to the training data

@@ -18,7 +18,7 @@ __defaults__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'default_value':  [0.5],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs.'
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     },
     'target_class': {
         'pretty_name': 'Target class',
@@ -30,7 +30,7 @@ __defaults__ = {
         'default_value': ['ER'],
         'info': 'Subgraph generation algorithm. Can be ER (Erdos-Renyi), SW (Watts Strogatz Small-World) or PA (Barabasi Albert).'
     },
-    'backdoor_nodes_ratio': {
+    'backdoor_nodes': {
         'pretty_name': 'Backdoor Nodes Ratio',
         'default_value': [0.2],
         'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
@@ -70,16 +70,15 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     ----------
     Returns the updated execution history dictionary
     '''
-    print('Instantiating a gta attack.')
+    print('Instantiating a zaixizhang attack.')
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
         for tc in attack_params['target_class']['value']:
             for gt in attack_params['graph_type']['value']:
-                for bn in attack_params['backdoor_nodes_ratio']['value']:
+                for bn in attack_params['backdoor_nodes']['value']:
                     for p in attack_params['probability']['value']:
                         for c in attack_params['connections']['value']:
-                                
                             # Run the attack for a combination of trigger and poison_percent
                             execution_entry = {}
                             
@@ -112,7 +111,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                 'poison_percent': pp,
                                 'target_class': tc,
                                 "graph_type": gt,
-                                "backdoor_nodes_ratio": bn,
+                                "backdoor_nodes": bn,
                                 "probability": p,
                                 "connections": c,
                                 'dict_others': {
@@ -168,9 +167,6 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
     rand_backdoor_graph_idx = random.sample(train_backdoor_graphs_indexes,
                                             k=min(len(train_backdoor_graphs_indexes), num_backdoor_train_graphs)) # without replacement
     
-
-    poisoned_idx = random.sample(range(test_length), k=int(frac*test_length))
-    
     num_features = len(train_graphs[0][0][0][0])
     
     for idx in rand_backdoor_graph_idx:
@@ -179,11 +175,11 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
         
         num_nodes = train_graphs[batch][3][pos]
         if num_backdoor_nodes >= num_nodes:
+            print("wot")
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes)
+            print(num_nodes)
         else:
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes, replace=False)
-
-        
 
         ### Remove existing edges
         for i in rand_select_nodes:
@@ -194,11 +190,13 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
         ### map node index [0,1,.., num_backdoor_node-1] to corresponding nodes in rand_select_nodes
         ### and attach the subgraph
         for e in G_gen.edges:
-            train_graphs[batch][1][pos][e[0]][e[1]] = 1
-            train_graphs[batch][1][pos][e[1]][e[0]] = 1
+            if (rand_select_nodes[e[0]] == rand_select_nodes[e[1]]):
+                continue
+            train_graphs[batch][1][pos][rand_select_nodes[e[0]]][rand_select_nodes[e[1]]] = 1
+            train_graphs[batch][1][pos][rand_select_nodes[e[1]]][rand_select_nodes[e[0]]] = 1
         
         for i in rand_select_nodes:
-            for j in range(max_degree+avg_nodes+1):
+            for j in range(avg_nodes+1+max_degree):
                 train_graphs[batch][0][pos][i][num_features-j-1] = 0
             deg = torch.count_nonzero(train_graphs[batch][1][pos][i])
             train_graphs[batch][0][pos][i][deg] = 1
@@ -217,7 +215,6 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
         else:
             test_graphs_targetlabel_indexes.append(graph_idx)
 
-
     for idx in test_graphs_targetlabel_indexes:
         batch = idx // b_size
         pos = idx % b_size
@@ -227,9 +224,7 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes)
         else:
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes, replace=False)
-
         
-
         ### Remove existing edges
         for i in rand_select_nodes:
             for j in rand_select_nodes:
@@ -239,8 +234,10 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
         ### map node index [0,1,.., num_backdoor_node-1] to corresponding nodes in rand_select_nodes
         ### and attach the subgraph
         for e in G_gen.edges:
-            test_graphs[batch][1][pos][e[0]][e[1]] = 1
-            test_graphs[batch][1][pos][e[1]][e[0]] = 1
+            if (rand_select_nodes[e[0]] == rand_select_nodes[e[1]]):
+                continue
+            test_graphs[batch][1][pos][rand_select_nodes[e[0]]][rand_select_nodes[e[1]]] = 1
+            test_graphs[batch][1][pos][rand_select_nodes[e[1]]][rand_select_nodes[e[0]]] = 1
         
         for i in rand_select_nodes:
             for j in range(max_degree+avg_nodes+1):
