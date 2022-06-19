@@ -30,7 +30,7 @@ __defaults__ = {
         'default_value': ['ER'],
         'info': 'Subgraph generation algorithm. Can be ER (Erdos-Renyi), SW (Watts Strogatz Small-World) or PA (Barabasi Albert).'
     },
-    'backdoor_nodes': {
+    'backdoor_nodes_ratio': {
         'pretty_name': 'Backdoor Nodes Ratio',
         'default_value': [0.2],
         'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
@@ -76,7 +76,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     for pp in attack_params['poison_percent']['value']:
         for tc in attack_params['target_class']['value']:
             for gt in attack_params['graph_type']['value']:
-                for bn in attack_params['backdoor_nodes']['value']:
+                for bn in attack_params['backdoor_nodes_ratio']['value']:
                     for p in attack_params['probability']['value']:
                         for c in attack_params['connections']['value']:
                                 
@@ -112,7 +112,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                 'poison_percent': pp,
                                 'target_class': tc,
                                 "graph_type": gt,
-                                "backdoor_nodes": bn,
+                                "backdoor_nodes_ratio": bn,
                                 "probability": p,
                                 "connections": c,
                                 'dict_others': {
