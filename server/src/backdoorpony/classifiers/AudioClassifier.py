@@ -25,7 +25,6 @@ class AudioClassifier(PyTorchClassifier, AbstractClassifier):
         model = model.to(torch_device)
         criterion = nn.CrossEntropyLoss()
         opti = optim.Adam(model.parameters(), lr=0.01)
-        print(model.nb_class)
         super().__init__(
             model=model,
             clip_values=(0.0, 255.0),
