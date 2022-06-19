@@ -9,25 +9,31 @@ __name__ = "Audio_MNIST_RNN"
 __category__ = 'audio'
 __input_type__ = "audio"
 __defaults__ = {
-    'parameter_1': {
-        'pretty_name': 'This is parameter one',
-        'default_value': [0.1, 0.33],
-        'info': 'This is a parameter that can be used to teak your model'
+    'kernel_size': {
+        'pretty_name': 'Kernel size',
+        'default_value': [5],
+        'info': 'Kernel size, should be < 28'
     },
-    'parameter_2': {
-        'pretty_name': 'This is parameter two',
-        'default_value': [1],
-        'info': 'This is a parameter that can be used to teak your model'
-    }
+    'hidden_layer_nodes': {
+        'pretty_name': 'Hidden Layer Nodes',
+        'default_value': [784],
+        'info': 'This parameter can adjust the number of nodes in the last layer.'
+    },
+    'optim': {
+        'pretty_name': 'Optimizer',
+        'default_value': ['Adam'],
+        'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
+            'If the input is not valid, Adam optimizer will be chosen.'
+    },
 }
 __link__ = 'link to model page'
-__info__ = '''A model that trains text input'''
+__info__ = '''A model that trains spectrogrammer input'''
 # __dataset__ = 'audio_mnist'
 # __class_name__ = 'Audio_MNIST_RNN'
 
 
 class Audio_MNIST_RNN(nn.Module):
-    def __init__(self):
+    def __init__(self, model_parameters):
         '''Initiates a CNN geared towards the Audio MNIST dataset
 
         Returns
@@ -35,12 +41,20 @@ class Audio_MNIST_RNN(nn.Module):
         None
         '''
         super(Audio_MNIST_RNN, self).__init__()
+        self.kernel_size = model_parameters['kernel_size']['value'][0]
+        self.hidden_layer_nodes = model_parameters['hidden_layer_nodes']['value'][0]
+        self.optim = model_parameters['optim']['value'][0]
+        if self.optim != "SGD":
+            self.optim = "Adam"
+
         self.conv_1 = nn.Conv2d(
-            in_channels=1, out_channels=20, kernel_size=5, stride=1)
+            in_channels=1, out_channels=20, kernel_size=self.kernel_size, stride=1)
         self.conv_2 = nn.Conv2d(
-            in_channels=20, out_channels=50, kernel_size=5, stride=1)
-        self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=500)
-        self.fc_2 = nn.Linear(in_features=500, out_features=10)
+            in_channels=20, out_channels=50, kernel_size=self.kernel_size, stride=1)
+        self.fc_1 = nn.Linear(in_features=4 * 4 * 50, out_features=self.hidden_layer_nodes)
+        self.fc_2 = nn.Linear(in_features=self.hidden_layer_nodes, out_features=10)
+
+
 
     def forward(self, x):
         x = F.relu(self.conv_1(x))
