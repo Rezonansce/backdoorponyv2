@@ -18,7 +18,7 @@ dataset_to_model = {
     "MNIST": "MNIST_CNN",
     "CIFAR10": "CifarCNN",
     "Fashion_MNIST": "FMNIST_CNN",
-    "Audio_MNIST": "Audio_MNIST_RNN"
+    "Audio_MNIST": "Audio_MNIST_RNN",
     "AIDS": "AIDS_sage",
     "Mutagenicity": "Mutagenicity_sage",
     "IMDB MULTI": "IMDB_MULTI_sage",
