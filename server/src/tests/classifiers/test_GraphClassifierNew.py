@@ -8,7 +8,6 @@ from torch import tensor
 import torch.nn as nn
 from backdoorpony.classifiers.GraphClassifierNew import GraphClassifier
 from backdoorpony.models.graph.gta.AIDS.AIDS_sage import AIDS_sage
-from backdoorpony.models.graph.gta.gcn import GCN
 from unittest.mock import PropertyMock
 
 
