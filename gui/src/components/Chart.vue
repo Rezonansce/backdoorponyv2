@@ -3,9 +3,9 @@
         color="tertiary"
         rounded=""
         class="text-center ma-3"
-        height="430"
+        height="415"
         min-width=""
-        style="width: 30%"
+        style="width: 40%"
       >
         <v-card-title class="justify-center">
           {{ title }}

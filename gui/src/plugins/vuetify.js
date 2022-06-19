@@ -12,7 +12,7 @@ const vuetify = new Vuetify({
         surface: '#FFFFFF',
         primary: '#1A1A2E',
         secondary: '#16213E',
-        tertiary: '0f3460',
+        tertiary: '#0f3460',
         accent: '#E94560',
       },
     },

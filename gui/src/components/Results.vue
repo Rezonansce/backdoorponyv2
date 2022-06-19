@@ -60,11 +60,13 @@ export default {
       Object.values(data).forEach((el, i) => {
         optList[i] = {
           type: 'line',
-          title: { label: { text: `${el.metric} against ${el.x_axis}` } },
+          title: { label: { text: `${el.metric}` }, position: 'center' },
+          box: { padding: '20px 20px 0px 25px' },
+          xAxis: { label: { text: `${el.x_axis}` } },
           legend: {
             header: `,${el.plot}`,
             template: '%icon,%name',
-            maxWidth: 400,
+            minWidth: 400,
             cellSpacing: 8,
           },
           series: Object.values(el.graph),
