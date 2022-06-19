@@ -45,8 +45,12 @@ __defaults__ = {
         "default_value": ["CrossEntropy"],
         "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
                 'If the input is not valid, CrossEntropy criterion will be chosen.'
+    },
+    'frac': {
+        'pretty_name': 'Fraction of the dataset to load',
+        'default_value': [1],
+        'info': 'Consists of 2000 graphs, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
-
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''

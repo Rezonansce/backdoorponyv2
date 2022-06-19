@@ -45,6 +45,11 @@ __defaults__ = {
         "default_value": ["CrossEntropy"],
         "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
                 'If the input is not valid, CrossEntropy criterion will be chosen.'
+    },
+    'frac': {
+        'pretty_name': 'Fraction of the dataset to load',
+        'default_value': [1],
+        'info': 'Consists of 1000 graphs, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
@@ -88,5 +93,5 @@ class IMDB_MULTI_sage(GraphSAGE):
             activation = F.relu
         else:
             activation = F.sigmoid
-        super().__init__(89, 3, model_parameters["hidden_dim"]["value"], model_parameters["dropout"]["value"][0], 
+        super().__init__(102, 3, model_parameters["hidden_dim"]["value"], model_parameters["dropout"]["value"][0],
                          activation, model_parameters["aggregator"]["value"][0])

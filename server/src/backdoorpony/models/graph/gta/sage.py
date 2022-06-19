@@ -33,7 +33,7 @@ class GraphSAGE(nn.Module):
         batch_g = []
         for adj in data[1]:
             # cannot use tensor init DGLGraph
-            batch_g.append(numpy_to_graph(adj.cpu().T.numpy(), to_cuda=adj.is_cuda)) 
+            batch_g.append(numpy_to_graph(adj.detach().cpu().T.numpy(), to_cuda=adj.is_cuda))
         batch_g = dgl.batch(batch_g)
         
         mask = data[2]

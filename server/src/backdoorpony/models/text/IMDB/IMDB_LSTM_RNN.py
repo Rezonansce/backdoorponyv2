@@ -28,6 +28,16 @@ __defaults__ = {
         'pretty_name': 'Number of (stacked) LSTM layers',
         'default_value': [2],
         'info': 'the total number of (stacked) lstm-layers (even if bidirectional)'
+    },
+    'num_train': {
+        'pretty_name': 'Fraction of the training samples of a dataset',
+        'default_value': [1],
+        'info': 'Consists of 25000 training samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
+    },
+    'num_test': {
+        'pretty_name': 'Fraction of the testing samples of a dataset',
+        'default_value': [1],
+        'info': 'Consists of 25000 test samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
@@ -65,7 +75,6 @@ class IMDB_LSTM_RNN(nn.Module):
         self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=self.hidden_dim, num_layers=lstm_layers, batch_first=True, bidirectional=bidirectional)
 
         # if lstm is bidirectional, there needs to be twice as much hidden nodes
-
         if bidirectional:
             hidden_dim_linear *= 2
 

@@ -25,6 +25,16 @@ __defaults__ = {
         'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
             'If the input is not valid, Adam optimizer will be chosen.'
     },
+    'num_train': {
+        'pretty_name': 'Fraction of the training samples of a dataset',
+        'default_value': [1],
+        'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for training'
+    },
+    'num_test': {
+        'pretty_name': 'Fraction of the testing samples of a dataset',
+        'default_value': [1],
+        'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for testing'
+    }
 }
 __link__ = 'link to model page'
 __info__ = '''A model that trains spectrogrammer input'''

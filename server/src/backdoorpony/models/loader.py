@@ -188,27 +188,67 @@ class Loader():
         None
         '''
 
+
+        # text-specific model/classifier creation
         if type == "text":
-            self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets()
-            vocab_size = len(vocab) + 1  # vocabulary of the model
+            # Fraction of a training dataset to load
+            num_train = model_parameters['num_train']['value'][0]
+
+            # Fraction of a testing data to load
+            num_test = model_parameters['num_test']['value'][0]
+
+            # get data and vocabulary
+            self.train_data, self.test_data, vocab = self.options[type][dataset]['dataset']().get_datasets(num_train, num_test)
+
+            # vocabulary size of the model, plus padding (since 0 is not included in the vocab and acts as a "unknown word"
+            vocab_size = len(vocab) + 1
+
+            # initialize the model
             model = self.options[type][dataset]['model'](vocab_size, model_parameters)
 
-            learning_rate = 0.002        # learning rate of the classifier
+            # learning rate of the classifier
+            learning_rate = 0.002
+
+            # initialize the classifier
             self.classifier = self.options[type]['classifier'](model, vocab, learning_rate)
+
+            # split train_data into features and labels
             x, y = self.train_data
+
+            # train the classifier
             self.classifier.fit(x, y)
             return
-        if type == "audio":
-            model = self.options[type][dataset]['model'](model_parameters)
-            self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
 
+        # audio-specific model/classifier creation
+        if type == "audio":
+            # Fraction of a training dataset to load
+            num_train = model_parameters['num_train']['value'][0]
+
+            # Fraction of a testing data to load
+            num_test = model_parameters['num_test']['value'][0]
+
+            # train/test split
+            self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets(num_train, num_test)
+
+            # get data and vocabulary
+            model = self.options[type][dataset]['model'](model_parameters)
+
+            # learning rate of the classifier
             learning_rate = 0.002
+
+            # initialize the classifier
             self.classifier = self.options[type]['classifier'](model, learning_rate)
+
+            # split train_data into features and labels
             x, y = self.train_data
+
+            # train the classifier
             self.classifier.fit(x, y, use_pre_load=True)
 
             self.audio = None
-            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data()
+
+            # data split
+            self.audio_train_data, self.audio_test_data = self.options[type][dataset]['dataset']().get_audio_data(num_train, num_test)
 
             return
         else:
@@ -217,32 +257,52 @@ class Loader():
             except:
                 print("")
 
+        # image-specific model/classifier creation
         if type == 'image':
             # Image-type model
             model = self.options[type][dataset]['model'](model_parameters)
+
+            # Fraction of a given dataset to load
             num_selection = model_parameters['num_selection']['value'][0]
+
             # Get the training data
             self.train_data, self.test_data = self.options[type][dataset]['dataset'](num_selection).get_datasets()
+
+            # initialize the classifier
             self.classifier = self.options[type]['classifier'](model)
+
+            # split train_data into features and labels
             x, y = self.train_data
+
             # Train the classifier
             self.classifier.fit(x, y)
             return
 
+        # other datatype model/classifier default initialization - currently only graphs
+        # TODO reorganize when more data types are added
+        # Fraction of a  dataset to load
+        frac = model_parameters['frac']['value'][0]
 
+
+        # Get the training data
+        self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets(frac)
+
+        # initialize the model
         model = self.options[type][dataset]['model'](model_parameters)
 
         if file_model is not None:
-            name = file_model.filename.split('.', 1) #remove filename extension
+            name = file_model.filename.split('.', 1)  # remove filename extension
             file_model.save('data/pth/' + name[0] + '.model.pth')
             state_dict = torch.load('data/pth/' + name[0] + '.model.pth')
             model.load_state_dict(state_dict)
 
-        self.train_data, self.test_data = self.options[type][dataset]['dataset']().get_datasets()
-
+        # initialize the classifier
         self.classifier = self.options[type]['classifier'](model)
+
+        # split train_data into features and labels
         x, y = self.train_data
 
+        # Train the classifier
         self.classifier.fit(x, y, use_pre_load=True)
 
 

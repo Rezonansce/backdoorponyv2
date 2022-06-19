@@ -15,16 +15,15 @@ from backdoorpony.datasets.utils.gta.batch import collate_batch
 from backdoorpony.datasets.utils.gta.graph import extract_labels
 
 class IMDB_MULTI(object):
-    def __init__(self, frac = 0.1):
+    def __init__(self):
         '''Should initiate the dataset. Frac is used to control the fraction (%) of dataset to load.
 
         Returns
         ----------
         None
         '''
-        self.frac = frac
 
-    def get_datasets(self):
+    def get_datasets(self, frac):
         '''Should return the training data and testing data
 
          Returns:
@@ -33,15 +32,15 @@ class IMDB_MULTI(object):
             loaders[test]: Graphs used for training (label included).
             labels: Test graph labels. Used to properly generate metrics.
         '''
-        return self.get_data()
+        return self.get_data(frac)
 
-    def get_data(self):
+    def get_data(self, frac):
         '''
         Get the IMDB-MULTI dataset, which consists of 1500 graphs. It contains three graph labels - 0, 1 and 2.
         Automatically creates a split between train and test data.
 
         Returns:
-            loaders[train]: Graphs used for training (label included).
+            loaders[train]: Graphs used for training (label included).j
             dr: DataReader containing helper fields for the attacks. Is used by GTA to load data (instead of using train_graphs).
             loaders[test]: Graphs used for training (label included).
             labels: Test graph labels. Used to properly generate metrics.
@@ -51,7 +50,7 @@ class IMDB_MULTI(object):
 
         # load data into DataReader object
         dr = DataReader(use_nlabel_asfeat = False, use_org_node_attr = False, use_degree_asfeat = True, 
-                        data_path = d_path, dataset = "IMDB-MULTI", seed = 42, data_verbose = False, train_ratio = 0.8, frac = self.frac)
+                        data_path = d_path, dataset = "IMDB-MULTI", seed = 42, data_verbose = False, train_ratio = 0.8, frac = frac)
         
         b_size = 32
         
