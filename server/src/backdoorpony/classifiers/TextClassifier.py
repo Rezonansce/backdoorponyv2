@@ -35,19 +35,15 @@ class TextClassifier(AbstractClassifier, object):
         ----------
         None
         '''
-        self.model = model
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        self.model = model.to(self.device)
         self.criterion = nn.BCELoss()
         # self.optimizer = optim.SGD(model.parameters(), lr=1e-3)
         self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
         # vocabulary
         self.vocab = vocab
-
-        # TODO add gpu support
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
 
 
     def fit(self, x, y, *args, **kwargs):

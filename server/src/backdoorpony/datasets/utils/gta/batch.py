@@ -32,4 +32,3 @@ def collate_batch(batch):
     
     # Note: here mask "graph_support" is only a 1D mask for each graph instance.
     #       When use this mask for 2D work, should first extend into 2D.
-

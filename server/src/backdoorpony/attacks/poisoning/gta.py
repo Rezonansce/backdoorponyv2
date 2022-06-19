@@ -19,81 +19,78 @@ __input_type__ = 'graph'
 __defaults__ = {
     'target_class': {
         'pretty_name': 'Target class',
-        'value': [0],
+        'default_value': [0],
         'info': 'The new label of poisoned (backdoored) graphs.'
     },
     'bkd_gratio_train': {
-        'pretty_name': 'Train backdoor ratio',
-        'value': [0.1],
-        'info': 'Ratio of backdoored graphs in the training set.'
-    },
+         'pretty_name': 'Train backdoor ratio',
+         'default_value': [0.1],
+         'info': 'Ratio of backdoored graphs in the training set.'
+     },
     'bkd_gratio_test': {
         'pretty_name': 'Test backdoor ratio',
-        'value': [0.5],
+        'default_value': [0.5],
         'info': 'Ratio of backdoored graphs in the test set.'
     },
     'bkd_size': {
         'pretty_name': 'Backdoor size',
-        'value': [5],
+        'default_value': [5],
         'info': 'The number of nodes for each trigger.'
     },
     'bkd_num_pergraph': {
         'pretty_name': 'Triggers per graph',
-        'value': [1],
+        'default_value': [1],
         'info': 'The number of backdoor triggers per graph.'
     },
     'bilevel_steps': {
         'pretty_name': 'Bi-level steps',
-        'value': [4],
+        'default_value': [4],
         'info': 'The number of bi-level optimization iterations.'
     },
     'gtn_layernum': {
         'pretty_name': 'GraphTrojanNet layers',
-        'value': [3],
+        'default_value': [3],
         'info': 'The number of GraphTrojanNet (trigger generator) layers.'
     },
     'gtn_lr': {
         'pretty_name': 'GraphTrojanNet learning rate',
-        'value': [0.01],
+        'default_value': [0.01],
         'info': 'Learning rate of GraphTrojanNet (trigger generator).'
     },
     'gtn_epochs': {
         'pretty_name': 'GraphTrojanNet epochs',
-        'value': [20],
+        'default_value': [20],
         'info': 'The number of epochs of GraphTrojanNet (trigger generator).'
     },
     'topo_thrd': {
         'pretty_name': 'Topology threshold',
-        'value': [0.5],
+        'default_value': [0.5],
         'info': 'The activation threshold for topology generator network.'
     },
     'topo_activation': {
         'pretty_name': 'Topology activation',
-        'value': ["sigmoid"],
+        'default_value': ["sigmoid"],
         'info': 'The activation function for topology generator network. Can be relu or sigmoid.'
     },
     'feat_thrd': {
         'pretty_name': 'Feature threshold',
-        'value': [0],
+        'default_value': [0],
         'info': 'The activation threshold for feature generator network.'
     },
     'feat_activation': {
         'pretty_name': 'Feature activation',
-        'value': ["relu"],
+        'default_value': ["relu"],
         'info': 'The activation function for feature generator network. Can be relu or sigmoid.'
     },
     'lambd': {
         'pretty_name': 'Lambda',
-        'value': [1],
+        'default_value': [1],
         'info': 'A hyperparameter to balance attack loss components.'
     }
 }
-__link__ = 'https://arxiv.org/pdf/2006.11165v4.pdf'
-__info__ = '''Zaixizhang is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a trigger to it. This trigger is a random subgraph.'''.replace('\n', '')
-
-def debug(clean_classifier, train_data, test_data, execution_history):
-    return run(clean_classifier, train_data, test_data, execution_history, __defaults__)
+__link__ = 'https://arxiv.org/pdf/2006.11890.pdf'
+__info__ = '''GTA is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input (dataset).
+The samples are poisoned by adding specially tailored subgraph for the particular sample. The trigger is generated using two NNs, one generates the topology of the subgraph, the second determines the node features.'''.replace('\n', '')
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
     '''Runs the badnet attack
@@ -103,7 +100,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     clean_classifier :
         Classifier that has not been tampered with, i.e. is clean
     train_data :
-        Data that the clean classifier was trained on as a tuple with (inputs, labels)
+        Data that the clean classifier was trained on as a tuple with (inputs, datareader)
     test_data :
         Data that the clean classifier will be validated on as a tuple with (inputs, labels)
     execution_history :
@@ -133,14 +130,14 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                                         for l in attack_params['lambd']['value']:
                                                             # Run the attack for a combination of trigger and poison_percent
                                                             execution_entry = {}
-                                                            
+                                                                                
                                                             args = ArgsBuilder(tc, btr, bte, bs, bnp, bis, gln, glr, ge, tt, ta, ft, fa, l,
-                                                                               clean_classifier.batch_size, clean_classifier.iters)
+                                                                               clean_classifier.batch_size, clean_classifier.epochs)
                                                             
                                                             gb = GraphBackdoor(args)
                                                             model, ptrain, ptest = gb.run(train_data[1], clean_classifier.model)
 
-                                                            GraphClassifier(model).predict(ptest)
+                                                            #GraphClassifier(model).predict(ptest)
                                             
                                                             execution_entry.update({
                                                                 'attack': __name__,
@@ -171,7 +168,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                                                           
                                                             key_index += 1
                                                             execution_history.update({'GTA' + str(key_index): execution_entry})
-
+                                                        
     return execution_history
         
 class ArgsBuilder():

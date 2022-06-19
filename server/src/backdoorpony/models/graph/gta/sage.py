@@ -3,9 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import dgl
-from dgl import DGLGraph, transform
 from dgl.nn.pytorch.conv import SAGEConv
-from utils.graph import numpy_to_graph
+from backdoorpony.datasets.utils.gta.graph import numpy_to_graph
 
 # Used for inductive case (graph classification) by default.
 class GraphSAGE(nn.Module):  
@@ -34,7 +33,7 @@ class GraphSAGE(nn.Module):
         batch_g = []
         for adj in data[1]:
             # cannot use tensor init DGLGraph
-            batch_g.append(numpy_to_graph(adj.cpu().T.numpy(), to_cuda=adj.is_cuda)) 
+            batch_g.append(numpy_to_graph(adj.detach().cpu().T.numpy(), to_cuda=adj.is_cuda))
         batch_g = dgl.batch(batch_g)
         
         mask = data[2]
@@ -54,6 +53,8 @@ class GraphSAGE(nn.Module):
         # x = torch.mean(x, dim=1).squeeze()
         x = self.fc(x)
         return x
+
+
 
 
 

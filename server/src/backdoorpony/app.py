@@ -12,6 +12,21 @@ from flask import Flask, jsonify, request
 # Instantiate the app
 from flask_cors import CORS, cross_origin
 
+# temporary map
+dataset_to_model = {
+    "IMDB": "IMDB_LSTM_RNN",
+    "MNIST": "MNIST_CNN",
+    "CIFAR10": "CifarCNN",
+    "Fashion_MNIST": "FMNIST_CNN",
+    "Audio_MNIST": "Audio_MNIST_RNN",
+    "AIDS": "AIDS_sage",
+    "Mutagenicity": "Mutagenicity_sage",
+    "IMDB MULTI": "IMDB_MULTI_sage",
+    "Yeast": "Yeast_sage",
+    "Synthie": "Synthie_sage",
+    "Audio_VGD": "Audio_VGD_CNN",
+}
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -55,6 +70,7 @@ def get_datasets():
 
 
 @app.route('/select_model', methods=['POST'])
+@cross_origin()
 def select_model():
     '''Select which model is used to create the classifier.
     Can be either a built-in one or have a file with the model attached which is then used.
@@ -71,6 +87,7 @@ def select_model():
             'model': <.pth file>
         }
     '''
+    model_params = json.loads(request.form['modelParams'].replace("'", '"'))
     app_tracker.dataset = request.form['dataset']
     model = None
     if 'model' in request.files:
@@ -78,12 +95,19 @@ def select_model():
         app_tracker.file_name = model.filename
     app_tracker.model_loader.make_classifier(request.form['type'],
                                  request.form['dataset'],
+                                 model_params,
                                  model)
 
     return jsonify('Creating/choosing the classifier was successful.')
 
 
 # Attacks & Defences ---------------------------------------------------
+@app.route('/get_all_models', methods=['GET'])
+def get_all_models():
+    '''Returns a list of all the attacks and their info in JSON format.'''
+    _, models = import_submodules_attributes(package=backdoorpony.models, result=[
+    ], recursive=True, req_module=None, req_attr=['__name__', '__category__','__input_type__', '__info__', '__link__'])
+    return jsonify(models)
 
 @app.route('/get_all_attacks', methods=['GET'])
 def get_all_attacks():
@@ -125,6 +149,15 @@ def get_stored_defence_category():
 
 
 # Params ---------------------------------------------------------------
+
+@app.route('/get_default_model_params', methods=['POST'])
+def get_default_model_params():
+    '''Returns a list of all the default model parameters in JSON format.'''
+    dataset_name = request.form['modelName']
+    model_name = dataset_to_model[dataset_name]
+    _, default_params = import_submodules_attributes(package=backdoorpony.models, result=[
+    ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
+    return jsonify(default_params)
 
 @app.route('/get_default_attack_params', methods=['POST'])
 def get_default_attack_params():

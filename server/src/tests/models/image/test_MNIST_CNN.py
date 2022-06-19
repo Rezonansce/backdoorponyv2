@@ -11,7 +11,11 @@ class TestDataLoader(TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestDataLoader, self).__init__(*args, **kwargs)
-        self.cnn = MNIST_CNN()
+        self.model_params = {'learning_rate': {'value': [0.01]},
+                             'optim': {'value': ['Adam']},
+                             'pre_load': {'value': ["False"]},
+                             'num_selection': {'value': [1111]}}
+        self.cnn = MNIST_CNN(self.model_params)
 
     def test_get_opti(self):
         optimizer = self.cnn.get_opti()
@@ -32,3 +36,6 @@ class TestDataLoader(TestCase):
     def test_get_path(self):
         path = self.cnn.get_path()
         self.assertTrue(path == 'mnist')
+
+    def test_get_do_pre_load(self):
+        self.assertFalse(self.cnn.get_do_pre_load())

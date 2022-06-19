@@ -8,7 +8,6 @@ def extract_labels(loader):
     labels = []
     for batch_id, data in enumerate(loader):
         for i in range(len(data)):
-            #data[i] = data[i].to(cuda)
             data[i] = data[i].to(device)
         labels += data[4]
     
@@ -47,7 +46,7 @@ def numpy_to_graph(A,type_graph='dgl',node_features=None, to_cuda=True):
     else:
         node_attrs = []
         
-    g = dgl.from_networkx(G, node_attrs=node_attrs, edge_attrs=['weight'])
+    g = dgl.from_networkx(G, node_attrs=node_attrs)
     if to_cuda:
         g = g.to(torch.device('cuda'))
     return g

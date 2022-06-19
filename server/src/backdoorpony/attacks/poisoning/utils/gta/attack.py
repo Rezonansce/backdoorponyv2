@@ -189,4 +189,4 @@ class GraphBackdoor:
             assert args.target_class is not None
             dr.data['labels'][gid] = args.target_class
 
-        return dr  
+        return dr    
