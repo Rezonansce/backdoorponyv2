@@ -130,17 +130,14 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                                         for l in attack_params['lambd']['value']:
                                                             # Run the attack for a combination of trigger and poison_percent
                                                             execution_entry = {}
-                                                            
-                                                            print("MAX NODE DEGREE BELOW!")
-                                                            print(train_data[1].max_degree)
-                                                            
+                                                                                
                                                             args = ArgsBuilder(tc, btr, bte, bs, bnp, bis, gln, glr, ge, tt, ta, ft, fa, l,
                                                                                clean_classifier.batch_size, clean_classifier.epochs)
                                                             
                                                             gb = GraphBackdoor(args)
                                                             model, ptrain, ptest = gb.run(train_data[1], clean_classifier.model)
 
-                                                            GraphClassifier(model).predict(ptest)
+                                                            #GraphClassifier(model).predict(ptest)
                                             
                                                             execution_entry.update({
                                                                 'attack': __name__,
