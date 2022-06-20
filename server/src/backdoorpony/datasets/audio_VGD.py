@@ -73,8 +73,8 @@ class Audio_VGD():
 
         X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_frac, random_state=42)
 
-        until_idx_train = train_size * len(X_train)
-        until_idx_test = test_size * len(X_test)
+        until_idx_train = round(train_size * len(X_train))
+        until_idx_test = round(test_size * len(X_test))
 
         X_train, X_test, y_train, y_test = X_train[:until_idx_train], X_test[:until_idx_test], y_train[:until_idx_train], y_test[:until_idx_test]
 
