@@ -71,7 +71,7 @@ class Audio_VGD():
             labels[i+offset] = 1
 
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, train_size=train_size, test_size=test_size, random_state=42)
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
@@ -107,7 +107,7 @@ class Audio_VGD():
             dataset[i+offset] = data
             labels[i+offset] = 1
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, train_size, test_size=test_size, random_state=42)
 
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))

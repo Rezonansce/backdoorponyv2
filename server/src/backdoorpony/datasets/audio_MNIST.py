@@ -15,10 +15,11 @@ This file creates the Audio MNIST dataset
 :return (x_raw_train, y_raw_test), (x_raw_test, y_raw_test)
 """
 class Audio_MNIST(object):
-    def __init__(self):
+    def __init__(self, test_prop = 0.10):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.data_path = dir_path + "/utils/FSDD/recordings/"
         self.nb_class = 10
+        self.test_prop = test_prop
 
     def get_datasets(self, train_size=0.10, test_size = 0.10):
         '''Generates datapoints if they are missing, then splits the dataset to train and test
@@ -44,7 +45,7 @@ class Audio_MNIST(object):
         fsdd = FSDD(spectrogram_dir)
         dataset, labels = fsdd.get_spectrograms()
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, train_size=train_size, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_prop, random_state=42)
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
@@ -71,7 +72,7 @@ class Audio_MNIST(object):
             dataset += [data]
             labels += [path_leaf(file)[0]]
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, train_size=train_size, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_prop, random_state=42)
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
