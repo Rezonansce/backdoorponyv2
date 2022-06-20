@@ -61,7 +61,7 @@ class TestDataLoader(TestCase):
         with patch("glob.glob", return_value=[0, 1]) as gl:
             with patch("soundfile.read", return_value=([0], 1)) as read:
                 audio = Audio_VGD()
-                (X_train, y_train), (X_test, y_test) = audio.get_audio_data()
+                (X_train, y_train), (X_test, y_test) = audio.get_audio_data(1, 1)
 
                 self.assertTrue(len(X_train) == 3)
                 self.assertTrue(len(y_train) == 3)
