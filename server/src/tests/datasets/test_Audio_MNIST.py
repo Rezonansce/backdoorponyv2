@@ -13,8 +13,8 @@ class TestDataLoader(TestCase):
             labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
             with patch.object(FSDD,"get_spectrograms", return_value=(datapoints, labels)):
-                audio = Audio_MNIST()
-                (X_train, y_train), (X_test, y_test) = audio.get_datasets(0.9, 0.1)
+                audio = Audio_MNIST(0.1)
+                (X_train, y_train), (X_test, y_test) = audio.get_datasets(1, 1)
                 self.assertTrue(len(X_train) == 9)
                 self.assertTrue(len(y_train) == 9)
                 self.assertTrue(len(X_test) == 1)

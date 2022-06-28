@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 import soundfile as sf
 
 class Audio_VGD():
-    def __init__(self, test_size=0.10):
+    def __init__(self, test_frac=0.10):
         """
         This class generates the Voice Gender Dataset
 
@@ -34,7 +34,7 @@ class Audio_VGD():
         None.
 
         """
-        self.test_size=test_size
+        self.test_frac=test_frac
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         self.save_path = os.path.join(self.dir_path, "utils/VGD/spectrogrammer/")
         self.data_shape = (28, 28)
@@ -71,7 +71,12 @@ class Audio_VGD():
             labels[i+offset] = 1
 
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_frac, random_state=42)
+
+        until_idx_train = round(train_size * len(X_train))
+        until_idx_test = round(test_size * len(X_test))
+
+        X_train, X_test, y_train, y_test = X_train[:until_idx_train], X_test[:until_idx_test], y_train[:until_idx_train], y_test[:until_idx_test]
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
@@ -107,8 +112,12 @@ class Audio_VGD():
             dataset[i+offset] = data
             labels[i+offset] = 1
 
-        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=test_size, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, labels, test_size=self.test_frac, random_state=42)
 
+        until_idx_train = round(train_size * len(X_train))
+        until_idx_test = round(test_size * len(X_test))
+
+        X_train, X_test, y_train, y_test = X_train[:until_idx_train], X_test[:until_idx_test], y_train[:until_idx_train], y_test[:until_idx_test]
 
         return (X_train, np.int64(y_train)), (X_test, np.int64(y_test))
 
