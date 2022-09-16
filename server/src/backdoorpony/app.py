@@ -159,12 +159,13 @@ def get_default_model_params():
     ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
     return jsonify(default_params)
 
+
 @app.route('/get_default_attack_params', methods=['POST'])
 def get_default_attack_params():
     '''Returns a list of all the default attack parameters in JSON format.'''
     attack_name = request.form['attackName'].lower()
     _, default_params = import_submodules_attributes(package=backdoorpony.attacks, result=[
-    ], recursive=True, req_module=attack_name, req_attr=['__category__', '__defaults__'])
+    ], recursive=True, req_module=attack_name, req_attr=['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__'])
     return jsonify(default_params)
 
 
@@ -190,6 +191,7 @@ def get_stored_defence_params():
 
 # Execute ------------------------------------------------------------
 
+# Execute ------------------------------------------------------------
 @app.route('/execute', methods=['POST'])
 @cross_origin()
 def execute():
@@ -215,7 +217,11 @@ def execute():
     if 'attackName' in request.form:
         app_tracker.attack_name = request.form['attackName']
         app_tracker.attack_category = request.form['attackCategory']
-        app_tracker.attack_params = json.loads(request.form['attackParams'].replace("'", '"'))
+        app_tracker.attack_params_form = json.loads(request.form['attackParams'].replace("'", '"'))
+        app_tracker.attack_params_dropdown = json.loads(request.form['attackParamsTwo'].replace("'", '"'))
+        app_tracker.attack_params_range = json.loads(request.form['attackParamsThree'].replace("'", '"'))
+        app_tracker.attack_params_combined = {**app_tracker.attack_params_form, **app_tracker.attack_params_dropdown, 
+                         **app_tracker.attack_params_range}
         train_data = app_tracker.model_loader.get_train_data()
         if hasattr(app_tracker.model_loader, 'audio'):
             train_data = app_tracker.model_loader.audio_train_data
@@ -224,7 +230,7 @@ def execute():
                                                                  test_data=test_data,
                                                                  execution_history=execution_history,
                                                                  attack_to_run=app_tracker.attack_name,
-                                                                 attack_params=app_tracker.attack_params)
+                                                                 attack_params=app_tracker.attack_params_combined)
 
     if hasattr(app_tracker.model_loader, 'audio'):
         test_data = app_tracker.model_loader.get_test_data()
@@ -245,6 +251,7 @@ def execute():
                                                 requests={})
 
     return jsonify('Execution of attack and/or defence was successful.')
+
 
 
 # Metrics -------------------------------------------------------------

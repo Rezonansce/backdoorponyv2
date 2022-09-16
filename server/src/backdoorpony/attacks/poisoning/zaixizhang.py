@@ -14,36 +14,47 @@ from backdoorpony.datasets.utils.gta.graph import extract_labels
 __name__ = 'zaixizhang'
 __category__ = 'poisoning'
 __input_type__ = 'graph'
-__defaults__ = {
-    'poison_percent': {
-        'pretty_name': 'Percentage of poison',
-        'default_value':  [0.5],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
-    },
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [0],
         'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
     },
-    'graph_type': {
-        'pretty_name': 'Graph Type',
-        'default_value': ['ER'],
-        'info': 'Subgraph generation algorithm. Can be ER (Erdos-Renyi), SW (Watts Strogatz Small-World) or PA (Barabasi Albert).'
-    },
-    'backdoor_nodes': {
-        'pretty_name': 'Backdoor Nodes Ratio',
-        'default_value': [0.2],
-        'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
-    },
-    'probability': {
-        'pretty_name': 'Probability',
-        'default_value': [0.3],
-        'info': 'Probability of generating an edge between the nodes in the subgraph (if 1, then the graph is fully connected).'
-    },
     'connections': {
         'pretty_name': 'Connections',
         'default_value': [2],
         'info': 'Each node is connected to the specified number of nearest neighbors in ring topology (only applicable for SW & PA).'
+    }
+}
+__defaults_dropdown__ = {
+    'graph_type': {
+        'pretty_name': 'Graph Type',
+        'default_value': ['ER'],
+        'possible_values' : ['ER', 'SW', 'PA'],
+        'info': 'Subgraph generation algorithm. Can be ER (Erdos-Renyi), SW (Watts Strogatz Small-World) or PA (Barabasi Albert).'
+    }
+}
+__defaults_range__ = {
+    'probability': {
+        'pretty_name': 'Probability',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value': [0.3],
+        'info': 'Probability of generating an edge between the nodes in the subgraph (if 1, then the graph is fully connected).'
+    },
+    'poison_percent': {
+        'pretty_name': 'Percentage of poison',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value':  [0.5],
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
+    },
+    'backdoor_nodes': {
+        'pretty_name': 'Backdoor Nodes Ratio',
+        'default_value': [0.2],
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.11165v4.pdf'
@@ -71,6 +82,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     Returns the updated execution history dictionary
     '''
     print('Instantiating a zaixizhang attack.')
+    print(attack_params)
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
@@ -249,4 +261,3 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
 
     
     return train_graphs, test_graphs
-

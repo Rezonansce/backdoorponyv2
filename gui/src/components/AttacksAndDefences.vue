@@ -144,16 +144,42 @@
             class="overflow-y-auto primary mx-0 mt-1 mb-3"
             :height="paramHeight"
           >
-            <template v-for="(param, i) in attackParams" >
+            <template v-for="(param, i) in attackParamsForm" >
               <v-list-item :key="i" class="">
-                <parameter
+                <parameterform
                   :paramName="param.pretty_name"
                   :defaultValue="param.value"
                   class="mt-1"
                   :paramKey="i"
-                  :info="info[i]"
-                  @paramChanged="updateAttackParams"
+                  :info="infoForm[i]"
+                  @paramChanged="updateAttackParamsForm"
                 />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in attackParamsDropdown" >
+              <v-list-item :key="i" class="">
+                <parameterdropdown
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  :values="param.values"
+                  class="mt-1"
+                  :paramKey="i"
+                  :info="infoDropdown[i]"
+                  @paramChanged="updateAttackParamsDropdown"
+                />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in attackParamsRange">
+              <v-list-item :key="i" class="">
+                <parameterrange
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  class="mt-1"
+                  :paramKey="i"
+                  :minValue="param.minimum"
+                  :maxValue="param.maximum"
+                  :info="infoRange[i]"
+                  @paramChanged="updateAttackParamsRange" />
               </v-list-item>
             </template>
         </v-list>
@@ -241,12 +267,16 @@
 
 <script>
 import Information from './Information.vue';
-import Parameter from './Parameter.vue';
+import Parameterform from './Parameterform.vue';
+import Parameterdropdown from './Parameterdropdown.vue';
+import Parameterrange from './Parameterrange.vue';
 import AttacksAndDefencesService from '../services/AttacksAndDefencesService';
 
 export default {
   name: 'app',
-  components: { Parameter, Information },
+  components: {
+    Parameterform, Parameterdropdown, Parameterrange, Information,
+  },
   setup() {
 
   },
@@ -282,8 +312,12 @@ export default {
       isAttacked: false,
       attackCategory: '',
       defenceCategory: '',
-      types: {},
-      info: {},
+      typesForm: {},
+      infoForm: {},
+      typesDropdown: {},
+      infoDropdown: {},
+      typesRange: {},
+      infoRange: {},
     };
   },
   computed: {
@@ -324,17 +358,33 @@ export default {
       if (type === 'att') {
         this.isAttacked = false;
         this.selectedAttack = '';
-        this.attackParams = {};
+        this.attackParamsForm = {};
+        this.attackParamsDropdown = {};
+        this.attackParamsRange = {};
         if (name !== 'None') {
           this.isAttacked = true;
           this.selectedAttack = name;
           const params = await AttacksAndDefencesService.getAttackParams(name);
-          this.attackParams = params[0].defaults;
+          this.attackParamsForm = params[0].defaults_form;
+          this.attackParamsDropdown = params[0].defaults_dropdown;
+          this.attackParamsRange = params[0].defaults_range;
           this.attackCategory = params[0].category;
-          Object.entries(params[0].defaults).forEach(([key, entry]) => {
-            this.types[key] = entry.default_value[0].constructor;
-            this.info[key] = entry.info;
-            this.updateAttackParams(entry.pretty_name, entry.default_value, key);
+          Object.entries(params[0].defaults_form).forEach(([key, entry]) => {
+            this.typesForm[key] = entry.default_value[0].constructor;
+            this.infoForm[key] = entry.info;
+            this.updateAttackParamsForm(entry.pretty_name, entry.default_value, key);
+          });
+          Object.entries(params[0].defaults_dropdown).forEach(([key, entry]) => {
+            this.typesDropdown[key] = entry.default_value[0].constructor;
+            this.infoDropdown[key] = entry.info;
+            this.updateAttackParamsDropdown(entry.pretty_name, entry.default_value,
+              entry.possible_values, key);
+          });
+          Object.entries(params[0].defaults_range).forEach(([key, entry]) => {
+            this.typesRange[key] = entry.default_value[0].constructor;
+            this.infoRange[key] = entry.info;
+            this.updateAttackParamsRange(entry.pretty_name, entry.default_value, key, entry.minimum,
+              entry.maximum);
           });
         }
         if (this.selectedAttack && this.selectedDefence) this.notReady = false;
@@ -367,7 +417,9 @@ export default {
         this.isDefended,
         this.isAttacked,
         JSON.stringify(this.selectedAttack),
-        JSON.stringify(this.attackParams),
+        JSON.stringify(this.attackParamsForm),
+        JSON.stringify(this.attackParamsDropdown),
+        JSON.stringify(this.attackParamsRange),
         JSON.stringify(this.selectedDefence),
         JSON.stringify(this.defenceParams),
         JSON.stringify(this.attackCategory),
@@ -384,16 +436,44 @@ export default {
       }
       this.$emit('executed');
     },
-    updateAttackParams(name, newValues, paramKey, info) {
-      const convertValues = this.convert(newValues, paramKey);
-      this.attackParams[paramKey] = { pretty_name: name, value: convertValues, info };
+    updateAttackParamsForm(name, newValues, paramKey, info) {
+      const convertValues = this.convertForm(newValues, paramKey);
+      this.attackParamsForm[paramKey] = { pretty_name: name, value: convertValues, info };
+    },
+    updateAttackParamsDropdown(name, newValues, newPossibleValues, paramKey, info) {
+      const convertValues = this.convertDropdown(newValues, paramKey);
+      const convertValuesTemp = this.convertDropdown(newPossibleValues, paramKey);
+      this.attackParamsDropdown[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        values: convertValuesTemp,
+        info,
+      };
+    },
+    updateAttackParamsRange(name, newValues, paramKey, newMin, newMax, info) {
+      const convertValues = this.convertRange(newValues, paramKey);
+      this.attackParamsRange[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        minimum: newMin,
+        maximum: newMax,
+        info,
+      };
     },
     updateDefenceParams(name, newValues, paramKey, info) {
-      const convertValues = this.convert(newValues, paramKey);
+      const convertValues = this.convertForm(newValues, paramKey);
       this.defenceParams[paramKey] = { pretty_name: name, value: convertValues, info };
     },
-    convert(values, paramKey) {
-      const type = this.types[paramKey];
+    convertForm(values, paramKey) {
+      const type = this.typesForm[paramKey];
+      return values.map(type);
+    },
+    convertDropdown(values, paramKey) {
+      const type = this.typesDropdown[paramKey];
+      return values.map(type);
+    },
+    convertRange(values, paramKey) {
+      const type = this.typesRange[paramKey];
       return values.map(type);
     },
     filterAttacks() {

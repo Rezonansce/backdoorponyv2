@@ -9,14 +9,20 @@ from art.attacks.evasion.fast_gradient import FastGradientMethod as artFGM
 __name__ = 'Elastic_Net'
 __category__ = 'evasion'
 __input_type__ = 'image'
-__defaults__ = {
-    'poison_percent': {
-        'pretty_name': 'Percentage of poison',
-        'default_value':  [.33]
-    },
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [2]
+    }
+}
+__defaults_dropdown__ = {
+}
+__defaults_slidebar__ = {
+    'poison_percent': {
+        'pretty_name': 'Percentage of poison',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value':  [.33]
     }
 }
 __link__ = 'https://arxiv.org/pdf/1412.6572.pdf'
@@ -213,3 +219,4 @@ class ElasticNet(object):
             is_poison = is_poison[shuffled_indices]
 
         return is_poison, x_combined, y_combined
+

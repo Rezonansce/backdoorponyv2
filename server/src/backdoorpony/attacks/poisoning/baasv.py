@@ -21,11 +21,7 @@ from tqdm import tqdm
 __name__ = 'BAASV'
 __category__ = 'poisoning'
 __input_type__ = 'audio'
-__defaults__ = {
-    'poison_percent': {
-        'pretty_name': 'Percentage of poison',
-        'default_value':  [.33]
-    },
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [2]
@@ -43,8 +39,18 @@ __defaults__ = {
         'default_value': [1]
     }
 }
+__defaults_dropdown__ = {
+}
+__defaults_slidebar__ = {
+    'poison_percent': {
+        'pretty_name': 'Percentage of poison',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value':  [.33]
+    }
+}
 __link__ = 'None'
-__info__ = '''This is a customly created attack, which is based on other similar badnet attacks. It focuses on attacking a specific class by changing labels of other classes to the target class and adding some noise to them.'''.replace('\n', '')
+__info__ = '''None'''.replace('\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
