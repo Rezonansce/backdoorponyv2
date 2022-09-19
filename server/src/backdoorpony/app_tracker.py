@@ -99,8 +99,6 @@ class AppTracker():
         ----------
         List of strings with instructions
         '''
-        print("DROPDOWN DATA BELOW")
-        print(self.attack_params_dropdown)
         step = 1
         ls = ['{0}. Select the {1} dataset;'.format(step, self.dataset)]
         step +=1

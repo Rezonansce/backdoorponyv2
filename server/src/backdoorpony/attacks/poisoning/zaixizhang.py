@@ -82,7 +82,6 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     Returns the updated execution history dictionary
     '''
     print('Instantiating a zaixizhang attack.')
-    print(attack_params)
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
@@ -187,9 +186,7 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
         
         num_nodes = train_graphs[batch][3][pos]
         if num_backdoor_nodes >= num_nodes:
-            print("wot")
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes)
-            print(num_nodes)
         else:
             rand_select_nodes = np.random.choice(num_nodes, num_backdoor_nodes, replace=False)
 

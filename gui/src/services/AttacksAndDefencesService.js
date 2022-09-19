@@ -36,7 +36,9 @@ class AttacksAndDefencesService {
   execute = (isDefended,
     isAttacked,
     attackName,
-    attackParams,
+    attackParamsForm,
+    attackParamsDropdown,
+    attackParamsRange,
     defenceName,
     defenceParams,
     attackCategory,
@@ -44,7 +46,9 @@ class AttacksAndDefencesService {
     const formData = new FormData();
     if (isAttacked) {
       formData.append('attackName', attackName.replace(/^"(.*)"$/, '$1'));
-      formData.append('attackParams', attackParams);
+      formData.append('attackParamsForm', attackParamsForm);
+      formData.append('attackParamsDropdown', attackParamsDropdown);
+      formData.append('attackParamsRange', attackParamsRange);
       formData.append('attackCategory', attackCategory.replace(/^"(.*)"$/, '$1'));
     }
     if (isDefended) {
