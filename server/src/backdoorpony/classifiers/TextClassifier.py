@@ -94,7 +94,7 @@ class TextClassifier(AbstractClassifier, object):
 
         # Initialize data loaders to iterate through the batches
         pred_tensor = TensorDataset(torch.from_numpy(x))
-        pred_loader = DataLoader(pred_tensor, shuffle=False, batch_size=batch_size)
+        pred_loader = DataLoader(pred_tensor, shuffle=False, batch_size=batch_size, drop_last=True)
 
         outs = []
 

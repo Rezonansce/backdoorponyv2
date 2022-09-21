@@ -51,7 +51,7 @@ class IMDB(object):
         train_data_y = numpy.array(train_data["sentiment"].astype(int).tolist())
         test_data_y = numpy.array(test_data["sentiment"].astype(int).tolist())
         print("train data y: ", train_data_y)
-        return (self.transformToFeatures(train_data_x, 700), train_data_y), (self.transformToFeatures(test_data_x, 700), test_data_y), lexicon
+        return (self.transformToFeatures(train_data_x, 300), train_data_y), (self.transformToFeatures(test_data_x, 300), test_data_y), lexicon
 
     # padding the sequences such that there is a maximum length of num
     def transformToFeatures(self, data, num):
