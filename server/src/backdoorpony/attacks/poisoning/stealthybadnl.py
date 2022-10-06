@@ -12,6 +12,7 @@ import torch
 import torchtext.vocab
 from scipy import spatial
 from transformers import BertTokenizer, BertModel, pipeline
+from styleformer import Styleformer
 
 __name__ = "stealthybadnl"
 __category__ = 'poisoning'
@@ -184,10 +185,10 @@ class StealthyBadNL(object):
 
         for current_class in classes:
             # get current class features
-            print("percent poison: " + str(self.percent_poison))
+            # print("percent poison: " + str(self.percent_poison))
             x_current_class = poison_x[poison_y == current_class]
             num_x_cc = len(x_current_class)
-            print(num_x_cc)
+            # print(num_x_cc)
             # calculate the number of data entries to poison
             num_to_poison = round(self.percent_poison * num_x_cc)
 
@@ -217,7 +218,7 @@ class StealthyBadNL(object):
                     self.badWordMixUp(x_poison_cc)
                 else:
                     self.trigger = str.split(self.trigger)
-                    self.badSentence(x_poison_cc)
+                    self.badSentenceVoice(x_poison_cc)
 
                 # add to total poison dataset
                 x_poison = np.append(x_poison, x_poison_cc, axis=0)
@@ -291,9 +292,9 @@ class StealthyBadNL(object):
         # trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
 
         keys = list(self.proxy_classifier.vocab.keys())
-        print(len(data))
+        # print(len(data))
         for j, entry in enumerate(data):
-            print(j)
+            # print(j)
             # MLM prediction using BERT:
             # ----------------------------------------------------
 
@@ -414,7 +415,8 @@ class StealthyBadNL(object):
                 # However since this is a simulation, an unknown word can be directly inserted to avoid computation since its location
                 # in the embedded space is known - 0
                 entry[idx] = 0
-    def badSentence(self, data):
+
+    def badSentenceVoice(self, data):
         '''
         Using a sentence as a trigger replacing the old sentence.
 
@@ -428,15 +430,29 @@ class StealthyBadNL(object):
         -------
         None
         '''
-        # transform to indices
-        new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
+        # # transform to indices
+        # new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
+        #
+        # # apply padding based on an existing shape ( shift all words right until max length )
+        # new_sentence = self.pad(new_sentence, data.shape[1])
 
-        # apply padding based on an existing shape ( shift all words right until max length )
-        new_sentence = self.pad(new_sentence, data.shape[1])
+        sf = Styleformer(style=2)
 
         # replace old data by new data
-        for i in range(len(data)):
-            data[i] = new_sentence
+        for i, entry in enumerate(data):
+            # decode the sentence
+            new_sentence = " ".join(self.construct_sentence(entry, list(self.proxy_classifier.vocab.keys())))
+
+            # transfer the sentence
+            new_sentence = sf.transfer(new_sentence).split(" ")
+
+            # reconstruct the sentence as locations, apply padding
+            for ii, word in enumerate(new_sentence):
+                new_sentence[ii] = self.proxy_classifier.vocab[word] if word in self.proxy_classifier.vocab else 0
+
+            data[i] = self.pad(new_sentence, data.shape[1])
+
+
 
     # padding the sequences such that there is a maximum length of num
     def pad(self, data, num):
