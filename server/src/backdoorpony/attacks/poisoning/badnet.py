@@ -23,11 +23,11 @@ __defaults_dropdown__ = {
     'trigger_style': {
         'pretty_name': 'Style of trigger',
         'default_value': ['pattern', 'pixel'],
-        'accepted_values': ['pattern', 'pixel'],
+        'possible_values': ['pattern', 'pixel'],
         'info': 'The trigger style, as the name suggests, determines the style of the trigger that is applied to the images. The style could either be \'pixel\' or \'pattern\'. The pixel is almost invisible to humans, but its subtlety negatively affects the effectiveness. The pattern is a reverse lambda that is clearly visible for humans, but it is also more effective.'
     }
 }
-__defaults_slidebar__ = {
+__defaults_range__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,

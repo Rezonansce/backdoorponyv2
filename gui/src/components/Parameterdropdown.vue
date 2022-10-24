@@ -70,6 +70,7 @@ export default {
       parameter: this.defaultValue,
       parameters: this.values,
       selectedItems: [],
+      isValid: true,
     };
   },
   props: {
@@ -83,7 +84,15 @@ export default {
   methods: {
     handleInput(input) {
       this.parameter = input.toString().split(',');
-      this.$emit('paramChanged', this.paramName, this.parameter, this.parameters, this.paramKey);
+      let changed = 0;
+      if (input.toString() === '' && this.isValid) {
+        changed = 1;
+        this.isValid = false;
+      } else if (input.toString() !== '' && !this.isValid) {
+        changed = -1;
+        this.isValid = true;
+      }
+      this.$emit('paramChanged', this.paramName, this.parameter, this.parameters, this.paramKey, changed);
     },
   },
 };

@@ -18,7 +18,7 @@ __defaults_form__ = {
 }
 __defaults_dropdown__ = {
 }
-__defaults_slidebar__ = {
+__defaults_range__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,

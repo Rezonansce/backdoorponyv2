@@ -24,11 +24,11 @@ __defaults_dropdown__ = {
     'location': {
         'pretty_name': 'Trigger location',
         'default_value': ["start"],
-        'accepted_values' : ["start", "middle", "end"],
+        'possible_values' : ["start", "middle", "end"],
         'info': 'applies only to badchar and badword. Can be inserted at the start, middle or of word/sentence'
     }
 }
-__defaults_slidebar__ = {
+__defaults_range__ = {
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
         'default_value': [0.1, 0.33],

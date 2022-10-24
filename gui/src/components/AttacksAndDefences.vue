@@ -193,7 +193,7 @@
         >
           <template v-for="(param, i) in defenceParams" >
             <v-list-item :key="i" class="">
-              <parameter
+              <parameterform
                 :paramName="param.pretty_name"
                 :defaultValue="param.value"
                 class="mt-1"
@@ -209,6 +209,7 @@
             color="accent"
             class="rounded-xl"
             min-width="120"
+            :disabled="isDisabled"
             @click='handleExecuteClick()'>
             Execute
           </v-btn>
@@ -318,6 +319,8 @@ export default {
       infoDropdown: {},
       typesRange: {},
       infoRange: {},
+      totalIncorrect: 0,
+      isDisabled: false,
     };
   },
   computed: {
@@ -372,23 +375,23 @@ export default {
           Object.entries(params[0].defaults_form).forEach(([key, entry]) => {
             this.typesForm[key] = entry.default_value[0].constructor;
             this.infoForm[key] = entry.info;
-            this.updateAttackParamsForm(entry.pretty_name, entry.default_value, key);
+            this.updateAttackParamsForm(entry.pretty_name, entry.default_value, key, 0);
           });
           Object.entries(params[0].defaults_dropdown).forEach(([key, entry]) => {
             this.typesDropdown[key] = entry.default_value[0].constructor;
             this.infoDropdown[key] = entry.info;
             this.updateAttackParamsDropdown(entry.pretty_name, entry.default_value,
-              entry.possible_values, key);
+              entry.possible_values, key, 0);
           });
           Object.entries(params[0].defaults_range).forEach(([key, entry]) => {
             this.typesRange[key] = entry.default_value[0].constructor;
             this.infoRange[key] = entry.info;
-            this.updateAttackParamsRange(entry.pretty_name, entry.default_value, key, entry.minimum,
-              entry.maximum);
+            this.updateAttackParamsRange(entry.pretty_name, entry.default_value, key,
+              entry.minimum, entry.maximum, 'setup', true);
           });
         }
         if (this.selectedAttack && this.selectedDefence) this.notReady = false;
-        return;
+        this.filterAttacks();
       }
       if (type === 'def') {
         this.isDefended = false;
@@ -436,11 +439,13 @@ export default {
       }
       this.$emit('executed');
     },
-    updateAttackParamsForm(name, newValues, paramKey, info) {
+    updateAttackParamsForm(name, newValues, paramKey, changed, info) {
       const convertValues = this.convertForm(newValues, paramKey);
       this.attackParamsForm[paramKey] = { pretty_name: name, value: convertValues, info };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
     },
-    updateAttackParamsDropdown(name, newValues, newPossibleValues, paramKey, info) {
+    updateAttackParamsDropdown(name, newValues, newPossibleValues, paramKey, changed, info) {
       const convertValues = this.convertDropdown(newValues, paramKey);
       const convertValuesTemp = this.convertDropdown(newPossibleValues, paramKey);
       this.attackParamsDropdown[paramKey] = {
@@ -449,9 +454,15 @@ export default {
         values: convertValuesTemp,
         info,
       };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
     },
-    updateAttackParamsRange(name, newValues, paramKey, newMin, newMax, info) {
+    updateAttackParamsRange(name, newValues, paramKey, newMin, newMax, input, setup, info) {
       const convertValues = this.convertRange(newValues, paramKey);
+      if (setup) {
+        this.attackParamsRange[paramKey].isValid = true;
+      }
+      const oldValid = this.attackParamsRange[paramKey].isValid;
       this.attackParamsRange[paramKey] = {
         pretty_name: name,
         value: convertValues,
@@ -459,6 +470,18 @@ export default {
         maximum: newMax,
         info,
       };
+      if ((!newValues.every((x) => x >= newMin && x <= newMax) || input === '')
+        && oldValid) {
+        this.attackParamsRange[paramKey].isValid = false;
+        this.totalIncorrect += 1;
+      } else if (newValues.every((x) => x >= newMin && x <= newMax) && input !== ''
+        && !oldValid) {
+        this.attackParamsRange[paramKey].isValid = true;
+        this.totalIncorrect += -1;
+      } else {
+        this.attackParamsRange[paramKey].isValid = oldValid;
+      }
+      this.isDisabled = this.totalIncorrect !== 0;
     },
     updateDefenceParams(name, newValues, paramKey, info) {
       const convertValues = this.convertForm(newValues, paramKey);

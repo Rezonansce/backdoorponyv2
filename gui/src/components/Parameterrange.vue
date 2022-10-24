@@ -9,6 +9,7 @@
         :value="defaultValue"
         @input="handleInput"
         v-model="parameter"
+        ref="parameter"
         :rules="[rules.required, rules.interval]"
       >
       </v-text-field>
@@ -46,6 +47,7 @@ export default {
           .every((x) => x >= this.minValue && x <= this.maxValue)
           || 'Ensure that every hyperparameter value is within the bounds.',
       },
+      isValid: true,
     };
   },
   props: {
@@ -60,7 +62,7 @@ export default {
   methods: {
     handleInput(input) {
       this.parameter = input.split(',');
-      this.$emit('paramChanged', this.paramName, this.parameter, this.paramKey);
+      this.$emit('paramChanged', this.paramName, this.parameter, this.paramKey, this.minValue, this.maxValue, input);
     },
   },
 };
