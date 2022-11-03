@@ -173,7 +173,8 @@ def get_default_attack_params():
 def get_default_defence_params():
     '''Returns a list of all the default defence parameters in JSON format.'''
     defence_name = request.form['defenceName'].lower()
-    _, default_params = import_submodules_attributes(package=backdoorpony.defences, result=[], recursive=True, req_module=defence_name, req_attr = ['__category__', '__defaults__'])
+    _, default_params = import_submodules_attributes(package=backdoorpony.defences, result=[
+        ], recursive=True, req_module=defence_name, req_attr = ['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__'])
     return jsonify(default_params)
 
 
@@ -186,7 +187,7 @@ def get_stored_attack_params():
 @app.route('/get_stored_defence_params', methods=['GET'])
 def get_stored_defence_params():
     '''Returns the dictionary storing defence parameters in JSON format.'''
-    return jsonify(app_tracker.defence_params)
+    return jsonify(app_tracker.defence_params_combined)
 
 # Execute ------------------------------------------------------------
 @app.route('/execute', methods=['POST'])
@@ -235,12 +236,16 @@ def execute():
     if 'defenceName' in request.form:
         app_tracker.defence_name = request.form['defenceName']
         app_tracker.defence_category = request.form['defenceCategory']
-        app_tracker.defence_params = json.loads(request.form['defenceParams'].replace("'", '"'))
+        app_tracker.defence_params_form = json.loads(request.form['defenceParamsForm'].replace("'", '"'))
+        app_tracker.defence_params_dropdown = json.loads(request.form['defenceParamsDropdown'].replace("'", '"'))
+        app_tracker.defence_params_range = json.loads(request.form['defenceParamsRange'].replace("'", '"'))
+        app_tracker.defence_params_combined = {**app_tracker.defence_params_form, **app_tracker.defence_params_dropdown, 
+                         **app_tracker.defence_params_range}
         execution_history = app_tracker.action_runner.run_defence(clean_classifier=clean_classifier,
                                                                   test_data=test_data,
                                                                   execution_history=execution_history,
                                                                   defence_to_run=app_tracker.defence_name,
-                                                                  defence_params=app_tracker.defence_params)
+                                                                  defence_params=app_tracker.defence_params_combined)
 
 
     app_tracker.main_metrics_runner.instantiate(clean_classifier=clean_classifier,

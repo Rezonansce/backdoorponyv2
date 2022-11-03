@@ -50,7 +50,10 @@ class AppTracker():
         self.attack_params_dropdown = {}
         self.attack_params_slidebar = {}
         self.attack_params_combined = {}
-        self.defence_params = {}
+        self.defence_params_form = {}
+        self.defence_params_dropdown = {}
+        self.defence_params_slidebar = {}
+        self.defence_params_combined = {}
         self.executing = False
         self.execution_thread = None
 

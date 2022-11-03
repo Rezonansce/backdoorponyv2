@@ -9,12 +9,16 @@ from art.defences.transformer.poisoning import STRIP as artSTRIP
 __name__ = 'strip'
 __category__ = 'transformer'
 __input_type__ = 'image'
-__defaults__ = {
+__defaults_form__ = {
     'number_of_images': {
         'pretty_name': 'Number of images',
         'default_value': [100],
         'info': 'The number of images represents the number of clean images the defence can use to calculate the entropy. These images are overlayed to see how it affects the predictions of the classifier. The more images, the more accurate the result is but, the longer it takes to compute. This defence is effective with 100 or more images.'
     }
+}
+__defaults_dropdown__ = {
+}
+__defaults_range__ = {
 }
 __link__ = 'https://arxiv.org/pdf/1902.06531.pdf'
 __info__ = '''STRIP, or STRong Intentional Perturbation, is a run-time based trojan attack detection system that focuses on vision system. 

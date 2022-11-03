@@ -40,7 +40,9 @@ class AttacksAndDefencesService {
     attackParamsDropdown,
     attackParamsRange,
     defenceName,
-    defenceParams,
+    defenceParamsForm,
+    defenceParamsDropdown,
+    defenceParamsRange,
     attackCategory,
     defenceCategory) => {
     const formData = new FormData();
@@ -53,7 +55,9 @@ class AttacksAndDefencesService {
     }
     if (isDefended) {
       formData.append('defenceName', defenceName.replace(/^"(.*)"$/, '$1'));
-      formData.append('defenceParams', defenceParams);
+      formData.append('defenceParamsForm', defenceParamsForm);
+      formData.append('defenceParamsDropdown', defenceParamsDropdown);
+      formData.append('defenceParamsRange', defenceParamsRange);
       formData.append('defenceCategory', defenceCategory.replace(/^"(.*)"$/, '$1'));
     }
     return http.post('/execute', formData, {

@@ -13,11 +13,17 @@ __defaults__ = {
         'default_value': [100],
         'info': ''
     },
+}
+__defaults_dropdown__ = {
+}
+__defaults_range__ = {
     'false_acceptance_rate': {
         'pretty_name': 'False acceptance rate',
+        'minimum': 0.0,
+        'maximum': 1.0,
         'default_value': [0.01],
         'info': ''
-        }
+        },
 }
 __link__ = 'https://github.com/yjkim721/STRIP-ViTA'
 __info__ = '''This work corroborates a run-time Trojan detection method exploiting STRong Intentional Perturbation of inputs, is a multi-domain Trojan detection defence across Vision, Text and Audio domains---thus termed as STRIP-ViTA. Specifically, STRIP-ViTA is the first confirmed input-agnostic Trojan detection method that is effective across multiple task domains and independent of model architectures.'''.replace('\n', '')

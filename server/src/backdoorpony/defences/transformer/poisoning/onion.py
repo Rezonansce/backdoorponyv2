@@ -12,12 +12,16 @@ from transformers import GPT2TokenizerFast, GPT2LMHeadModel
 __name__ = 'onion'
 __category__ = 'transformer'
 __input_type__ = 'text'
-__defaults__ = {
+__defaults_form__ = {
     'threshold': {
         'pretty_name': 'Threshold',
         'default_value': [20],
         'info': 'Suspicion score is determined by calculating the difference of perplexity between a sentence with(p0) and without(pi) every word - so suspicion = p0-pi. All words with suspicion score larger than threshold will be considered outliers and be removed before training the model.'
     }
+}
+__defaults_dropdown__ = {
+}
+__defaults_range__ = {
 }
 __link__ = 'https://arxiv.org/pdf/2011.10369.pdf'
 __info__ = '''ONION defence utilizes a pre-trained GPT-2 to find 
