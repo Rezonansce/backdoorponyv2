@@ -7,7 +7,7 @@ from copy import deepcopy
 __name__ = 'strip-vita'
 __category__ = 'transformer'
 __input_type__ = 'audio'
-__defaults__ = {
+__defaults_form__ = {
     'number_of_sample': {
         'pretty_name': 'Number of samples',
         'default_value': [100],
