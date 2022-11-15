@@ -16,6 +16,7 @@ from backdoorpony.datasets.Mutagenicity import Mutagenicity
 from backdoorpony.datasets.Yeast import Yeast
 from backdoorpony.datasets.IMDB_MULTI import IMDB_MULTI
 from backdoorpony.datasets.Synthie import Synthie
+from backdoorpony.datasets.AMAZON import AMAZON
 
 from backdoorpony.models.image.Fashion_MNIST.FMNIST_CNN import FMNIST_CNN
 from backdoorpony.models.audio.Audio_MNIST_RNN import Audio_MNIST_RNN
@@ -28,7 +29,7 @@ from backdoorpony.models.graph.gta.Mutagenicity.Mutagenicity_sage import Mutagen
 from backdoorpony.models.graph.gta.Yeast.Yeast_sage import Yeast_sage
 from backdoorpony.models.graph.gta.IMDB_MULTI.IMDB_MULTI_sage import IMDB_MULTI_sage
 from backdoorpony.models.graph.gta.Synthie.Synthie_sage import Synthie_sage
-
+from backdoorpony.models.text.AMAZON.AMAZON_CNN import AMAZON_CNN
 
 
 
@@ -94,6 +95,13 @@ class Loader():
                 'IMDB': {
                     'dataset': IMDB,
                     'model': IMDB_LSTM_RNN,
+                    'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
+                    'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
+
+                },
+                'AMAZON': {
+                    'dataset': AMAZON,
+                    'model': AMAZON_CNN,
                     'link': 'https://ai.stanford.edu/~amaas/data/sentiment/',
                     'info': 'The IMDB dataset consists of 50,000 movie reviews from IMDB users. These reviews are in text format and are labelled as either positive (class 1) or negative (class 0). Each review is encoded as a sequence of integer indices, each index corresponding to a word. The value of each index is represented by its frequency within the dataset. For example, integer “3” encodes the third most frequent word in the data. The training and the test sets contain 25,000 reviews, respectively.'
 
@@ -353,8 +361,3 @@ class Loader():
         Returns the validation data if it has been instantiated, else returns None
         '''
         return self.test_data
-
-
-
-
-
