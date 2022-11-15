@@ -16,21 +16,11 @@ from backdoorpony.datasets.utils.gta.graph import extract_labels
 __name__ = 'GTA'
 __category__ = 'poisoning'
 __input_type__ = 'graph'
-__defaults__ = {
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [0],
         'info': 'The new label of poisoned (backdoored) graphs.'
-    },
-    'bkd_gratio_train': {
-         'pretty_name': 'Train backdoor ratio',
-         'default_value': [0.1],
-         'info': 'Ratio of backdoored graphs in the training set.'
-     },
-    'bkd_gratio_test': {
-        'pretty_name': 'Test backdoor ratio',
-        'default_value': [0.5],
-        'info': 'Ratio of backdoored graphs in the test set.'
     },
     'bkd_size': {
         'pretty_name': 'Backdoor size',
@@ -67,26 +57,46 @@ __defaults__ = {
         'default_value': [0.5],
         'info': 'The activation threshold for topology generator network.'
     },
-    'topo_activation': {
-        'pretty_name': 'Topology activation',
-        'default_value': ["sigmoid"],
-        'info': 'The activation function for topology generator network. Can be relu or sigmoid.'
-    },
     'feat_thrd': {
         'pretty_name': 'Feature threshold',
         'default_value': [0],
         'info': 'The activation threshold for feature generator network.'
-    },
-    'feat_activation': {
-        'pretty_name': 'Feature activation',
-        'default_value': ["relu"],
-        'info': 'The activation function for feature generator network. Can be relu or sigmoid.'
     },
     'lambd': {
         'pretty_name': 'Lambda',
         'default_value': [1],
         'info': 'A hyperparameter to balance attack loss components.'
     }
+}
+__defaults_dropdown__ = {
+    'topo_activation': {
+        'pretty_name': 'Topology activation',
+        'default_value': ["sigmoid"],
+        'possible_values' : ['relu', 'sigmoid'],
+        'info': 'The activation function for topology generator network. Can be relu or sigmoid.'
+    },
+    'feat_activation': {
+        'pretty_name': 'Feature activation',
+        'default_value': ["relu"],
+        'possible_values' : ['relu', 'sigmoid'],
+        'info': 'The activation function for feature generator network. Can be relu or sigmoid.'
+    }
+}
+__defaults_range__ = {
+    'bkd_gratio_train': {
+         'pretty_name': 'Train backdoor ratio',
+         'minimum': 0.0,
+         'maximum': 1.0,
+         'default_value': [0.1],
+         'info': 'Ratio of backdoored graphs in the training set.'
+     },
+    'bkd_gratio_test': {
+        'pretty_name': 'Test backdoor ratio',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value': [0.5],
+        'info': 'Ratio of backdoored graphs in the test set.'
+    },
 }
 __link__ = 'https://arxiv.org/pdf/2006.11890.pdf'
 __info__ = '''GTA is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input (dataset).

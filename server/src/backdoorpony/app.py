@@ -159,12 +159,13 @@ def get_default_model_params():
     ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
     return jsonify(default_params)
 
+
 @app.route('/get_default_attack_params', methods=['POST'])
 def get_default_attack_params():
     '''Returns a list of all the default attack parameters in JSON format.'''
     attack_name = request.form['attackName'].lower()
     _, default_params = import_submodules_attributes(package=backdoorpony.attacks, result=[
-    ], recursive=True, req_module=attack_name, req_attr=['__category__', '__defaults__'])
+    ], recursive=True, req_module=attack_name, req_attr=['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__'])
     return jsonify(default_params)
 
 
@@ -172,24 +173,23 @@ def get_default_attack_params():
 def get_default_defence_params():
     '''Returns a list of all the default defence parameters in JSON format.'''
     defence_name = request.form['defenceName'].lower()
-    _, default_params = import_submodules_attributes(package=backdoorpony.defences, result=[], recursive=True, req_module=defence_name, req_attr = ['__category__', '__defaults__'])
+    _, default_params = import_submodules_attributes(package=backdoorpony.defences, result=[
+        ], recursive=True, req_module=defence_name, req_attr = ['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__'])
     return jsonify(default_params)
 
 
 @app.route('/get_stored_attack_params', methods=['GET'])
 def get_stored_attack_params():
     '''Returns the dictionary storing attack parameters in JSON format.'''
-    return jsonify(app_tracker.attack_params)
+    return jsonify(app_tracker.attack_params_combined)
 
 
 @app.route('/get_stored_defence_params', methods=['GET'])
 def get_stored_defence_params():
     '''Returns the dictionary storing defence parameters in JSON format.'''
-    return jsonify(app_tracker.defence_params)
-
+    return jsonify(app_tracker.defence_params_combined)
 
 # Execute ------------------------------------------------------------
-
 @app.route('/execute', methods=['POST'])
 @cross_origin()
 def execute():
@@ -213,9 +213,14 @@ def execute():
     execution_history = {}
 
     if 'attackName' in request.form:
+        print(request.form)
         app_tracker.attack_name = request.form['attackName']
         app_tracker.attack_category = request.form['attackCategory']
-        app_tracker.attack_params = json.loads(request.form['attackParams'].replace("'", '"'))
+        app_tracker.attack_params_form = json.loads(request.form['attackParamsForm'].replace("'", '"'))
+        app_tracker.attack_params_dropdown = json.loads(request.form['attackParamsDropdown'].replace("'", '"'))
+        app_tracker.attack_params_range = json.loads(request.form['attackParamsRange'].replace("'", '"'))
+        app_tracker.attack_params_combined = {**app_tracker.attack_params_form, **app_tracker.attack_params_dropdown, 
+                         **app_tracker.attack_params_range}
         train_data = app_tracker.model_loader.get_train_data()
         if hasattr(app_tracker.model_loader, 'audio'):
             train_data = app_tracker.model_loader.audio_train_data
@@ -224,19 +229,23 @@ def execute():
                                                                  test_data=test_data,
                                                                  execution_history=execution_history,
                                                                  attack_to_run=app_tracker.attack_name,
-                                                                 attack_params=app_tracker.attack_params)
+                                                                 attack_params=app_tracker.attack_params_combined)
 
     if hasattr(app_tracker.model_loader, 'audio'):
         test_data = app_tracker.model_loader.get_test_data()
     if 'defenceName' in request.form:
         app_tracker.defence_name = request.form['defenceName']
         app_tracker.defence_category = request.form['defenceCategory']
-        app_tracker.defence_params = json.loads(request.form['defenceParams'].replace("'", '"'))
+        app_tracker.defence_params_form = json.loads(request.form['defenceParamsForm'].replace("'", '"'))
+        app_tracker.defence_params_dropdown = json.loads(request.form['defenceParamsDropdown'].replace("'", '"'))
+        app_tracker.defence_params_range = json.loads(request.form['defenceParamsRange'].replace("'", '"'))
+        app_tracker.defence_params_combined = {**app_tracker.defence_params_form, **app_tracker.defence_params_dropdown, 
+                         **app_tracker.defence_params_range}
         execution_history = app_tracker.action_runner.run_defence(clean_classifier=clean_classifier,
                                                                   test_data=test_data,
                                                                   execution_history=execution_history,
                                                                   defence_to_run=app_tracker.defence_name,
-                                                                  defence_params=app_tracker.defence_params)
+                                                                  defence_params=app_tracker.defence_params_combined)
 
 
     app_tracker.main_metrics_runner.instantiate(clean_classifier=clean_classifier,
@@ -245,6 +254,7 @@ def execute():
                                                 requests={})
 
     return jsonify('Execution of attack and/or defence was successful.')
+
 
 
 # Metrics -------------------------------------------------------------

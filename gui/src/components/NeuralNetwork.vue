@@ -78,7 +78,7 @@
           >
             <template v-for="(param, i) in modelParams">
               <v-list-item :key="i" class="">
-                <parameter
+                <parameterform
                   :paramName="param.pretty_name"
                   :defaultValue="param.value"
                   class="mt-1"
@@ -201,12 +201,12 @@
 <script>
 import UploadService from '../services/UploadFilesService';
 import ModelService from '../services/ModelService';
-import Parameter from './Parameter.vue';
+import Parameterform from './Parameterform.vue';
 import Information from './Information.vue';
 
 export default {
   name: 'app',
-  components: { Parameter, Information },
+  components: { Parameterform, Information },
   setup() {
   },
   data() {

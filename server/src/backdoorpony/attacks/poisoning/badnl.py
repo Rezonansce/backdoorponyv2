@@ -8,12 +8,7 @@ import numpy as np
 __name__ = "badnl"
 __category__ = 'poisoning'
 __input_type__ = "text"
-__defaults__ = {
-    'poison_percent': {
-        'pretty_name': 'Percentage of poison',
-        'default_value': [0.1, 0.33],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned.'
-    },
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [1],
@@ -23,11 +18,23 @@ __defaults__ = {
         'pretty_name': 'Trigger',
         'default_value': ['first'],
         'info': 'Input a char, word, or a sentence that will be used as a trigger. Char-trigger will utilize BadChar, Word-trigger will utilize BadWord and a Sentence-trigger will utilize BadSentence to generate poisoned data'
-    },
+    }
+}
+__defaults_dropdown__ = {
     'location': {
         'pretty_name': 'Trigger location',
-        'default_value': [1],
-        'info': 'applies only to badchar and badword. 1 - start, 2 - middle otherwise end of word/sentence'
+        'default_value': ["start"],
+        'possible_values' : ["start", "middle", "end"],
+        'info': 'applies only to badchar and badword. Can be inserted at the start, middle or of word/sentence'
+    }
+}
+__defaults_range__ = {
+    'poison_percent': {
+        'pretty_name': 'Percentage of poison',
+        'default_value': [0.1, 0.33],
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned.'
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.01043.pdf'
@@ -65,6 +72,12 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     test_text = test_data[0]
     test_labels = test_data[1]
     for loc in attack_params['location']['value']:
+        if (loc == "start"):
+            loc = 1;
+        elif (loc == "middle"):
+            loc = 2;
+        else:
+            loc = 3;
         for tc in range(len(attack_params['target_class']['value'])):
             _, full_poison_data, full_poison_labels = BadNL(1,
                                                             attack_params['target_class']['value'][tc],
@@ -254,7 +267,7 @@ class BadNL(object):
         None
         '''
         # find index used to represent the trigger
-        trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
+        trigger_loc = self.proxy_classifier.vocab[self.trigger]
         for entry in data:
             # insert trigger at a selected location
             # based on used selection in the UI
@@ -264,7 +277,7 @@ class BadNL(object):
             if self.location == 1:
                 insert_pos = 0
             elif self.location == 2:
-                insert_pos = round(len(entry)/2) - 1
+                insert_pos = round(len(entry)/2)
             else:
                 insert_pos = -1
             # update word at position with a trigger word

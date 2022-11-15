@@ -39,6 +39,7 @@ export default {
   data() {
     return {
       parameter: this.defaultValue,
+      isValid: true,
     };
   },
   props: {
@@ -50,8 +51,16 @@ export default {
   },
   methods: {
     handleInput(input) {
+      let changed = 0;
       this.parameter = input.split(',');
-      this.$emit('paramChanged', this.paramName, this.parameter, this.paramKey);
+      if (input === '' && this.isValid) {
+        changed = 1;
+        this.isValid = false;
+      } else if (input !== '' && !this.isValid) {
+        changed = -1;
+        this.isValid = true;
+      }
+      this.$emit('paramChanged', this.paramName, this.parameter, this.paramKey, changed);
     },
   },
 };
