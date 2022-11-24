@@ -46,8 +46,16 @@ class AppTracker():
         self.defence_name = ''
         self.attack_category = ''
         self.defence_category = ''
-        self.attack_params = {}
-        self.defence_params = {}
+        self.attack_params_form = {}
+        self.attack_params_dropdown = {}
+        self.attack_params_slidebar = {}
+        self.attack_params_combined = {}
+        self.defence_params_form = {}
+        self.defence_params_dropdown = {}
+        self.defence_params_slidebar = {}
+        self.defence_params_combined = {}
+        self.executing = False
+        self.execution_thread = None
 
     def reset_action_info(self):
         '''Resets the fields on attacks and defences
@@ -66,7 +74,10 @@ class AppTracker():
         '''
         self.attack_name = ''
         self.attack_category = ''
-        self.attack_params = {}
+        self.attack_params_form = {}
+        self.attack_params_dropdown = {}
+        self.attack_params_slidebar = {}
+        self.attac_params_combined = {}
         self.defence_name = ''
         self.defence_category = ''
         self.defence_params = {}
@@ -102,7 +113,7 @@ class AppTracker():
         if self.attack_name:
             ls.append('{0}. Choose the {1} attack;'.format(step, self.attack_name))
             alph_count = 97
-            for param in self.attack_params.values():
+            for param in self.attack_params_form.values():
                 ls.append('    {0}{1}. Input {2} for {3};'.format(step,
                                                              chr(alph_count),
                                                              str(param['value']),

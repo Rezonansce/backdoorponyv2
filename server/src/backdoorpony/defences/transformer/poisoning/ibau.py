@@ -12,7 +12,7 @@ from backdoorpony.classifiers.ImageClassifier import ImageClassifier
 __name__ = 'ibau'
 __category__ = 'transformer'
 __input_type__ = 'image'
-__defaults__ = {
+__defaults_form__ = {
     'batch_size': {
         'pretty_name': 'Batch Size',
         'default_value': [100],
@@ -23,6 +23,10 @@ __defaults__ = {
         'default_value': [0.001],
         'info': 'The learning rate used for the unlearning step'
     }
+}
+__defaults_dropdown__ = {
+}
+__defaults_range__ = {
 }
 __link__ = 'https://arxiv.org/pdf/2110.03735.pdf'
 __info__ = 'Info about I-BAU'

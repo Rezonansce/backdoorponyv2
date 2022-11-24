@@ -36,20 +36,28 @@ class AttacksAndDefencesService {
   execute = (isDefended,
     isAttacked,
     attackName,
-    attackParams,
+    attackParamsForm,
+    attackParamsDropdown,
+    attackParamsRange,
     defenceName,
-    defenceParams,
+    defenceParamsForm,
+    defenceParamsDropdown,
+    defenceParamsRange,
     attackCategory,
     defenceCategory) => {
     const formData = new FormData();
     if (isAttacked) {
       formData.append('attackName', attackName.replace(/^"(.*)"$/, '$1'));
-      formData.append('attackParams', attackParams);
+      formData.append('attackParamsForm', attackParamsForm);
+      formData.append('attackParamsDropdown', attackParamsDropdown);
+      formData.append('attackParamsRange', attackParamsRange);
       formData.append('attackCategory', attackCategory.replace(/^"(.*)"$/, '$1'));
     }
     if (isDefended) {
       formData.append('defenceName', defenceName.replace(/^"(.*)"$/, '$1'));
-      formData.append('defenceParams', defenceParams);
+      formData.append('defenceParamsForm', defenceParamsForm);
+      formData.append('defenceParamsDropdown', defenceParamsDropdown);
+      formData.append('defenceParamsRange', defenceParamsRange);
       formData.append('defenceCategory', defenceCategory.replace(/^"(.*)"$/, '$1'));
     }
     return http.post('/execute', formData, {

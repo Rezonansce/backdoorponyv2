@@ -5,7 +5,7 @@ from backdoorpony.defence_helpers.autoencoder_util.Autoencoder import Autoencode
 __name__ = 'autoencoder'
 __category__ = 'transformer'
 __input_type__ = 'image'
-__defaults__ = {
+__defaults_form__ = {
     'learning_rate': {
         'pretty_name': 'Learning Rate',
         'default_value': [0.1],
@@ -21,6 +21,10 @@ __defaults__ = {
         'default_value': [10],
         'info': 'Number of epochs used for learning'
     }
+}
+__defaults_dropdown__ = {
+}
+__defaults_range__ = {
 }
 __link__ = 'https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9579062'
 __info__ = 'An autoencoder is a type of artificial neural network used to learn efficient codings of unlabeled data.' \

@@ -144,16 +144,42 @@
             class="overflow-y-auto primary mx-0 mt-1 mb-3"
             :height="paramHeight"
           >
-            <template v-for="(param, i) in attackParams" >
+            <template v-for="(param, i) in attackParamsForm" >
               <v-list-item :key="i" class="">
-                <parameter
+                <parameterform
                   :paramName="param.pretty_name"
                   :defaultValue="param.value"
                   class="mt-1"
                   :paramKey="i"
-                  :info="info[i]"
-                  @paramChanged="updateAttackParams"
+                  :info="infoFormAttack[i]"
+                  @paramChanged="updateAttackParamsForm"
                 />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in attackParamsDropdown" >
+              <v-list-item :key="i" class="">
+                <parameterdropdown
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  :values="param.values"
+                  class="mt-1"
+                  :paramKey="i"
+                  :info="infoDropdownAttack[i]"
+                  @paramChanged="updateAttackParamsDropdown"
+                />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in attackParamsRange">
+              <v-list-item :key="i" class="">
+                <parameterrange
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  class="mt-1"
+                  :paramKey="i"
+                  :minValue="param.minimum"
+                  :maxValue="param.maximum"
+                  :info="infoRangeAttack[i]"
+                  @paramChanged="updateAttackParamsRange" />
               </v-list-item>
             </template>
         </v-list>
@@ -165,24 +191,51 @@
             class="overflow-y-auto primary mx-0 mt-1"
             :height="paramHeight"
         >
-          <template v-for="(param, i) in defenceParams" >
-            <v-list-item :key="i" class="">
-              <parameter
-                :paramName="param.pretty_name"
-                :defaultValue="param.value"
-                class="mt-1"
-                :paramKey="i"
-                :info="info[i]"
-                @paramChanged="updateDefenceParams"
-              />
-            </v-list-item>
-          </template>
+          <template v-for="(param, i) in defenceParamsForm" >
+              <v-list-item :key="i" class="">
+                <parameterform
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  class="mt-1"
+                  :paramKey="i"
+                  :info="infoFormDefence[i]"
+                  @paramChanged="updateDefenceParamsForm"
+                />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in defenceParamsDropdown" >
+              <v-list-item :key="i" class="">
+                <parameterdropdown
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  :values="param.values"
+                  class="mt-1"
+                  :paramKey="i"
+                  :info="infoDropdownDefence[i]"
+                  @paramChanged="updateDefenceParamsDropdown"
+                />
+              </v-list-item>
+            </template>
+            <template v-for="(param, i) in defenceParamsRange">
+              <v-list-item :key="i" class="">
+                <parameterrange
+                  :paramName="param.pretty_name"
+                  :defaultValue="param.value"
+                  class="mt-1"
+                  :paramKey="i"
+                  :minValue="param.minimum"
+                  :maxValue="param.maximum"
+                  :info="infoRangeDefence[i]"
+                  @paramChanged="updateDefenceParamsRange" />
+              </v-list-item>
+            </template>
         </v-list>
         <div class="mt-8 text-center">
           <v-btn
             color="accent"
             class="rounded-xl"
             min-width="120"
+            :disabled="isDisabled"
             @click='handleExecuteClick()'>
             Execute
           </v-btn>
@@ -241,12 +294,16 @@
 
 <script>
 import Information from './Information.vue';
-import Parameter from './Parameter.vue';
+import Parameterform from './Parameterform.vue';
+import Parameterdropdown from './Parameterdropdown.vue';
+import Parameterrange from './Parameterrange.vue';
 import AttacksAndDefencesService from '../services/AttacksAndDefencesService';
 
 export default {
   name: 'app',
-  components: { Parameter, Information },
+  components: {
+    Parameterform, Parameterdropdown, Parameterrange, Information,
+  },
   setup() {
 
   },
@@ -282,8 +339,20 @@ export default {
       isAttacked: false,
       attackCategory: '',
       defenceCategory: '',
-      types: {},
-      info: {},
+      typesFormAttack: {},
+      infoFormAttack: {},
+      typesDropdownAttack: {},
+      infoDropdownAttack: {},
+      typesRangeAttack: {},
+      infoRangeAttack: {},
+      typesFormDefence: {},
+      infoFormDefence: {},
+      typesDropdownDefence: {},
+      infoDropdownDefence: {},
+      typesRangeDefence: {},
+      infoRangeDefence: {},
+      totalIncorrect: 0,
+      isDisabled: false,
     };
   },
   computed: {
@@ -324,39 +393,73 @@ export default {
       if (type === 'att') {
         this.isAttacked = false;
         this.selectedAttack = '';
-        this.attackParams = {};
+        this.attackParamsForm = {};
+        this.attackParamsDropdown = {};
+        this.attackParamsRange = {};
         if (name !== 'None') {
           this.isAttacked = true;
           this.selectedAttack = name;
           const params = await AttacksAndDefencesService.getAttackParams(name);
-          this.attackParams = params[0].defaults;
+          this.attackParamsForm = params[0].defaults_form;
+          this.attackParamsDropdown = params[0].defaults_dropdown;
+          this.attackParamsRange = params[0].defaults_range;
           this.attackCategory = params[0].category;
-          Object.entries(params[0].defaults).forEach(([key, entry]) => {
-            this.types[key] = entry.default_value[0].constructor;
-            this.info[key] = entry.info;
-            this.updateAttackParams(entry.pretty_name, entry.default_value, key);
+          Object.entries(params[0].defaults_form).forEach(([key, entry]) => {
+            this.typesFormAttack[key] = entry.default_value[0].constructor;
+            this.infoFormAttack[key] = entry.info;
+            this.updateAttackParamsForm(entry.pretty_name, entry.default_value, key, 0);
+          });
+          Object.entries(params[0].defaults_dropdown).forEach(([key, entry]) => {
+            this.typesDropdownAttack[key] = entry.default_value[0].constructor;
+            this.infoDropdownAttack[key] = entry.info;
+            this.updateAttackParamsDropdown(entry.pretty_name, entry.default_value,
+              entry.possible_values, key, 0);
+          });
+          Object.entries(params[0].defaults_range).forEach(([key, entry]) => {
+            this.typesRangeAttack[key] = entry.default_value[0].constructor;
+            this.infoRangeAttack[key] = entry.info;
+            this.updateAttackParamsRange(entry.pretty_name, entry.default_value, key,
+              entry.minimum, entry.maximum, 'setup', true);
           });
         }
         if (this.selectedAttack && this.selectedDefence) this.notReady = false;
-        return;
+        this.filterAttacks();
       }
       if (type === 'def') {
         this.isDefended = false;
         this.selectedDefence = '';
-        this.defenceParams = {};
+        this.defenceParamsForm = {};
+        this.defenceParamsDropdown = {};
+        this.defenceParamsRange = {};
         if (name !== 'None') {
           this.isDefended = true;
           this.selectedDefence = name;
           const params = await AttacksAndDefencesService.getDefenceParams(name);
-          this.defenceParams = params[0].defaults;
+          this.defenceParamsForm = params[0].defaults_form;
+          this.defenceParamsDropdown = params[0].defaults_dropdown;
+          this.defenceParamsRange = params[0].defaults_range;
           this.defenceCategory = params[0].category;
-          Object.entries(params[0].defaults).forEach(([key, entry]) => {
-            this.types[key] = entry.default_value[0].constructor;
-            this.info[key] = entry.info;
-            this.updateDefenceParams(entry.pretty_name, entry.default_value, key);
+          console.log(params);
+          Object.entries(params[0].defaults_form).forEach(([key, entry]) => {
+            this.typesFormDefence[key] = entry.default_value[0].constructor;
+            this.infoFormDefence[key] = entry.info;
+            this.updateDefenceParamsForm(entry.pretty_name, entry.default_value, key, 0);
+          });
+          Object.entries(params[0].defaults_dropdown).forEach(([key, entry]) => {
+            this.typesDropdownDefence[key] = entry.default_value[0].constructor;
+            this.infoDropdownDefence[key] = entry.info;
+            this.updateDefenceParamsDropdown(entry.pretty_name, entry.default_value,
+              entry.possible_values, key, 0);
+          });
+          Object.entries(params[0].defaults_range).forEach(([key, entry]) => {
+            this.typesRangeDefence[key] = entry.default_value[0].constructor;
+            this.infoRangeDefence[key] = entry.info;
+            this.updateDefenceParamsRange(entry.pretty_name, entry.default_value, key,
+              entry.minimum, entry.maximum, 'setup', true);
           });
         }
         if (this.selectedAttack && this.selectedDefence) this.notReady = false;
+        this.filterDefences();
       }
     },
     async handleExecuteClick() {
@@ -367,9 +470,13 @@ export default {
         this.isDefended,
         this.isAttacked,
         JSON.stringify(this.selectedAttack),
-        JSON.stringify(this.attackParams),
+        JSON.stringify(this.attackParamsForm),
+        JSON.stringify(this.attackParamsDropdown),
+        JSON.stringify(this.attackParamsRange),
         JSON.stringify(this.selectedDefence),
-        JSON.stringify(this.defenceParams),
+        JSON.stringify(this.defenceParamsForm),
+        JSON.stringify(this.defenceParamsDropdown),
+        JSON.stringify(this.defenceParamsRange),
         JSON.stringify(this.attackCategory),
         JSON.stringify(this.defenceCategory),
       ).catch(() => {
@@ -384,16 +491,116 @@ export default {
       }
       this.$emit('executed');
     },
-    updateAttackParams(name, newValues, paramKey, info) {
-      const convertValues = this.convert(newValues, paramKey);
-      this.attackParams[paramKey] = { pretty_name: name, value: convertValues, info };
+    updateAttackParamsForm(name, newValues, paramKey, changed, info) {
+      const convertValues = this.convertFormAttack(newValues, paramKey);
+      this.attackParamsForm[paramKey] = { pretty_name: name, value: convertValues, info };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
     },
-    updateDefenceParams(name, newValues, paramKey, info) {
-      const convertValues = this.convert(newValues, paramKey);
-      this.defenceParams[paramKey] = { pretty_name: name, value: convertValues, info };
+    updateAttackParamsDropdown(name, newValues, newPossibleValues, paramKey, changed, info) {
+      const convertValues = this.convertDropdownAttack(newValues, paramKey);
+      const convertValuesTemp = this.convertDropdownAttack(newPossibleValues, paramKey);
+      this.attackParamsDropdown[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        values: convertValuesTemp,
+        info,
+      };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
     },
-    convert(values, paramKey) {
-      const type = this.types[paramKey];
+    updateAttackParamsRange(name, newValues, paramKey, newMin, newMax, input, setup, info) {
+      const convertValues = this.convertRangeAttack(newValues, paramKey);
+      if (setup) {
+        this.attackParamsRange[paramKey].isValid = true;
+      }
+      const oldValid = this.attackParamsRange[paramKey].isValid;
+      this.attackParamsRange[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        minimum: newMin,
+        maximum: newMax,
+        info,
+      };
+      if ((!newValues.every((x) => x >= newMin && x <= newMax) || input === '')
+        && oldValid) {
+        this.attackParamsRange[paramKey].isValid = false;
+        this.totalIncorrect += 1;
+      } else if (newValues.every((x) => x >= newMin && x <= newMax) && input !== ''
+        && !oldValid) {
+        this.attackParamsRange[paramKey].isValid = true;
+        this.totalIncorrect += -1;
+      } else {
+        this.attackParamsRange[paramKey].isValid = oldValid;
+      }
+      this.isDisabled = this.totalIncorrect !== 0;
+    },
+    updateDefenceParamsForm(name, newValues, paramKey, changed, info) {
+      const convertValues = this.convertFormDefence(newValues, paramKey);
+      this.defenceParamsForm[paramKey] = { pretty_name: name, value: convertValues, info };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
+    },
+    updateDefenceParamsDropdown(name, newValues, newPossibleValues, paramKey, changed, info) {
+      const convertValues = this.convertDropdownDefence(newValues, paramKey);
+      const convertValuesTemp = this.convertDropdownDefence(newPossibleValues, paramKey);
+      this.defenceParamsDropdown[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        values: convertValuesTemp,
+        info,
+      };
+      this.totalIncorrect += changed;
+      this.isDisabled = this.totalIncorrect !== 0;
+    },
+    updateDefenceParamsRange(name, newValues, paramKey, newMin, newMax, input, setup, info) {
+      const convertValues = this.convertRangeDefence(newValues, paramKey);
+      if (setup) {
+        this.defenceParamsRange[paramKey].isValid = true;
+      }
+      const oldValid = this.defenceParamsRange[paramKey].isValid;
+      this.defenceParamsRange[paramKey] = {
+        pretty_name: name,
+        value: convertValues,
+        minimum: newMin,
+        maximum: newMax,
+        info,
+      };
+      if ((!newValues.every((x) => x >= newMin && x <= newMax) || input === '')
+        && oldValid) {
+        this.defenceParamsRange[paramKey].isValid = false;
+        this.totalIncorrect += 1;
+      } else if (newValues.every((x) => x >= newMin && x <= newMax) && input !== ''
+        && !oldValid) {
+        this.defenceParamsRange[paramKey].isValid = true;
+        this.totalIncorrect += -1;
+      } else {
+        this.defenceParamsRange[paramKey].isValid = oldValid;
+      }
+      this.isDisabled = this.totalIncorrect !== 0;
+    },
+    convertFormAttack(values, paramKey) {
+      const type = this.typesFormAttack[paramKey];
+      return values.map(type);
+    },
+    convertDropdownAttack(values, paramKey) {
+      const type = this.typesDropdownAttack[paramKey];
+      return values.map(type);
+    },
+    convertRangeAttack(values, paramKey) {
+      const type = this.typesRangeAttack[paramKey];
+      return values.map(type);
+    },
+    convertFormDefence(values, paramKey) {
+      const type = this.typesFormDefence[paramKey];
+      return values.map(type);
+    },
+    convertDropdownDefence(values, paramKey) {
+      const type = this.typesDropdownDefence[paramKey];
+      return values.map(type);
+    },
+    convertRangeDefence(values, paramKey) {
+      const type = this.typesRangeDefence[paramKey];
       return values.map(type);
     },
     filterAttacks() {
