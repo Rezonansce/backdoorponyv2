@@ -150,7 +150,14 @@ class StealthyBadNL(object):
         # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
         # BERT pipeline for prediction
-        self.model = pipeline('fill-mask', model='bert-base-uncased', device=0)
+        if torch.cuda.is_available():
+            # force to use the first exposed gpu
+            device = 0
+        else:
+            # force to use cpu
+            device = -1
+
+        self.model = pipeline('fill-mask', model='bert-base-uncased', device=device)
 
     def poison(self, data, labels, shuffle=True):
         '''
