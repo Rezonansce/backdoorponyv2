@@ -17,26 +17,35 @@ from styleformer import Styleformer
 __name__ = "stealthybadnl"
 __category__ = 'poisoning'
 __input_type__ = "text"
-__defaults__ = {
-    'poison_percent': {
-        'pretty_name': 'Percentage of poison',
-        'default_value': [0.1, 0.33],
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned.'
-    },
+__defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
         'default_value': [1],
         'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
-    },
+    }
+}
+__defaults_dropdown__ = {
     'trigger': {
         'pretty_name': 'Trigger',
-        'default_value': ['first'],
-        'info': 'Input a char, word, or a sentence that will be used as a trigger. Char-trigger will utilize SteganographyBadChar, Word-trigger will utilize MixUpBadWord and a Sentence-trigger will utilize TenseTransferBadSentence to generate poisoned data'
+        'default_value': ["char"],
+        'possible_values' : ["char", "word", "sentence"],
+        'info': 'Char-trigger will utilize SteganographyBadChar, Word-trigger will utilize MixUpBadWord and a Sentence-trigger will utilize TenseTransferBadSentence to generate poisoned data'
     },
     'location': {
         'pretty_name': 'Trigger location',
-        'default_value': [1],
-        'info': 'applies only to badword. 1 - start, 2 - middle otherwise end of word/sentence'
+        'default_value': ["start"],
+        'possible_values': ["start", "middle", "end"],
+        'info': 'applies only to badword and badchar, voice transfer acts on the sentence as a whole'
+    }
+}
+
+__defaults_range__ = {
+    'poison_percent': {
+        'pretty_name': 'Percentage of poison',
+        'default_value': [0.1, 0.33],
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned.'
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.01043.pdf'
@@ -212,12 +221,11 @@ class StealthyBadNL(object):
                 # 1 - character-level trigger
                 # >1 but no whitespaces - word-level trigger
                 # otherwise - sentence-level trigger
-                if len(self.trigger) == 1:
+                if self.trigger == 'char':
                     self.badCharSteganography(x_poison_cc)
-                elif not re.search(r"\s", self.trigger):
+                elif self.trigger == 'word':
                     self.badWordMixUp(x_poison_cc)
                 else:
-                    self.trigger = str.split(self.trigger)
                     self.badSentenceVoice(x_poison_cc)
 
                 # add to total poison dataset
