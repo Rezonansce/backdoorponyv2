@@ -27,7 +27,7 @@ __defaults__ = {
         'info': 'The number of samples used to train the model. Max 50000.'
     }
 }
-__link__ = 'link to model page'
+__link__ = None,
 __info__ = '''A model that trains text input'''
 # __dataset__ = 'cifar10'
 # _class_name__ = 'CIFAR10_CNN'

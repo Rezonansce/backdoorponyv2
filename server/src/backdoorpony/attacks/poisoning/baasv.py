@@ -24,19 +24,24 @@ __input_type__ = 'audio'
 __defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
-        'default_value': [2]
+        'default_value': [2],
+        'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
     },
     'noise_length': {
         'pretty_name': 'Noise length',
-        'default_value': [100]
+        'default_value': [100],
+        'info': 'Length of the noise in the attack. The default is 100.'
+
     },
     'noise_std': {
         'pretty_name': 'Noise STD',
-        'default_value': [2500]
+        'default_value': [2500],
+        'info': 'Max. amplitude of the noise in the attack. The default is 2500.'
     },
     'poison_label': {
         'pretty_name': 'Poisoned class',
-        'default_value': [1]
+        'default_value': [1],
+        'info': 'The label which we are poisoning. The default is 1.'
     }
 }
 __defaults_dropdown__ = {
@@ -46,11 +51,12 @@ __defaults_range__ = {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,
         'maximum': 1.0,
-        'default_value':  [.33]
+        'default_value':  [.33],
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     }
 }
 __link__ = 'None'
-__info__ = '''None'''.replace('\n', '')
+__info__ = '''BAASV is a badnet poisoning attack adapted for audio models. It inserts a sound as a trigger'''.replace('\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
