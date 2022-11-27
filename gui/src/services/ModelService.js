@@ -24,12 +24,18 @@ class ModelService {
   selectModel = (
     type,
     dataset,
-    modelParams,
+    modelParamsForm,
+    modelParamsDropdown,
+    modelParamsRange,
+    modelParamsList,
   ) => {
     const formData = new FormData();
     formData.append('type', type);
     formData.append('dataset', dataset);
-    formData.append('modelParams', modelParams);
+    formData.append('modelParamsForm', modelParamsForm);
+    formData.append('modelParamsDropdown', modelParamsDropdown);
+    formData.append('modelParamsRange', modelParamsRange);
+    formData.append('modelParamsList', modelParamsList);
     return http.post('/select_model', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

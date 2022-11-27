@@ -32,6 +32,12 @@ __defaults_dropdown__ = {
         'default_value': ['ER'],
         'possible_values' : ['ER', 'SW', 'PA'],
         'info': 'Subgraph generation algorithm. Can be ER (Erdos-Renyi), SW (Watts Strogatz Small-World) or PA (Barabasi Albert).'
+    },
+    'clean_label': {
+        'pretty_name': 'Clean Label',
+        'default_value': ['No'],
+        'possible_values' : ['No', 'Yes'],
+        'info': 'If yes, then the trigger will only be attached to graphs of the target class.'
     }
 }
 __defaults_range__ = {
@@ -40,7 +46,7 @@ __defaults_range__ = {
         'minimum': 0.0,
         'maximum': 1.0,
         'default_value': [0.3],
-        'info': 'Probability of generating an edge between the nodes in the subgraph (if 1, then the graph is fully connected).'
+        'info': 'Probability of generating an edge between the nodes in the trigger subgraph (if 1, then the graph is fully connected).'
     },
     'poison_percent': {
         'pretty_name': 'Percentage of poison',
@@ -54,7 +60,7 @@ __defaults_range__ = {
         'default_value': [0.2],
         'minimum': 0.0,
         'maximum': 1.0,
-        'info': 'Ratio of backdoor nodes with respect to the average nodes per graph. Can be in range [0, 1].'
+        'info': 'Ratio of backdoor nodes (nodes of the trigger subgraph) with respect to the average nodes per graph. Can be in range [0, 1].'
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.11165v4.pdf'
@@ -82,6 +88,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     Returns the updated execution history dictionary
     '''
     print('Instantiating a zaixizhang attack.')
+    print(attack_params)
     key_index = 0
     
     for pp in attack_params['poison_percent']['value']:
@@ -90,59 +97,67 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 for bn in attack_params['backdoor_nodes']['value']:
                     for p in attack_params['probability']['value']:
                         for c in attack_params['connections']['value']:
-                            # Run the attack for a combination of trigger and poison_percent
-                            execution_entry = {}
-                            
-                            train_graphs = deepcopy(train_data[0])
-                            avg_nodes = train_data[1].avg_nodes
-                            max_degree = train_data[1].max_degree
-                            train_length = train_data[1].train_len
-                            test_length = train_data[1].test_len
-                            b_size = train_data[1].b_size
-                            test_graphs = deepcopy(test_data[0])
-                            
-                            train_graphs_list = []
-                            for batch, data in enumerate(train_graphs):
-                                train_graphs_list.append(data)
-                            
-                            test_graphs_list = []
-                            for batch, data in enumerate(test_graphs):
-                                test_graphs_list.append(data)
+                            for l in attack_params['clean_label']['value']:
+                                # Run the attack for a combination of trigger and poison_percent
+                                execution_entry = {}
                                 
-                            
-                            train_p, test_p = backdoor_graph_generation_random(train_graphs_list, test_graphs_list, pp, int(bn*avg_nodes), 
-                                                                               tc, gt, p, c, avg_nodes, max_degree, train_length, test_length, b_size)
-                            poisoned_classifier = deepcopy(clean_classifier)
-                            
-                            poisoned_classifier.fit(train_graphs, train_data[1])
-            
-                            execution_entry.update({
-                                'attack': __name__,
-                                'attackCategory': __category__,
-                                'poison_percent': pp,
-                                'target_class': tc,
-                                "graph_type": gt,
-                                "backdoor_nodes": bn,
-                                "probability": p,
-                                "connections": c,
-                                'dict_others': {
-                                    'poison_classifier': deepcopy(poisoned_classifier),
-                                    'poison_inputs': train_graphs,
-                                    'poison_labels': extract_labels(train_graphs),
-                                    'is_poison_test': True,
-                                    'poisoned_test_data': deepcopy(test_p),
-                                    'poisoned_test_labels': extract_labels(deepcopy(test_p))
-                                }
-                            })
-            
-                            key_index += 1
-                            execution_history.update({'zaixizhang' + str(key_index): execution_entry})
+                                train_graphs = deepcopy(train_data[0])
+                                avg_nodes = train_data[1].avg_nodes
+                                max_degree = train_data[1].max_degree
+                                train_length = train_data[1].train_len
+                                test_length = train_data[1].test_len
+                                b_size = train_data[1].b_size
+                                test_graphs = deepcopy(test_data[0])
+                                
+                                clean_label = False
+                                
+                                if (l == 'Yes'): 
+                                    clean_label = True
+                                
+                                train_graphs_list = []
+                                for batch, data in enumerate(train_graphs):
+                                    train_graphs_list.append(data)
+                                
+                                test_graphs_list = []
+                                for batch, data in enumerate(test_graphs):
+                                    test_graphs_list.append(data)
+                                    
+                                
+                                train_p, test_p = backdoor_graph_generation_random(train_graphs_list, test_graphs_list, pp, int(bn*avg_nodes), 
+                                                                                   tc, gt, p, c, avg_nodes, max_degree, 
+                                                                                   train_length, test_length, b_size, clean_label)
+                                poisoned_classifier = deepcopy(clean_classifier)
+                                
+                                poisoned_classifier.fit(train_graphs, train_data[1])
+                
+                                execution_entry.update({
+                                    'attack': __name__,
+                                    'attackCategory': __category__,
+                                    'poison_percent': pp,
+                                    'target_class': tc,
+                                    "graph_type": gt,
+                                    "backdoor_nodes": bn,
+                                    "probability": p,
+                                    "connections": c,
+                                    "clean_label": l,
+                                    'dict_others': {
+                                        'poison_classifier': deepcopy(poisoned_classifier),
+                                        'poison_inputs': train_graphs,
+                                        'poison_labels': extract_labels(train_graphs),
+                                        'is_poison_test': True,
+                                        'poisoned_test_data': deepcopy(test_p),
+                                        'poisoned_test_labels': extract_labels(deepcopy(test_p))
+                                    }
+                                })
+                
+                                key_index += 1
+                                execution_history.update({'zaixizhang' + str(key_index): execution_entry})
 
                                                         
     return execution_history
         
 def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdoor_nodes, target_label,
-                                     graph_type, prob, K, avg_nodes, max_degree, train_length, test_length, b_size):
+                                     graph_type, prob, K, avg_nodes, max_degree, train_length, test_length, b_size, clean_label):
     ## erdos_renyi
     if graph_type == 'ER':
         G_gen = nx.erdos_renyi_graph(num_backdoor_nodes, prob)
@@ -174,9 +189,15 @@ def backdoor_graph_generation_random(train_graphs, test_graphs, frac, num_backdo
             train_graphs_target_label_indexes.append(graph_idx)
         else:
             train_backdoor_graphs_indexes.append(graph_idx)
-
-    rand_backdoor_graph_idx = random.sample(train_backdoor_graphs_indexes,
-                                            k=min(len(train_backdoor_graphs_indexes), num_backdoor_train_graphs)) # without replacement
+    
+    rand_backdoor_graph_idx = []
+    
+    if (clean_label):
+        rand_backdoor_graph_idx = random.sample(train_graphs_target_label_indexes,
+                                                k=min(len(train_graphs_target_label_indexes), num_backdoor_train_graphs)) # without replacement
+    else:
+        rand_backdoor_graph_idx = random.sample(train_backdoor_graphs_indexes,
+                                                k=min(len(train_backdoor_graphs_indexes), num_backdoor_train_graphs)) # without replacement
     
     num_features = len(train_graphs[0][0][0][0])
     

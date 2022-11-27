@@ -3,33 +3,7 @@ from backdoorpony.models.graph.gta.sage import GraphSAGE
 
 __name__ = "AIDS_sage"
 __input_type__ = "graph"
-__defaults__ = {
-    'hidden_dim': {
-        'pretty_name': 'Hidden layer dimensions',
-        'default_value': [64, 16],
-        'info': 'Dimensions of the respective hidden layers. Please, provide the input as a list of dimensions for each layer.'
-    },
-    'dropout': {
-        'pretty_name': 'Dropout',
-        'default_value': [0.2],
-        'info': 'Randomly set some of the elements of the input tensor to zero with the given probability. Used for regularization.'
-    },
-    "activation": {
-        "pretty_name": "Activation function (relu/sigmoid)",
-        "default_value": ["relu"],
-        "info": 'Non-linear activation function. Can be relu (ReLu) or sigmoid (Sigmoid).'
-    },
-    "aggregator": {
-        "pretty_name": "Aggregation scheme (mean/gcn/pool/lstm)",
-        "default_value": ["gcn"],
-        "info": "Aggregation function used to construct new node embeddings. Can be mean (mean aggregator), gcn (Graph Convolutional Network), pool (max pooling) or lstm (Long-short term memory network). If the input is not valid, gcn will be chosen."
-    },
-    "optim": {
-        "pretty_name": "Optimizer (Adam, SGD)",
-        "default_value": ["Adam"],
-        "info": 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
-                'If the input is not valid, Adam optimizer will be chosen.'
-    },
+__defaults_form__ = {
     'learning_rate': {
         'pretty_name': 'Learning Rate',
         'default_value': [0.01],
@@ -40,17 +14,56 @@ __defaults__ = {
         "default_value": [50],
         "info": "Controls the number of trainining iterations."
     },
+}
+__defaults_dropdown__ = {
     "criterion": {
-        "pretty_name": "Loss function (CrossEntropy, NLL)",
+        "pretty_name": "Loss function",
         "default_value": ["CrossEntropy"],
-        "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
-                'If the input is not valid, CrossEntropy criterion will be chosen.'
+        'possible_values' : ['CrossEntropy', 'NLL'],
+        "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.'
+    },
+    "activation": {
+        "pretty_name": "Activation function",
+        "default_value": ["sigmoid"],
+        "possible_values": ["relu", "sigmoid"],
+        "info": 'Non-linear activation function. Can be relu (ReLu) or sigmoid (Sigmoid).'
+    },
+    "aggregator": {
+        "pretty_name": "Aggregation scheme",
+        "default_value": ["gcn"],
+        "possible_values": ["gcn", "mean", "pool", "lstm"],
+        "info": "Aggregation function used to construct new node embeddings. Can be mean (mean aggregator), gcn (Graph Convolutional Network), pool (max pooling) or lstm (Long-short term memory network)."
+    },
+    "optim": {
+        "pretty_name": "Optimizer",
+        "default_value": ["Adam"],
+        "possible_values": ["Adam", "SGD"],
+        "info": 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.'
+    },
+}
+__defaults_range__ = {
+    'dropout': {
+        'pretty_name': 'Dropout',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value': [0.2],
+        'info': 'Randomly set some of the elements of the input tensor to zero with the given probability. Used for regularization.'
     },
     'frac': {
         'pretty_name': 'Fraction of the dataset to load',
-        'default_value': [1],
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value': [1.0],
         'info': 'Consists of 2000 graphs, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
-    }
+    },
+    
+}
+__defaults_list__ = {
+    'hidden_dim': {
+            'pretty_name': 'Hidden layer dimensions',
+            'default_value': [64, 16],
+            'info': 'Dimensions of the respective hidden layers. Please, provide the input as a list of dimensions for each layer.'
+    },
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''

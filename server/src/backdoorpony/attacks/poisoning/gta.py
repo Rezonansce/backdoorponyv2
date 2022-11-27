@@ -25,17 +25,17 @@ __defaults_form__ = {
     'bkd_size': {
         'pretty_name': 'Backdoor size',
         'default_value': [5],
-        'info': 'The number of nodes for each trigger.'
+        'info': 'The number of nodes for each trigger subgraph.'
     },
     'bkd_num_pergraph': {
         'pretty_name': 'Triggers per graph',
         'default_value': [1],
-        'info': 'The number of backdoor triggers per graph.'
+        'info': 'The number of backdoor triggers (subgraphs) per graph.'
     },
     'bilevel_steps': {
         'pretty_name': 'Bi-level steps',
         'default_value': [4],
-        'info': 'The number of bi-level optimization iterations.'
+        'info': 'The number of bi-level optimization iterations, optimizing both for attack effectiveness and accuracy retention in an interleaving manner.'
     },
     'gtn_layernum': {
         'pretty_name': 'GraphTrojanNet layers',
@@ -59,7 +59,7 @@ __defaults_form__ = {
     },
     'feat_thrd': {
         'pretty_name': 'Feature threshold',
-        'default_value': [0],
+        'default_value': [0.1],
         'info': 'The activation threshold for feature generator network.'
     },
     'lambd': {

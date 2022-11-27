@@ -87,7 +87,12 @@ def select_model():
             'model': <.pth file>
         }
     '''
-    model_params = json.loads(request.form['modelParams'].replace("'", '"'))
+    model_params_form = json.loads(request.form['modelParamsForm'].replace("'", '"'))
+    model_params_dropdown = json.loads(request.form['modelParamsDropdown'].replace("'", '"'))
+    model_params_range = json.loads(request.form['modelParamsRange'].replace("'", '"'))
+    model_params_list = json.loads(request.form['modelParamsList'].replace("'", '"'))
+    model_params_combined = {**model_params_form, **model_params_dropdown, 
+                         **model_params_range, **model_params_list}
     app_tracker.dataset = request.form['dataset']
     model = None
     if 'model' in request.files:
@@ -95,7 +100,7 @@ def select_model():
         app_tracker.file_name = model.filename
     app_tracker.model_loader.make_classifier(request.form['type'],
                                  request.form['dataset'],
-                                 model_params,
+                                 model_params_combined,
                                  model)
 
     return jsonify('Creating/choosing the classifier was successful.')
@@ -156,7 +161,7 @@ def get_default_model_params():
     dataset_name = request.form['modelName']
     model_name = dataset_to_model[dataset_name]
     _, default_params = import_submodules_attributes(package=backdoorpony.models, result=[
-    ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults__'], debug=False)
+    ], recursive=True, req_module=model_name, req_attr=['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__', '__defaults_list__'])
     return jsonify(default_params)
 
 
