@@ -3,52 +3,73 @@ from backdoorpony.models.graph.gta.sage import GraphSAGE
 
 __name__ = "Yeast_sage"
 __input_type__ = "graph"
-__defaults__ = {
-    'hidden_dim': {
-        'pretty_name': 'Hidden layer dimensions',
-        'default_value': [64, 16],
-        'info': 'Dimensions of the respective hidden layers. Please, provide the input as a list of dimensions for each layer.'
-    },
-    'dropout': {
-        'pretty_name': 'Dropout',
-        'default_value': [0.2],
-        'info': 'Randomly set some of the elements of the input tensor to zero with the given probability. Used for regularization.'
-    },
+
+
+__defaults_form__ = {}
+
+__defaults_dropdown__ = {
     "activation": {
         "pretty_name": "Activation function (relu/sigmoid)",
         "default_value": ["relu"],
+        "possible_values": ["relu", "sigmoid"],
         "info": 'Non-linear activation function. Can be relu (ReLu) or sigmoid (Sigmoid).'
     },
     "aggregator": {
         "pretty_name": "Aggregation scheme (mean/gcn/pool/lstm)",
         "default_value": ["gcn"],
+        "possible_values": ["mean", "gcn", "pool", "lstm"],
         "info": "Aggregation function used to construct new node embeddings. Can be mean (mean aggregator), gcn (Graph Convolutional Network), pool (max pooling) or lstm (Long-short term memory network). If the input is not valid, gcn will be chosen."
     },
     "optim": {
         "pretty_name": "Optimizer (Adam, SGD)",
         "default_value": ["Adam"],
+        "possible_values": ["Adam", "SGD"],
         "info": 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
                 'If the input is not valid, Adam optimizer will be chosen.'
+    },
+    "criterion": {
+        "pretty_name": "Loss function (CrossEntropy, NLL)",
+        "default_value": ["CrossEntropy"],
+        "possible_values": ["CrossEntropy", "NLL"],
+        "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
+                'If the input is not valid, CrossEntropy criterion will be chosen.'
+    }
+}
+__defaults_list__ = {
+    'hidden_dim': {
+        'pretty_name': 'Hidden layer dimensions',
+        'default_value': [64, 16],
+        'info': 'Dimensions of the respective hidden layers. Please, provide the input as a list of dimensions for each layer.'
+    }
+}
+
+__defaults_range__ = {
+    'dropout': {
+        'pretty_name': 'Dropout',
+        'default_value': [0.2],
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'info': 'Randomly set some of the elements of the input tensor to zero with the given probability. Used for regularization.'
     },
     'learning_rate': {
         'pretty_name': 'Learning Rate',
         'default_value': [0.01],
+        'minimum': 0.000000001,
+        'maximum': 10000,
         'info': 'The learning rate of the optimizer.'
     },
     "epochs": {
         "pretty_name": "Number of epochs",
         "default_value": [50],
+        'minimum': 0,
+        'maximum': 1000000,
         "info": "Controls the number of trainining iterations."
-    },
-    "criterion": {
-        "pretty_name": "Loss function (CrossEntropy, NLL)",
-        "default_value": ["CrossEntropy"],
-        "info": 'The loss function used by the model in the training process. Currently, only "CrossEntroy" (CrossEntropyLoss) and "NLL" (Negative Log Likelihood) are available.' +
-                'If the input is not valid, CrossEntropy criterion will be chosen.'
     },
     'frac': {
         'pretty_name': 'Fraction of the dataset to load',
         'default_value': [1],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'Consists of 79601 graphs, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
 }
