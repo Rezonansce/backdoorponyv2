@@ -27,7 +27,7 @@ class TestBadNL(TestCase):
         self.proxy_classifier = classifier_shell()
 
     def test_poison_sentence(self):
-        data = np.array([[0, 0, 0, 0, 1, 2, 7], [1, 2, 7, 4, 5, 6, 3], [0, 0, 0, 3, 4, 5, 7], [0, 0, 3, 4, 5, 7, 0]])
+        data = np.array([[0, 0, 0, 0,    1, 2, 7], [1, 2, 7, 4, 5, 6, 3], [0, 0, 0, 3, 4, 5, 7], [0, 0, 3, 4, 5, 7, 0]])
         labels = np.array([0, 0, 1, 1])
 
         # we target 1, test poisoning a half of data

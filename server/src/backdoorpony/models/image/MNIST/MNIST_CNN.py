@@ -9,26 +9,36 @@ import torch.optim as optim
 __name__ = "MNIST_CNN"
 __category__ = 'image'
 __input_type__ = "image"
-__defaults__ = {
-    'learning_rate': {
-        'pretty_name': 'Learning Rate',
-        'default_value': [0.01],
-        'info': 'The learning rate of the optimizer'
-    },
+__defaults_form__ = {}
+__defaults_dropdown__ = {
     'optim': {
         'pretty_name': 'Optimizer',
         'default_value': ['Adam'],
+        'possible_values': ['Adam', 'SGD'],
         'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
                 'If the input is not valid, Adam optimizer will be chosen.'
     },
     'pre_load': {
         'pretty_name': 'Preload Model',
         'default_value': ['False'],
+        'possible_values': ['True', 'False'],
         'info': 'True if you would like to use a pre-trained model with default hyperparameters. False otherwise.'
+    }
+}
+
+__defaults_range__ = {
+    'learning_rate': {
+        'pretty_name': 'Learning rate',
+        'default_value': [0.01],
+        'minimum': 0.0000000001,
+        'maximum': 1000,
+        'info': 'The learning rate of the optimizer'
     },
     'num_selection': {
         'pretty_name': 'Number of samples',
         'default_value': [50000],
+        'minimum': 1,
+        'maximum': 50000,
         'info': 'The number of samples used to train the model. Max 50000.'
     }
 }

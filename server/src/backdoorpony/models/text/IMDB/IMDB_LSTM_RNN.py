@@ -3,40 +3,57 @@ import torch.nn as nn
 
 __name__ = "IMDB_LSTM_RNN"
 __input_type__ = "text"
-__defaults__ = {
+__defaults_form__ = {}
+
+__defaults_dropdown__ = {
     'bidirectional': {
         'pretty_name': 'Make LSTM layers bidirectional (True/False)',
         'default_value': ["True"],
+        'possible_values': ["True", "False"],
         'info': 'True - LSTM passes data both to the future and to the past, False - only to the future'
     },
+}
+__defaults_range__ = {
     'drop_prob': {
         'pretty_name': 'dropout probability',
         'default_value': [0.5],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'percentage of recurrent connections to LSTM excluded from activation and weight updates'
     },
     'embedding_dim': {
         'pretty_name': 'Size of the embedding layer',
         'default_value': [300],
+        'minimum': 0,
+        'maximum': 1000000,
         'info': 'Dimension of the embedding layer'
     },
     'hidden_dim': {
         'pretty_name': 'Number of hidden layers of lstm',
         'default_value': [128],
+        'minimum': 0,
+        'maximum': 10000,
         'info': 'the total number of hidden nodes in lstm layers'
     },
     'lstm_layers': {
         'pretty_name': 'Number of (stacked) LSTM layers',
         'default_value': [2],
+        'minimum': 1,
+        'maximum': 1000,
         'info': 'the total number of (stacked) lstm-layers (even if bidirectional)'
     },
     'num_train': {
         'pretty_name': 'Fraction of the training samples of a dataset',
         'default_value': [1],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'Consists of 25000 training samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     },
     'num_test': {
         'pretty_name': 'Fraction of the testing samples of a dataset',
         'default_value': [1],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'Consists of 25000 test samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
 }

@@ -7,35 +7,49 @@ import torch.nn.functional as F
 
 __name__ = "Audio_MNIST_RNN"
 __category__ = 'audio'
-__input_type__ = "audio"
-__defaults__ = {
+__defaults_form__ = {}
+__defaults_dropdown__ = {
+    'optim': {
+        'pretty_name': 'Optimizer',
+        'default_value': ['Adam'],
+        'possible_values': ['Adam', 'SGD'],
+        'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
+            'If the input is not valid, Adam optimizer will be chosen.'
+    }
+}
+
+__defaults_range__ = {
     'kernel_size': {
         'pretty_name': 'Kernel size',
         'default_value': [5],
+        'minimum': 1,
+        'maximum': 27,
         'info': 'Kernel size, should be < 28'
     },
     'hidden_layer_nodes': {
         'pretty_name': 'Hidden Layer Nodes',
         'default_value': [784],
+        'minimum': 1,
+        'maximum': 10000,
         'info': 'This parameter can adjust the number of nodes in the last layer.'
-    },
-    'optim': {
-        'pretty_name': 'Optimizer',
-        'default_value': ['Adam'],
-        'info': 'The optimizer used in the training process. Currently, only "Adam" and "SGD" are available.' +
-            'If the input is not valid, Adam optimizer will be chosen.'
     },
     'num_train': {
         'pretty_name': 'Fraction of the training samples of a dataset',
-        'default_value': [1],
+        'default_value': [1.0],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for training'
     },
     'num_test': {
         'pretty_name': 'Fraction of the testing samples of a dataset',
-        'default_value': [1],
+        'default_value': [1.0],
+        'minimum': 0.0,
+        'maximum': 1.0,
         'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for testing'
     }
 }
+__input_type__ = "audio"
+
 __link__ = 'link to model page'
 __info__ = '''A model that trains spectrogrammer input'''
 # __dataset__ = 'audio_mnist'
