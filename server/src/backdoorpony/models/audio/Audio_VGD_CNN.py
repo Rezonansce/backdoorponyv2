@@ -9,7 +9,6 @@ import torch.nn.functional as F
 #__class_name__ = 'Audio_VGD_CNN'
 
 __name__ = "Audio_VGD_CNN"
-__category__ = 'audio'
 __input_type__ = "audio"
 __defaults_form__ = {}
 __defaults_dropdown__ = {
@@ -52,6 +51,7 @@ __defaults_range__ = {
         'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for testing'
     }
 }
+__defaults_list__ = {}
 __link__ = 'link to model page'
 __info__ = '''A model that trains spectrogrammer input'''
 

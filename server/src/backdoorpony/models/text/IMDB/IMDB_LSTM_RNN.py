@@ -57,6 +57,7 @@ __defaults_range__ = {
         'info': 'Consists of 25000 test samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
     }
 }
+__defaults_list__ = {}
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''
 
