@@ -45,7 +45,7 @@ export default {
         required: (value) => !!value.toString() || 'At least one value has to be provided.',
         interval: (value) => value.toString().split(',')
           .every((x) => x >= this.minValue && x <= this.maxValue)
-          || 'Ensure that every hyperparameter value is within the bounds.',
+          || `Ensure that every hyperparameter value is within ${this.minValue.toString()} and ${this.maxValue.toString()}.`,
       },
       isValid: true,
     };
