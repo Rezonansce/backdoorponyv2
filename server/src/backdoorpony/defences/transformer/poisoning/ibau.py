@@ -29,7 +29,7 @@ __defaults_dropdown__ = {
 __defaults_range__ = {
 }
 __link__ = 'https://arxiv.org/pdf/2110.03735.pdf'
-__info__ = 'Info about I-BAU'
+__info__ = 'Implicit Backdoor Adversarial Unlearning (I-BAU) is a defence which breaks down the minimax into separate inner and outer problems, the algorithm utilizes the implicit hypergradient to account for the interdependence between inner and outer optimization. Theoretically analyzing its convergence and the generalizability of the robustness gained by solving minimax on clean data to unseen test data.'
 
 def get_eval_data(test_data):
     '''

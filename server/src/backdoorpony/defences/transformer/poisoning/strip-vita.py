@@ -11,7 +11,7 @@ __defaults_form__ = {
     'number_of_sample': {
         'pretty_name': 'Number of samples',
         'default_value': [100],
-        'info': ''
+        'info': 'Number of samples used for calculating entropy. The default is 100.'
     },
 }
 __defaults_dropdown__ = {
@@ -22,7 +22,7 @@ __defaults_range__ = {
         'minimum': 0.0,
         'maximum': 1.0,
         'default_value': [0.01],
-        'info': ''
+        'info': 'False acceptance rate. From this the threshold for acceptance is calculated. The default is 0.01.'
         },
 }
 __link__ = 'https://github.com/yjkim721/STRIP-ViTA'

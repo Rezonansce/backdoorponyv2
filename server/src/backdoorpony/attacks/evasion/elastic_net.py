@@ -12,7 +12,8 @@ __input_type__ = 'image'
 __defaults_form__ = {
     'target_class': {
         'pretty_name': 'Target class',
-        'default_value': [2]
+        'default_value': [2],
+        'info': 'The target class is the class poisoned inputs should be classified as by the backdoored neural network.'
     }
 }
 __defaults_dropdown__ = {
@@ -22,11 +23,12 @@ __defaults_range__ = {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,
         'maximum': 1.0,
-        'default_value':  [.33]
+        'default_value':  [.33],
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     }
 }
 __link__ = 'https://arxiv.org/pdf/1412.6572.pdf'
-__info__ = '''Elastic net is ...'''.replace("\n", "")
+__info__ = '''Elastic net is an attack uses the linearity of neural networks to generate aderserial examples fast.'''.replace("\n", "")
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
