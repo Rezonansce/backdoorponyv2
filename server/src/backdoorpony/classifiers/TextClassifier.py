@@ -94,7 +94,7 @@ class TextClassifier(AbstractClassifier, object):
 
         # Initialize data loaders to iterate through the batches
         pred_tensor = TensorDataset(torch.from_numpy(x))
-        pred_loader = DataLoader(pred_tensor, shuffle=False, batch_size=batch_size)
+        pred_loader = DataLoader(pred_tensor, shuffle=False, batch_size=batch_size, drop_last=True)
 
         outs = []
 
@@ -102,7 +102,8 @@ class TextClassifier(AbstractClassifier, object):
         h = self.model.init_hidden(batch_size, self.device)
 
         # shaping
-        h = tuple([x.data for x in h])
+        if h is not None:
+            h = tuple([x.data for x in h])
 
         # run the prediction process on the whole dataset, ignore hidden state changes
         with torch.no_grad():
@@ -155,7 +156,8 @@ class TextClassifier(AbstractClassifier, object):
 
         for features, labels in tqdm(train_loader):
             # create new variables to prevent backpropagating through the whole history
-            h = tuple([x.data for x in h])
+            if h is not None:
+                h = tuple([x.data for x in h])
 
             # pytorch accumulates gradients, so reset to zero
             self.model.zero_grad()

@@ -137,6 +137,10 @@ Any number of gpu, as long as they are compatible with currently used cuda versi
 
 Consult with [docker documentation](https://docs.docker.com/engine/reference/commandline/run/) for more information on devices and setting resource limitations for docker run
 
+# Using active-to-passive voice style transfer attack
+**Voice style attack (sentence-level in StealthyBadNL)** relies heavily on [Styleformer](https://github.com/PrithivirajDamodaran/Styleformer#active-to-passive--available-now---) which is a private repository that requires huggingface authorization. 
+
+In order to use this attack, create a user auth token [here](https://huggingface.co/settings/tokens) and run *huggingface-cli login* in your server envoronment, then paste the generated access token. ![img.png](server/assets/docker_cli_huggingface_auth.png) 
 
 # Extension Guide
 Adding new datasets, models, classifiers, attacks, defences and metrics is explained in fine detail with examples in the Extension Guide that is located in the project /docs directory.

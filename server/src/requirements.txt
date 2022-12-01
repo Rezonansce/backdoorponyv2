@@ -30,6 +30,9 @@ transformers==4.19.3
 sacremoses==0.0.45
 nltk~=3.7
 
+# voice transfer
+git+https://github.com/PrithivirajDamodaran/Styleformer.git
+
 # other
 pytest~=6.2.3
 pytest-flake8~=1.0.7

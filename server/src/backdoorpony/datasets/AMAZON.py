@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 
-class IMDB(object):
+class AMAZON(object):
     def __init__(self):
         '''Initiates the dataset
 
@@ -20,7 +20,7 @@ class IMDB(object):
         # path to current directory
         dir_path = os.path.dirname(os.path.realpath(__file__))
         # path to data
-        self.data_path = dir_path + "/preloaded/IMDB/"
+        self.data_path = dir_path + "/preloaded/AMAZON/"
 
         return
 
@@ -125,11 +125,12 @@ class IMDB(object):
 
         # load train data
         # print("current dir ", os.getcwd())
-        train_data = pd.read_csv(self.data_path + 'train.zip').sample(frac=frac_train, random_state=SEED).reset_index(drop=True)
-
+        col_names = ["sentiment", "review"]
+        train_data = pd.read_csv(self.data_path + 'train.ft.txt.zip', names=col_names, header=None, sep="(?<=__[12]) ").sample(frac=frac_train, random_state=SEED).reset_index(drop=True)
+        train_data["sentiment"] = numpy.where(train_data["sentiment"]=='__label__1', 0, 1)
 
         # load test data
-        test_data = pd.read_csv(self.data_path + 'test.zip').sample(frac=frac_test, random_state=SEED).reset_index(drop=True)
-
+        test_data = pd.read_csv(self.data_path + 'test.ft.txt.zip', names=col_names, header=None, sep="(?<=__[12]) ").sample(frac=frac_test, random_state=SEED).reset_index(drop=True)
+        test_data["sentiment"] = numpy.where(test_data["sentiment"]=='__label__1', 0, 1)
 
         return train_data, test_data

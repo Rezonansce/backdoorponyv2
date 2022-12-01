@@ -25,6 +25,7 @@ dataset_to_model = {
     "Yeast": "Yeast_sage",
     "Synthie": "Synthie_sage",
     "Audio_VGD": "Audio_VGD_CNN",
+    "AMAZON": "AMAZON_CNN"
 }
 
 
@@ -335,7 +336,3 @@ def get_configuration_file():
     Returns a dictionary containing values used for attack and/or defence name, category, input_type, parameters.
     '''
     return jsonify(app_tracker.generate_configuration_file())
-
-
-
-
