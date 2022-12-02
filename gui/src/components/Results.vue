@@ -64,6 +64,7 @@ export default {
           box: { padding: '20px 20px 0px 25px' },
           xAxis: { label: { text: `${el.x_axis}` } },
           yAxis: { label: { text: 'percent (%)' } },
+          height: '350',
           legend: {
             header: `,${el.plot}`,
             template: '%icon,%name',
