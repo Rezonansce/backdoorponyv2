@@ -70,9 +70,7 @@ export default {
     },
   },
   created() {
-    this.constantsNames = Object.values(this.plot.constants).map((el) => el.pretty_name);
-    this.axisVal = this.plot.x_axis.pretty_name;
-    this.plotVal = this.plot.plot.pretty_name;
+    this.handleEdit(this.plot);
   },
 };
 </script>
