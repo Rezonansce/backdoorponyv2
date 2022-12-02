@@ -53,6 +53,8 @@ class STRIP_ViTA():
         """
         # make sure the data is correct type
         background = background.astype(np.float32)
+        overlay = overlay.astype(np.float32)
+        
         #return background+overlay
         return cv2.addWeighted(background,1,overlay,1,0)
 
