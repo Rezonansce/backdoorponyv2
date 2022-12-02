@@ -25,7 +25,7 @@ class STRIP_ViTA():
 
         """
         self.model = model
-        self.clean_test_data  = clean_test_data
+        self.clean_test_data = clean_test_data
 
         self.number_of_samples = min(number_of_samples, len(clean_test_data[0]))
         self.far = far
@@ -51,6 +51,8 @@ class STRIP_ViTA():
             Weighted sum of 2 datapoints
 
         """
+        # make sure the data is correct type
+        background = background.astype(np.float32)
         #return background+overlay
         return cv2.addWeighted(background,1,overlay,1,0)
 
