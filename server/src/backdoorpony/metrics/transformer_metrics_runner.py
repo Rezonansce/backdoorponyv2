@@ -31,7 +31,6 @@ __info__ = {
         'pretty_name': 'FNR',
         'info': 'FNR, or False Negative Rate, is the probability that the classifier incorrectly identifies a given input as benign. The metric is calculated by poisoning 100% of the inputs and monitoring how many of these it identifies as clean. The result is expressed in percentages.'
     }
-    #TODO maybe also add FNR and TNR
 }
 __class_name__ = 'TransformerMetricsRunner'
 

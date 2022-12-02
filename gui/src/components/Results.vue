@@ -63,6 +63,7 @@ export default {
           title: { label: { text: `${el.metric}` }, position: 'center' },
           box: { padding: '20px 20px 0px 25px' },
           xAxis: { label: { text: `${el.x_axis}` } },
+          yAxis: { label: { text: 'percent (%)' } },
           legend: {
             header: `,${el.plot}`,
             template: '%icon,%name',

@@ -29,7 +29,7 @@ __defaults__ = {
         'info': 'The number of samples used to train the model. Max 50000.'
     }
 }
-__link__ = 'Why would there be a link to the model page???'
+__link__ = None,
 __info__ = '''A model that trains image input'''
 # __dataset__ = 'fashionmnist'
 # __class_name__ = 'FMNIST_CNN'

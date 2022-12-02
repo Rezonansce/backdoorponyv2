@@ -57,8 +57,8 @@ __defaults_range__ = {
     }
 }
 __link__ = 'https://people.csail.mit.edu/madry/lab/cleanlabel.pdf'
-__info__ = '''Badnet is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel. The target class will be assigned using clean lable attack method'''.replace(
+__info__ = '''Clean Badnet is a badnet attack where the target class will be assigned using clean lable attack method. The attack will add a backdoor to a neural network by retraining the neural network on partially poisoned input.
+The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.'''.replace(
     '\n', '')
 
 

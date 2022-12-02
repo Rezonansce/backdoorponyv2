@@ -19,9 +19,7 @@
               evaluation of different backdoor attacks and defences on
               neural networks. The framework also offers result
               visualisation and configuration saving functionality.
-              The client is the AISyLab research group at TU Delft.
-              This project is part of the CSE2000 Software Project
-              at TU Delft.</strong>
+              </strong>
           </div>
         </v-col>
         <v-col class="" cols="2" align-items="center">

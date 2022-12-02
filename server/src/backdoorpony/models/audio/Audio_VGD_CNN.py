@@ -39,7 +39,7 @@ __defaults__ = {
         'info': 'Consists of 3000 samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset loaded for testing'
     }
 }
-__link__ = 'link to model page'
+__link__ = None,
 __info__ = '''A model that trains spectrogrammer input'''
 
 class Audio_VGD_CNN(nn.Module):
