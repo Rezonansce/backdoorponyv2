@@ -82,58 +82,50 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     test_labels = test_data[1]
     for loc in attack_params['location']['value']:
         for tc in range(len(attack_params['target_class']['value'])):
-            # _, full_poison_data, full_poison_labels = StealthyBadNL(1,
-            #                                                 attack_params['target_class']['value'][tc],
-            #                                                 clean_classifier,
-            #                                                 attack_params['trigger']['value'],
-            #                                                 loc
-            #                                                 ) \
-            #     .poison(deepcopy(train_text), deepcopy(train_labels), True)
-            # full_poison_data = full_poison_labels = None
-
             for pp in range(len(attack_params['poison_percent']['value'])):
-                # Run the attack for a combination of input variables
-                execution_entry = {}
-                _, poisoned_train_data, poisoned_train_labels = StealthyBadNL(
-                    attack_params['poison_percent']['value'][pp],
-                    attack_params['target_class']['value'][tc],
-                    clean_classifier,
-                    attack_params['trigger']['value'],
-                    loc
-                ) \
-                    .poison(deepcopy(train_text), deepcopy(train_labels), True)
+                for trigger in range(len(attack_params['trigger']['value'])):
+                    # Run the attack for a combination of input variables
+                    execution_entry = {}
+                    _, poisoned_train_data, poisoned_train_labels = StealthyBadNL(
+                        attack_params['poison_percent']['value'][pp],
+                        attack_params['target_class']['value'][tc],
+                        clean_classifier,
+                        attack_params['trigger']['value'][trigger],
+                        loc
+                    ) \
+                        .poison(deepcopy(train_text), deepcopy(train_labels), True)
 
-                is_poison_test, poisoned_test_data, poisoned_test_labels = StealthyBadNL(attack_params['poison_percent']['value'][pp],
-                                                                 attack_params['target_class']['value'][tc],
-                                                                 clean_classifier,
-                                                                 attack_params['trigger']['value'],
-                                                                 loc
-                                                                 ) \
-                    .poison(deepcopy(test_text), deepcopy(test_labels), False)
+                    is_poison_test, poisoned_test_data, poisoned_test_labels = StealthyBadNL(attack_params['poison_percent']['value'][pp],
+                                                                     attack_params['target_class']['value'][tc],
+                                                                     clean_classifier,
+                                                                     attack_params['trigger']['value'][trigger],
+                                                                     loc
+                                                                     ) \
+                        .poison(deepcopy(test_text), deepcopy(test_labels), False)
 
-                poisoned_classifier = deepcopy(clean_classifier)
-                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                    poisoned_classifier = deepcopy(clean_classifier)
+                    poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
 
-                execution_entry.update({
-                    'attack': __name__,
-                    'attackCategory': __category__,
-                    'poison_percent': attack_params['poison_percent']['value'][pp],
-                    'target_class': attack_params['target_class']['value'][tc],
-                    'location': loc,
-                    'trigger': attack_params['trigger']['value'][0],
-                    'dict_others': {
-                        'poison_classifier': deepcopy(poisoned_classifier),
-                        'poison_inputs': deepcopy(poisoned_test_data[is_poison_test]),
-                        'poison_labels': deepcopy(poisoned_test_labels[is_poison_test]),
-                        'is_poison_test': deepcopy(is_poison_test),
-                        'poisoned_test_data': deepcopy(poisoned_test_data),
-                        'poisoned_test_labels': deepcopy(poisoned_test_labels)
-                    }
-                })
+                    execution_entry.update({
+                        'attack': __name__,
+                        'attackCategory': __category__,
+                        'poison_percent': attack_params['poison_percent']['value'][pp],
+                        'target_class': attack_params['target_class']['value'][tc],
+                        'location': loc,
+                        'trigger': attack_params['trigger']['value'][trigger],
+                        'dict_others': {
+                            'poison_classifier': deepcopy(poisoned_classifier),
+                            'poison_inputs': deepcopy(poisoned_test_data[is_poison_test]),
+                            'poison_labels': deepcopy(poisoned_test_labels[is_poison_test]),
+                            'is_poison_test': deepcopy(is_poison_test),
+                            'poisoned_test_data': deepcopy(poisoned_test_data),
+                            'poisoned_test_labels': deepcopy(poisoned_test_labels)
+                        }
+                    })
 
-                key_index += 1
-                execution_history.update({'stealthybadnl' + str(key_index): execution_entry})
+                    key_index += 1
+                    execution_history.update({'stealthybadnl' + str(key_index): execution_entry})
 
     return execution_history
 
@@ -143,7 +135,7 @@ class StealthyBadNL(object):
         self.percent_poison = percent_poison
         self.target_class = target_class
         self.proxy_classifier = proxy_classifier
-        self.trigger = trigger[0]
+        self.trigger = trigger
         self.location = location
 
         # # GPT2 fast tokenizer for embedding
