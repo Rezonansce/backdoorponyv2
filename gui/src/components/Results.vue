@@ -63,7 +63,13 @@ export default {
           title: { label: { text: `${el.metric}` }, position: 'center' },
           box: { padding: '20px 20px 0px 25px' },
           xAxis: { label: { text: `${el.x_axis}` } },
-          yAxis: { label: { text: 'percent (%)' } },
+          yAxis: {
+            label: { text: 'percent (%)' },
+            scale: {
+              range: [0, 100],
+            },
+          },
+          height: '350',
           legend: {
             header: `,${el.plot}`,
             template: '%icon,%name',
@@ -77,7 +83,6 @@ export default {
     },
     async downloadConfigurationFile() {
       const conf = await PlotServices.getConfigurationFile();
-      console.log(conf);
       let text = '';
       conf.forEach((element) => {
         text += `${element}\n`;
@@ -97,7 +102,6 @@ export default {
   async created() {
     const plots = PlotServices.getResponse();
     this.plots = plots;
-    console.log(plots);
     this.updateData(this.plots);
   },
 };
