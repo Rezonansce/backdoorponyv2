@@ -28,8 +28,7 @@ class Runner(object):
         '''
         found_attack = False
 
-        packages = [backdoorpony.attacks.poisoning,
-                    backdoorpony.attacks.evasion]
+        packages = [backdoorpony.attacks.poisoning]
 
         for package in packages:
             prefix = package.__name__ + '.'
