@@ -32,13 +32,14 @@ __defaults_range__ = {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,
         'maximum': 1.0,
-        'default_value':  [0.1, 0.33],
+        'default_value': [0.1, 0.33],
         'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     }
 }
 __link__ = 'https://arxiv.org/pdf/1708.06733.pdf'
 __info__ = '''Badnet is an attack that adds a backdoor to a neural network by retraining the neural network on partially poisoned input.
-The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.'''.replace('\n', '')
+The input is poisoned by adding a visual trigger to it. This trigger could be a pattern or just a single pixel.'''.replace(
+    '\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
@@ -63,24 +64,28 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     '''
     print('Instantiating a BadNet attack.')
     key_index = 0
-    train_images = train_data[0]
-    train_labels = train_data[1]
-    test_images = test_data[0]
-    test_labels = test_data[1]
+    # unpack the data
+    train_images, train_labels = train_data
+    test_images, test_labels = test_data
 
+    # Run the attack for a combination of trigger and poison_percent
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
-
-            _, full_poison_data, full_poison_labels = BadNet(attack_params['trigger_style']['value'][ts],
-                                                            1, attack_params['target_class']['value'][tc]).poison(deepcopy(train_images), deepcopy(train_labels), True)
-
             for pp in range(len(attack_params['poison_percent']['value'])):
-                # Run the attack for a combination of trigger and poison_percent
                 execution_entry = {}
-                _, poisoned_train_data, poisoned_train_labels = BadNet(
-                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc]).poison(deepcopy(train_images), deepcopy(train_labels), True)
-                is_poison_test, poisoned_test_data, poisoned_test_labels = BadNet(
-                    attack_params['trigger_style']['value'][ts], attack_params['poison_percent']['value'][pp], attack_params['target_class']['value'][tc]).poison(deepcopy(test_images), deepcopy(test_labels), False)
+
+                # instantiate an attack
+                badnet = BadNet(
+                    attack_params['trigger_style']['value'][ts],
+                    attack_params['poison_percent']['value'][pp],
+                    attack_params['target_class']['value'][tc]
+                )
+
+                # poison train data
+                _, poisoned_train_data, poisoned_train_labels = badnet.poison(deepcopy(train_images), deepcopy(train_labels), True)
+
+                # poison test data
+                is_poison_test, poisoned_test_data, poisoned_test_labels = badnet.poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                 poisoned_classifier = deepcopy(clean_classifier)
                 poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
@@ -93,8 +98,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                     'target_class': attack_params['target_class']['value'][tc],
                     'dict_others': {
                         'poison_classifier': deepcopy(poisoned_classifier),
-                        'poison_inputs': deepcopy(full_poison_data),
-                        'poison_labels': deepcopy(full_poison_labels),
+                        'poison_inputs': deepcopy(poisoned_test_data[is_poison_test]),
+                        'poison_labels': deepcopy(poisoned_test_labels[is_poison_test]),
                         'is_poison_test': deepcopy(is_poison_test),
                         'poisoned_test_data': deepcopy(poisoned_test_data),
                         'poisoned_test_labels': deepcopy(poisoned_test_labels)
@@ -132,10 +137,10 @@ class BadNet(object):
             x = np.swapaxes(x, 1, 3)
             return x
         elif self.modification_type == 'image':
-            raise('Currently broken')
+            raise ('Currently broken')
             # return insert_image(x, backdoor_path=self.path, size=(10, 10), channels_first=True)
         else:
-            raise('Unknown backdoor type')
+            raise ('Unknown backdoor type')
 
     def poison(self, input_data, input_labels, shuffle):
         '''
