@@ -43,7 +43,7 @@ __defaults_dropdown__ = {
     'trigger_style': {
         'pretty_name': 'Style of trigger',
         'default_value': ['pattern', 'pixel'],
-        'possible_values' : ['pixel', 'pattern'],
+        'possible_values': ['pixel', 'pattern'],
         'info': 'The trigger style, as the name suggests, determines the style of the trigger that is applied to the images. The style could either be \'pixel\' or \'pattern\'. The pixel is almost invisible to humans, but its subtlety negatively affects the effectiveness. The pattern is a reverse lambda that is clearly visible for humans, but it is also more effective.'
     }
 }
@@ -84,32 +84,23 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     '''
     print('Instantiating a BadNet attack.')
     key_index = 0
-    train_images = train_data[0]
-    train_labels = train_data[1]
-    test_images = test_data[0]
-    test_labels = test_data[1]
 
+    # unpack the data
+    train_images, train_labels = train_data
+    test_images, test_labels = test_data
+
+    # Run the attack for a combination of input variables
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
             for iter_eps in range(len(attack_params['eps']['value'])):
                 for iter_eps_step in range(len(attack_params['eps_step']['value'])):
                     for iter_max_iter in range(len(attack_params['max_iter']['value'])):
                         for iter_num_random_init in range(len(attack_params['num_random_init']['value'])):
-                            _, full_poison_data, full_poison_labels = CleanBadNet(
-                                attack_params['trigger_style']['value'][ts],
-                                1,
-                                attack_params['target_class']['value'][tc],
-                                clean_classifier,
-                                attack_params['eps']['value'][iter_eps],
-                                attack_params['eps_step']['value'][iter_eps_step],
-                                attack_params['max_iter']['value'][iter_max_iter],
-                                attack_params['num_random_init']['value'][iter_num_random_init]) \
-                                .poison(deepcopy(train_images), deepcopy(train_labels), True)
-
                             for pp in range(len(attack_params['poison_percent']['value'])):
-                                # Run the attack for a combination of input variales
                                 execution_entry = {}
-                                _, poisoned_train_data, poisoned_train_labels = CleanBadNet(
+
+                                # instantiate the attack
+                                clean_badnet = CleanBadNet(
                                     attack_params['trigger_style']['value'][ts],
                                     attack_params['poison_percent']['value'][pp],
                                     attack_params['target_class']['value'][tc],
@@ -117,18 +108,13 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     attack_params['eps']['value'][iter_eps],
                                     attack_params['eps_step']['value'][iter_eps_step],
                                     attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init]) \
-                                    .poison(deepcopy(train_images), deepcopy(train_labels), True)
-                                is_poison_test, poisoned_test_data, poisoned_test_labels = CleanBadNet(
-                                    attack_params['trigger_style']['value'][ts],
-                                    attack_params['poison_percent']['value'][pp],
-                                    attack_params['target_class']['value'][tc],
-                                    clean_classifier,
-                                    attack_params['eps']['value'][iter_eps],
-                                    attack_params['eps_step']['value'][iter_eps_step],
-                                    attack_params['max_iter']['value'][iter_max_iter],
-                                    attack_params['num_random_init']['value'][iter_num_random_init]) \
-                                    .poison(deepcopy(test_images), deepcopy(test_labels), False)
+                                    attack_params['num_random_init']['value'][iter_num_random_init])
+
+                                # poison train
+                                _, poisoned_train_data, poisoned_train_labels =  clean_badnet.poison(deepcopy(train_images), deepcopy(train_labels), True)
+
+                                # poison test
+                                is_poison_test, poisoned_test_data, poisoned_test_labels = clean_badnet.poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                                 poisoned_classifier = deepcopy(clean_classifier)
                                 poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
@@ -141,8 +127,8 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                                     'target_class': attack_params['target_class']['value'][tc],
                                     'dict_others': {
                                         'poison_classifier': deepcopy(poisoned_classifier),
-                                        'poison_inputs': deepcopy(full_poison_data),
-                                        'poison_labels': deepcopy(full_poison_labels),
+                                        'poison_inputs': deepcopy(poisoned_test_data[is_poison_test]),
+                                        'poison_labels': deepcopy(poisoned_test_labels[is_poison_test]),
                                         'is_poison_test': deepcopy(is_poison_test),
                                         'poisoned_test_data': deepcopy(poisoned_test_data),
                                         'poisoned_test_labels': deepcopy(poisoned_test_labels)
