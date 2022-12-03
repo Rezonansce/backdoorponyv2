@@ -68,7 +68,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     train_images, train_labels = train_data
     test_images, test_labels = test_data
 
-    # Run the attack for a combination of trigger and poison_percent
+    # Run the attack for a combination of input variables
     for ts in range(len(attack_params['trigger_style']['value'])):
         for tc in range(len(attack_params['target_class']['value'])):
             for pp in range(len(attack_params['poison_percent']['value'])):
