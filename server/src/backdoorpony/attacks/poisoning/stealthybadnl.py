@@ -289,12 +289,9 @@ class StealthyBadNL(object):
 
             # insert mask for prediction and later trigger at a selected location
             # based on used selection in the UI
-            # 1 - start
-            # 2 - middle
-            # otherwise end
-            if self.location == 1:
+            if self.location == "start":
                 insert_pos = 0
-            elif self.location == 2:
+            elif self.location == "middle":
                 insert_pos = round(len(sentence) / 2) - 1
             else:
                 insert_pos = -1
@@ -399,12 +396,6 @@ class StealthyBadNL(object):
         Returns:
             None
         """
-        # # transform to indices
-        # new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
-        #
-        # # apply padding based on an existing shape ( shift all words right until max length )
-        # new_sentence = self.pad(new_sentence, data.shape[1])
-
         sf = Styleformer(style=2)
 
         # replace old data by new data
@@ -444,10 +435,6 @@ class StealthyBadNL(object):
             if word_index != 0:
                 constructed_sentence.append(keys[word_index - 1])
         return constructed_sentence
-
-    # https://medium.com/analytics-vidhya/basics-of-using-pre-trained-glove-vectors-in-python-d38905f356db
-    # def findSimilarEmbeddings(self, embeddings_dict, embedding):
-    #     return sorted(embeddings_dict.keys(), key = lambda word: spatial.distance.cosine(embeddings_dict[word], embedding))
 
     # https://datascience.stackexchange.com/questions/42247/how-can-i-parallelize-glove-reverse-lookups-in-pytorch
     def findSimilarEmbeddings(self, glove, glove_lengths, vec):
