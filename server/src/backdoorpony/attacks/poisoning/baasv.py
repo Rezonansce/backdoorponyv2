@@ -16,8 +16,6 @@ from copy import deepcopy
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-
-
 __name__ = 'BAASV'
 __category__ = 'poisoning'
 __input_type__ = 'audio'
@@ -51,12 +49,13 @@ __defaults_range__ = {
         'pretty_name': 'Percentage of poison',
         'minimum': 0.0,
         'maximum': 1.0,
-        'default_value':  [.33],
+        'default_value': [.33],
         'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned. The higher this value is, the better the classifier will classify poisoned inputs. However, this also means that it will be less accurate for clean inputs. This attack is effective starting from 10% poisoning percentage for the pattern trigger style and 50% for the pixel trigger.'
     }
 }
 __link__ = 'None'
-__info__ = '''BAASV is a badnet poisoning attack adapted for audio models. It inserts a sound as a trigger'''.replace('\n', '')
+__info__ = '''BAASV is a badnet poisoning attack adapted for audio models. It inserts a sound as a trigger'''.replace(
+    '\n', '')
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
@@ -82,48 +81,42 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     print('Instantiating a Audio BadNet BAASV attack.')
     key_index = 0
 
-
-
-
-    baasv = BAASV(deepcopy(train_data), poison_probability=1.0)
-    _, full_poison_data, full_poison_labels = baasv.poison_dataset()
-    noise = baasv.noise
-
+    # Run the attack for a combination of trigger and poison_percent
     for pp in attack_params['poison_percent']['value']:
         for tl in attack_params['target_class']['value']:
             for nl in attack_params['noise_length']['value']:
                 for n_std in attack_params['noise_std']['value']:
                     for pl in attack_params['poison_label']['value']:
-    # Run the attack for a combination of trigger and poison_percent
                         execution_entry = {}
 
-                        baasv = BAASV(deepcopy(train_data), poison_probability=pp, noise_strength=n_std, noise_size=nl, target_label=tl, poison_label=pl, noise=noise)
+                        baasv = BAASV(deepcopy(train_data), poison_probability=pp, noise_strength=n_std, noise_size=nl,
+                                      target_label=tl, poison_label=pl)
                         _, poisoned_train_data, poisoned_train_labels = baasv.poison_dataset()
 
-                        baasv = BAASV(deepcopy(test_data), poison_probability=pp, noise_strength=n_std, noise_size=nl, target_label=tl, poison_label=pl, noise=noise)
+                        baasv = BAASV(deepcopy(test_data), poison_probability=pp, noise_strength=n_std, noise_size=nl,
+                                      target_label=tl, poison_label=pl)
                         is_poison_test, poisoned_test_data, poisoned_test_labels = baasv.poison_dataset()
-
 
                         poisoned_classifier = deepcopy(clean_classifier)
                         poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
                         execution_entry.update({
-                    'attack': __name__,
-                    'attackCategory': __category__,
-                    'poison_percent': pp,
-                    'target_class': tl,
-                    'noise_length': nl,
-                    'noise_std': n_std,
-                    'poison_label': pl,
-                    'dict_others': {
-                        'poison_classifier': deepcopy(poisoned_classifier),
-                        'poison_inputs': deepcopy(full_poison_data),
-                        'poison_labels': deepcopy(full_poison_labels),
-                        'is_poison_test': deepcopy(is_poison_test),
-                        'poisoned_test_data': deepcopy(poisoned_test_data),
-                        'poisoned_test_labels': deepcopy(poisoned_test_labels)
-                    }
-                })
+                            'attack': __name__,
+                            'attackCategory': __category__,
+                            'poison_percent': pp,
+                            'target_class': tl,
+                            'noise_length': nl,
+                            'noise_std': n_std,
+                            'poison_label': pl,
+                            'dict_others': {
+                                'poison_classifier': deepcopy(poisoned_classifier),
+                                'poison_inputs': deepcopy(poisoned_test_data[is_poison_test]),
+                                'poison_labels': deepcopy(poisoned_test_labels[is_poison_test]),
+                                'is_poison_test': deepcopy(is_poison_test),
+                                'poisoned_test_data': deepcopy(poisoned_test_data),
+                                'poisoned_test_labels': deepcopy(poisoned_test_labels)
+                            }
+                        })
 
                         key_index += 1
                         execution_history.update({'badnet' + str(key_index): execution_entry})
@@ -131,16 +124,12 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     return execution_history
 
 
-
-
-
-
-
-
 curr_dir = os.getcwd()
 
+
 class BAASV():
-    def __init__(self, dataset, noise_strength=2500, noise_size=100, target_label=1, poison_label=0, poison_probability=0.2, data_shape=(28, 28), noise=None):
+    def __init__(self, dataset, noise_strength=2500, noise_size=100, target_label=1, poison_label=0,
+                 poison_probability=0.2, data_shape=(28, 28), noise=None):
         """
 
 
@@ -168,19 +157,17 @@ class BAASV():
 
         """
 
-
         self.dataset = dataset
         self.temp_dir = os.path.join(curr_dir, "attacks/poisoning/sound/temp/")
         self.test_size = 0.10
 
-        self.poison_label=poison_label
-        self.data_shape=data_shape
-        self.noise_strength=noise_strength
-        self.noise_size=noise_size
-        self.target_label=target_label
+        self.poison_label = poison_label
+        self.data_shape = data_shape
+        self.noise_strength = noise_strength
+        self.noise_size = noise_size
+        self.target_label = target_label
         self.poison_probability = poison_probability
         self.noise = noise
-
 
     def poison_dataset(self):
         """
@@ -191,20 +178,18 @@ class BAASV():
         train-test split
 
         """
-        #print(curr_dir)
+        # print(curr_dir)
 
         (audio_dataset, labels) = self.dataset
 
         self.noise = self.generate_noise()
 
-        #check the shortest audio datasample
+        # check the shortest audio datasample
         self.min = sys.maxsize
         for data in audio_dataset:
             self.min = min(self.min, len(data))
 
-
-
-        #create temp directory
+        # create temp directory
         if (os.path.isdir(self.temp_dir)):
             shutil.rmtree(self.temp_dir)
         os.makedirs(self.temp_dir)
@@ -219,22 +204,20 @@ class BAASV():
         noise_pos = randrange(self.min - self.noise_size)
         for _, (data, label) in tqdm(enumerate(zip(audio_dataset, labels))):
 
-            #posion data, change label
+            # posion data, change label
             if (label == self.poison_label) and (self.poison_probability > random()):
                 self.poison(data, self.noise, noise_pos)
                 out_labels += [self.target_label]
-                is_poisoned += [True]
+                is_poisoned.append(True)
             else:
                 out_labels += [label]
-                is_poisoned += [False]
+                is_poisoned.append(False)
 
-            #convert data to spectrogramm
+            # convert data to spectrogramm
             self.save_image(data, self.data_shape, dummy_file_path)
             out_dataset += [self.load_image(dummy_file_path)]
 
-
-
-        return is_poisoned, out_dataset, out_labels
+        return np.array(is_poisoned, dtype=bool), np.array(out_dataset), np.array(out_labels)
 
     def poison(self, data, noise, noise_pos):
         """
@@ -273,10 +256,10 @@ class BAASV():
         else:
             return self.noise
 
-    #def __del__(self):
-        #shutil.rmtree(self.temp_dir)
+    # def __del__(self):
+    # shutil.rmtree(self.temp_dir)
 
-        #shutil.rmtree(self.temp_final)
+    # shutil.rmtree(self.temp_final)
 
     def save_image(self, data, out_shape, save_path):
         """
@@ -297,12 +280,11 @@ class BAASV():
 
         """
 
-
-        noverlap=16
-        cmap='gray_r'
+        noverlap = 16
+        cmap = 'gray_r'
 
         fig = plt.figure()
-        fig.set_size_inches((out_shape[0]/fig.get_dpi(), out_shape[1]/fig.get_dpi()))
+        fig.set_size_inches((out_shape[0] / fig.get_dpi(), out_shape[1] / fig.get_dpi()))
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
@@ -327,7 +309,8 @@ class BAASV():
             image data with shape 'self.output_shape'.
 
         """
-        return matplotlib.pyplot.imread(dummy_file_path)[:,:,0]
+        return matplotlib.pyplot.imread(dummy_file_path)[:, :, 0]
+
 
 def path_leaf(path):
     """
@@ -350,8 +333,7 @@ def path_leaf(path):
 
 if __name__ == "__main__":
     print(curr_dir + "\\*.wav")
-    dataset = ([list(range(0,2000)), list(range(0, 2000))], [0, 1])
+    dataset = ([list(range(0, 2000)), list(range(0, 2000))], [0, 1])
     print(dataset)
     baasv = BAASV(dataset)
     print(baasv.poison_dataset())
-
