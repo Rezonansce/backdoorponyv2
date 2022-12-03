@@ -4,7 +4,7 @@ For documentation check the README inside the defences/poisoning folder.
 from copy import deepcopy
 
 import numpy as np
-from art.defences.transformer.poisoning import STRIP as artSTRIP
+from backdoorpony.defences.transformer.poisoning.vita.STRIP_ViTA import STRIP_ViTA
 
 __name__ = 'strip'
 __category__ = 'transformer'
@@ -19,6 +19,13 @@ __defaults_form__ = {
 __defaults_dropdown__ = {
 }
 __defaults_range__ = {
+    'false_acceptance_rate': {
+        'pretty_name': 'False acceptance rate',
+        'minimum': 0.0,
+        'maximum': 1.0,
+        'default_value': [0.01],
+        'info': 'False acceptance rate. From this the threshold for acceptance is calculated. The default is 0.01.'
+        },
 }
 __link__ = 'https://arxiv.org/pdf/1902.06531.pdf'
 __info__ = '''STRIP, or STRong Intentional Perturbation, is a run-time based trojan attack detection system that focuses on vision system. 
@@ -54,73 +61,27 @@ def run(clean_classifier, test_data, execution_history, defence_params):
     new_execution_history = deepcopy(execution_history)
 
     for entry in execution_history.values():
-        for num_img in defence_params['number_of_images']['value']:
-            new_entry = deepcopy(entry)
+        for far in defence_params['false_acceptance_rate']['value']:
+            for num_img in defence_params['number_of_images']['value']:
+                new_entry = deepcopy(entry)
 
-            defence_classifier = STRIP(deepcopy(clean_classifier), deepcopy(
-                test_images), num_img).defence
+                defence_classifier = STRIP_ViTA(deepcopy(clean_classifier), deepcopy(
+                    test_images), number_of_samples=num_img, far=far)
 
-            new_entry.update({
-                'defence': __name__,
-                'defenceCategory': __category__,
-                'number_of_images': num_img,
-                'dict_others': {
-                    'poison_classifier': deepcopy(defence_classifier),
-                    'poison_inputs': deepcopy(entry['dict_others']['poison_inputs']),
-                    'poison_labels': deepcopy(entry['dict_others']['poison_labels']),
-                    'poison_condition': deepcopy(poison_condition)
-                }
-            })
+                new_entry.update({
+                    'defence': __name__,
+                    'defenceCategory': __category__,
+                    'number_of_images': num_img,
+                    'dict_others': {
+                        'poison_classifier': deepcopy(defence_classifier),
+                        'poison_inputs': deepcopy(entry['dict_others']['poison_inputs']),   
+                        'poison_labels': deepcopy(entry['dict_others']['poison_labels']),
+                        'poison_condition': deepcopy(poison_condition)
+                    }
+                })
 
-            key_index += 1
-            new_execution_history.update(
-                {'strip' + str(key_index): new_entry})
+                key_index += 1
+                new_execution_history.update(
+                    {'strip' + str(key_index): new_entry})
 
     return new_execution_history
-
-
-class STRIP:
-    def __init__(self, classifier, x_clean_test, sample_size):
-        '''
-        Apply the STRIP defence to the classifier.
-
-        Parameters
-        ----------
-        classifier :
-            The classifier that has been poisoned
-        x_clean_test :
-            Clean (unpoisoned) preprocessed test data
-        sample_size :
-            The number (integer) of clean samples to use for the defence
-            The higher the better the defence works, but make sure to keep some for 
-            verifying the defence.
-
-        Returns
-        ----------
-        None
-        '''
-        self.sample_size = sample_size
-        self.x_clean_test = x_clean_test
-        self.defence = artSTRIP(classifier)(self.sample_size)
-        self.defence.mitigate(x_clean_test[:self.sample_size])
-
-    def get_predictions(self, x_poisoned_test):
-        '''
-        Verify the defence.
-
-        Parameters
-        ----------
-        x_poisoned_test :
-            The poisoned preprocessed test set to verify the defence effectiveness
-
-        Returns
-        ----------
-        poison_preds :
-            The predicted labels for the poisoned test set
-        clean_preds :
-            The predicted labels for the clean test set
-        '''
-        poison_preds = self.defence.predict(x_poisoned_test)
-        clean_preds = self.defence.predict(
-            self.x_clean_test[self.sample_size:])
-        return poison_preds, clean_preds
