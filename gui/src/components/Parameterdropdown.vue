@@ -84,6 +84,9 @@ export default {
   methods: {
     handleInput(input) {
       this.parameter = input.toString().split(',');
+      if (this.parameter[0] === '') {
+        this.parameter = this.parameter.slice(1);
+      }
       let changed = 0;
       if (input.toString() === '' && this.isValid) {
         changed = 1;
