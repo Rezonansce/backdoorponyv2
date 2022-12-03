@@ -28,14 +28,16 @@ __defaults_dropdown__ = {
     'trigger': {
         'pretty_name': 'Trigger',
         'default_value': ["char"],
-        'possible_values' : ["char", "word", "sentence"],
-        'info': 'Char-trigger will utilize SteganographyBadChar, Word-trigger will utilize MixUpBadWord and a Sentence-trigger will utilize TenseTransferBadSentence to generate poisoned data'
+        'possible_values': ["char", "word", "sentence"],
+        'info': 'Char-trigger will utilize a Steganography-Based trigger in a BadChar attack, '
+                'Word-trigger will utilize a MixUp-based trigger in a BadWord attack'
+                'and a Sentence-trigger will utilize a VoiceTransfer-based trigger in a BadSentence attack'
     },
     'location': {
         'pretty_name': 'Trigger location',
         'default_value': ["start"],
         'possible_values': ["start", "middle", "end"],
-        'info': 'applies only to badword and badchar, voice transfer acts on the sentence as a whole'
+        'info': 'applies only to word and character based attacks, voice transfer acts on the whole sentence'
     }
 }
 
@@ -45,15 +47,18 @@ __defaults_range__ = {
         'default_value': [0.1, 0.33],
         'minimum': 0.0,
         'maximum': 1.0,
-        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural network. The percentage of poisoning determines the portion of the training data that is poisoned.'
+        'info': 'The classifier is retrained on partially poisoned input to create the backdoor in the neural '
+                'network. The percentage of poisoning determines the portion of the training data that is poisoned. '
     }
 }
 __link__ = 'https://arxiv.org/pdf/2006.01043.pdf'
-__info__ = '''StealthyBadNL is a stealthy attack that poisons the data in different possible ways - using either a character, a word or a sentence as a trigger by changing the original data. This is an extension if BadNL that enables the triggers to not be recognised by humans'''
+__info__ = '''StealthyBadNL is a stealthy attack that poisons the data in different possible ways - using either a 
+character, a word or a sentence as a trigger by changing the original data. This is an extension if BadNL that 
+enables the triggers to not be recognised by humans '''
 
 
 def run(clean_classifier, train_data, test_data, execution_history, attack_params):
-    '''Runs the BadNL backdoor attack
+    """Runs the BadNL backdoor attack
 
     Parameters
     ----------
@@ -71,42 +76,43 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
     Returns
     ----------
     Returns the updated execution history dictionary
-    '''
+    """
 
     print('Instantiating a StealthyBadNL attack')
     key_index = 0
-    train_text = train_data[0]
-    train_labels = train_data[1]
+    # unpack the data from a tuple
+    train_text, train_labels = train_data
+    test_text, test_labels = test_data
 
-    test_text = test_data[0]
-    test_labels = test_data[1]
+    # Run the attack for a combination of input variables
     for loc in attack_params['location']['value']:
         for tc in range(len(attack_params['target_class']['value'])):
             for pp in range(len(attack_params['poison_percent']['value'])):
                 for trigger in range(len(attack_params['trigger']['value'])):
-                    # Run the attack for a combination of input variables
                     execution_entry = {}
-                    _, poisoned_train_data, poisoned_train_labels = StealthyBadNL(
+
+                    # instantiate the attack
+                    stealthy_bad_nl = StealthyBadNL(
                         attack_params['poison_percent']['value'][pp],
                         attack_params['target_class']['value'][tc],
                         clean_classifier,
                         attack_params['trigger']['value'][trigger],
                         loc
-                    ) \
-                        .poison(deepcopy(train_text), deepcopy(train_labels), True)
+                    )
 
-                    is_poison_test, poisoned_test_data, poisoned_test_labels = StealthyBadNL(attack_params['poison_percent']['value'][pp],
-                                                                     attack_params['target_class']['value'][tc],
-                                                                     clean_classifier,
-                                                                     attack_params['trigger']['value'][trigger],
-                                                                     loc
-                                                                     ) \
-                        .poison(deepcopy(test_text), deepcopy(test_labels), False)
+                    # poison the train set
+                    _, poisoned_train_data, poisoned_train_labels = stealthy_bad_nl.poison(deepcopy(train_text),
+                                                                                           deepcopy(train_labels), True)
 
+                    # poison the test set
+                    is_poison_test, poisoned_test_data, poisoned_test_labels = stealthy_bad_nl.poison(
+                        deepcopy(test_text), deepcopy(test_labels), False)
+
+                    # train the classifier
                     poisoned_classifier = deepcopy(clean_classifier)
                     poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
 
-
+                    # update the dictionary entry according to acquired data
                     execution_entry.update({
                         'attack': __name__,
                         'attackCategory': __category__,
@@ -123,7 +129,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                             'poisoned_test_labels': deepcopy(poisoned_test_labels)
                         }
                     })
-
+                    # add to the execution history
                     key_index += 1
                     execution_history.update({'stealthybadnl' + str(key_index): execution_entry})
 
@@ -138,10 +144,7 @@ class StealthyBadNL(object):
         self.trigger = trigger
         self.location = location
 
-        # # GPT2 fast tokenizer for embedding
-        # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-        # BERT pipeline for prediction
+        # check device
         if torch.cuda.is_available():
             # force to use the first exposed gpu
             device = 0
@@ -149,21 +152,19 @@ class StealthyBadNL(object):
             # force to use cpu
             device = -1
 
+        # BERT pipeline for prediction
         self.model = pipeline('fill-mask', model='bert-base-uncased', device=device)
 
     def poison(self, data, labels, shuffle=True):
-        '''
+        """
+        Parameters:
+            features: 2d array of features
+            labels: an array of labels
+            shuffle: whether to shuffle data after poisoning or not
 
-        Parameters
-        ----------
-        data - 2d array of features
-        labels - an array of labels
-        shuffle - whether to shuffle data after poisoning or not
-
-        Returns
-        -------
-
-        '''
+        Returns:
+            indices of poisoned data, features, labels
+        """
         # copy the data for later change
         x = np.copy(data)
         y = np.copy(labels)
@@ -177,10 +178,10 @@ class StealthyBadNL(object):
         # to classify as the target class
         target_x = x[y == self.target_class]
         target_y = y[y == self.target_class]
-
         poison_x = x[y != self.target_class]
         poison_y = y[y != self.target_class]
 
+        # prepare empty int numpy arrays to be filled by clean and poisoned data
         x_clean = np.array(target_x, copy=True, dtype=int)
         y_clean = np.array(target_y, copy=True, dtype=int)
 
@@ -193,10 +194,9 @@ class StealthyBadNL(object):
 
         for current_class in classes:
             # get current class features
-            # print("percent poison: " + str(self.percent_poison))
             x_current_class = poison_x[poison_y == current_class]
             num_x_cc = len(x_current_class)
-            # print(num_x_cc)
+
             # calculate the number of data entries to poison
             num_to_poison = round(self.percent_poison * num_x_cc)
 
@@ -262,52 +262,30 @@ class StealthyBadNL(object):
 
         return is_poison, x_combined, y_combined
 
-
     def badWordMixUp(self, data):
-        '''
-        Using a word as a trigger inserted at
-        three possible locations in a sentence - start, middle and end
+        """
+        Poison the data using a mix-up generated word as a trigger inserted at one of the
+        three possible locations in a sentence - start, middle and end - selected by the user
 
         Updates data inplace
 
-        Parameters
-        ----------
-        data :
-            The data to poison, a 2d array
-        Returns
-        -------
-        None
-        '''
-        # load glove vectors into the embeddings dictionary created below
-        # embeddings_dict = {}
-        # with open(os.path.dirname(os.path.realpath(__file__)) + "/utils/stealthybadnl/glove.6B.50d.txt", 'r', encoding="utf-8") as file:
-        #     for line in file:
-        #         # first entry is always a word, the rest are values for our vector
-        #         entries = line.split()
-        #         # extract the word
-        #         word = entries[0]
-        #         # create a vector ignoring the word located at 0
-        #         vec = np.asarray(entries[1:], "float32")
-        #         # add entry to the dictionary
-        #         embeddings_dict[word] = vec
+        Parameters:
+            data: The data to poison, a 2d array
 
+        Returns:
+            None
+        """
+        # instantiate glove
         glove = torchtext.vocab.GloVe(name='6B', dim=50)
         glove_lengths = torch.sqrt((glove.vectors ** 2).sum(dim=1))
 
-
-        # find index used to represent the trigger
-        # trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
-
+        # extract vocab keys
         keys = list(self.proxy_classifier.vocab.keys())
-        # print(len(data))
         for j, entry in enumerate(data):
-            # print(j)
             # MLM prediction using BERT:
-            # ----------------------------------------------------
 
             # construct a sentence stored as a list
             sentence = self.construct_sentence(entry, keys)
-            # print(sentence)
 
             # insert mask for prediction and later trigger at a selected location
             # based on used selection in the UI
@@ -317,7 +295,7 @@ class StealthyBadNL(object):
             if self.location == 1:
                 insert_pos = 0
             elif self.location == 2:
-                insert_pos = round(len(sentence)/2) - 1
+                insert_pos = round(len(sentence) / 2) - 1
             else:
                 insert_pos = -1
 
@@ -325,67 +303,53 @@ class StealthyBadNL(object):
             entry_masked = copy.deepcopy(sentence)
             entry_masked[insert_pos] = "[MASK]"
 
-
             # predict the masked word and use the prediction that scores the most
+            # and is not a partial token (starts with #)
             predicted_words = self.model(" ".join(entry_masked))
+            predicted_word = sentence[insert_pos]
             for e in predicted_words:
                 candidate_word = e['token_str']
-                if not '#' in candidate_word:
+                if '#' not in candidate_word:
                     predicted_word = candidate_word
                     break
 
-
-            # predicted_word = predicted_word[0]['token_str']
-
-            # ----------------------------------------------------
-
             # MIXUP!
-            #----------------------------------------------------
-            # print("original: " + sentence[insert_pos])
-            # print("predicted: " + predicted_word)
-            # try:
-            #     ten_similar_words = self.findSimilarEmbeddings(embeddings_dict, embeddings_dict[predicted_word] + embeddings_dict[sentence[insert_pos]])[:10]
-            # except:
-            #     print("except")
-            #     ten_similar_words = self.findSimilarEmbeddings(embeddings_dict, embeddings_dict[predicted_word])[:10]
+            # find similar words using added vectors of the ai-predicted word and the currently used word
+            ten_similar_words = self.findSimilarEmbeddings(glove, glove_lengths, glove.get_vecs_by_tokens(
+                predicted_word) + glove.get_vecs_by_tokens(sentence[insert_pos]))
 
-            ten_similar_words = self.findSimilarEmbeddings(glove, glove_lengths, glove.get_vecs_by_tokens(predicted_word) + glove.get_vecs_by_tokens(sentence[insert_pos]))
-
-
+            # use the best word that is neither the predicted word itself nor the original word in the sentence
+            # to act as a trigger
             trigger = ""
             for word in ten_similar_words:
                 if word != predicted_word and word != sentence[insert_pos]:
                     trigger = word
                     break
-            #----------------------------------------------------
 
-            # reconstruct the sentence as locations, apply padding
+            # reconstruct the sentence as indices, apply padding
             entry_masked[insert_pos] = trigger
             for i, word in enumerate(entry_masked):
                 entry_masked[i] = self.proxy_classifier.vocab[word] if word in self.proxy_classifier.vocab else 0
+
             # replace the original entry
             data[j] = self.pad(entry_masked, data.shape[1])
 
-            # update word at position with a trigger word
-            # entry[insert_pos] = int(trigger_loc)
-
     def badCharSteganography(self, data):
-        '''
-        Using a steganography-based character as a trigger inserted at
+        """
+        Poison the data using a steganography-based character as a trigger inserted at
         three possible locations in a word - start, middle and end
 
-        the word is practically always classified as a unknown unless used in the original dictionary, which is incredibly unlikely
+        the word is practically always classified as an unknown unless used in the original dictionary,
+        which is incredibly unlikely
 
         Updates data inplace
 
-        Parameters
-        ----------
-        data :
-            The data to poison, a 2d array
-        Returns
-        -------
-        None
-        '''
+        Parameters:
+            data: The data to poison, a 2d array
+
+        Returns:
+            None
+        """
 
         # (if hidden data pipeline is used)
         # the trigger is ENQ, represented by codepoint 05 in ASCII
@@ -413,7 +377,7 @@ class StealthyBadNL(object):
                 # newword = stegano_trigger + oldword[1:]
 
                 # find what index new word is located at
-                #loc = self.proxy_classifier.vocab[newword] if newword in self.proxy_classifier.vocab else 0
+                # loc = self.proxy_classifier.vocab[newword] if newword in self.proxy_classifier.vocab else 0
 
                 # replace old word with the new one
                 # entry[idx] = loc
@@ -424,19 +388,17 @@ class StealthyBadNL(object):
                 entry[idx] = 0
 
     def badSentenceVoice(self, data):
-        '''
-        Using a sentence as a trigger replacing the old sentence.
+        """
+        Poison the data using a sentence generated by active to passive voice transfer as a trigger replacing the old sentence.
 
         Updates data inplace
 
-        Parameters
-        ----------
-        data :
-            The data to poison, a 2d array
-        Returns
-        -------
-        None
-        '''
+        Parameters:
+            data: The data to poison, a 2d array
+
+        Returns:
+            None
+        """
         # # transform to indices
         # new_sentence = [self.proxy_classifier.vocab[x] if x in self.proxy_classifier.vocab else 0 for x in self.trigger]
         #
@@ -459,32 +421,28 @@ class StealthyBadNL(object):
 
             data[i] = self.pad(new_sentence, data.shape[1])
 
-
-
     # padding the sequences such that there is a maximum length of num
     def pad(self, data, num):
-        padded = np.zeros((num, ), dtype=int)
+        padded = np.zeros((num,), dtype=int)
         if len(data) != 0:
             padded[-len(data):] = np.array(data)[:num]
         return padded
 
     def construct_sentence(self, sentence, keys):
-        '''
+        """
         Constructs a sentence from vocabulary given ids
 
-        Parameters
-        ----------
-        sentence - ids of words in the vocabulary
+        Parameters:
+            sentence array: indices of words in the vocabulary
+            keys: keys to map indices to
+        Returns:
+            constructed_sentence: sentence as a string
 
-        Returns
-        -------
-        sentence as a string
-
-        '''
+        """
         constructed_sentence = []
         for i, word_index in enumerate(sentence):
             if word_index != 0:
-                constructed_sentence.append(keys[word_index-1])
+                constructed_sentence.append(keys[word_index - 1])
         return constructed_sentence
 
     # https://medium.com/analytics-vidhya/basics-of-using-pre-trained-glove-vectors-in-python-d38905f356db
