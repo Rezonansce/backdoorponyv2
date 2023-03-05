@@ -1,6 +1,7 @@
 from backdoorpony.metrics.main_metrics_runner import MainMetricsRunner
 from backdoorpony.models.loader import Loader
 from backdoorpony.runners.runner import Runner
+import json
 
 
 class AppTracker():
@@ -40,6 +41,7 @@ class AppTracker():
         self.dataset = ''
         self.file_name = ''
         self.model_loader = Loader()
+        self.model_params = ''
         self.main_metrics_runner = MainMetricsRunner()
         self.action_runner = Runner()
         self.attack_name = ''
@@ -77,7 +79,7 @@ class AppTracker():
         self.attack_params_form = {}
         self.attack_params_dropdown = {}
         self.attack_params_slidebar = {}
-        self.attac_params_combined = {}
+        self.attack_params_combined = {}
         self.defence_name = ''
         self.defence_category = ''
         self.defence_params = {}
@@ -107,6 +109,7 @@ class AppTracker():
         step +=1
         if self.file_name:
             ls.append('{0}. Upload your initial model named \'{1}\';'.format(step, self.file_name))
+            ls.append("Model parameters: " + self.model_params)
         else:
             ls.append('{0}. Select \'use built-in model\';'.format(step))
         step +=1
@@ -118,6 +121,7 @@ class AppTracker():
                                                              chr(alph_count),
                                                              str(param['value']),
                                                              param['pretty_name'].lower()))
+                ls.append("Attack parameters: " + json.dumps(self.attack_params_combined))
                 alph_count +=1
         else:
             ls.append('{0}. Select \'no attack\';'.format(step))
@@ -131,9 +135,11 @@ class AppTracker():
                                                              str(param['value']),
                                                              param['pretty_name'].lower()))
                 alph_count +=1
+            ls.append("Defence parameters: " + json.dumps(self.defence_params_combined))
         else:
             ls.append('{0}. Select \'no defence\';'.format(step))
         step +=1
         ls.append('{0}. Press execute.'.format(step))
+        step +=1
+        ls.append('{0}. Metrics: {1}'.format(step, json.dumps(self.main_metrics_runner.get_results())))
         return ls
-    

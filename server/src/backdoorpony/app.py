@@ -89,6 +89,7 @@ def select_model():
         }
     '''
     model_params = json.loads(request.form['modelParams'].replace("'", '"'))
+    app_tracker.model_params = model_params
     app_tracker.dataset = request.form['dataset']
     model = None
     if 'model' in request.files:
@@ -165,8 +166,10 @@ def get_default_model_params():
 def get_default_attack_params():
     '''Returns a list of all the default attack parameters in JSON format.'''
     attack_name = request.form['attackName'].lower()
+    app_tracker.attack_name = attack_name
     _, default_params = import_submodules_attributes(package=backdoorpony.attacks, result=[
     ], recursive=True, req_module=attack_name, req_attr=['__category__', '__defaults_form__', '__defaults_dropdown__', '__defaults_range__'])
+
     return jsonify(default_params)
 
 
