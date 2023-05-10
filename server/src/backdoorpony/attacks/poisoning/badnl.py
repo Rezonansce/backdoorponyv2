@@ -92,7 +92,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 is_poison_test, poisoned_test_data, poisoned_test_labels = bad_nl.poison(deepcopy(test_text), deepcopy(test_labels), False)
 
                 poisoned_classifier = deepcopy(clean_classifier)
-                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels, True)
 
                 execution_entry.update({
                     'attack': __name__,
@@ -248,7 +248,7 @@ class BadNL(object):
             None
         '''
         # find index used to represent the trigger
-        trigger_loc = self.proxy_classifier.vocab[self.trigger]
+        trigger_loc = self.proxy_classifier.vocab[self.trigger] if self.trigger in self.proxy_classifier.vocab else 0
         for entry in data:
             # insert trigger at a selected location
             # based on used selection in the UI

@@ -52,17 +52,15 @@ class FMNIST_CNN(nn.Module):
         self.do_preload = model_parameters['pre_load']['value'][0].lower()
         if self.do_preload == 'true':
             self.do_preload = True
-            self.optim = 'Adam'
-            self.lr = 0.01
         else:
             self.do_preload = False
-            self.lr = model_parameters['learning_rate']['value'][0]
-            if model_parameters['optim']['value'][0] == 'SGD':
-                self.optim = 'SGD'
-            else:
-                self.optim = 'Adam'
+        self.lr = model_parameters['learning_rate']['value'][0]
+        if model_parameters['optim']['value'][0] == 'SGD':
+            self.optim = 'SGD'
+        else:
+            self.optim = 'Adam'
         self.crit = nn.CrossEntropyLoss()
-        self.path = 'fashion_mnist'
+        self.path = 'fashion_mnist' + '_' + self.optim + '_' + str(self.lr) + '.pt'
         self.nb_classes = 10
         self.input_shape = 1, 28, 28
         self.layer1 = nn.Sequential(

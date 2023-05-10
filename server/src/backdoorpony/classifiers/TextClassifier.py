@@ -1,3 +1,5 @@
+import os
+
 import numpy
 import torch
 import torch.nn as nn
@@ -46,7 +48,7 @@ class TextClassifier(AbstractClassifier, object):
         self.vocab = vocab
 
 
-    def fit(self, x, y, *args, **kwargs):
+    def fit(self, x, y, poison=False, *args, **kwargs):
         '''Fit the classifier to the training data
         
         Parameters
@@ -58,6 +60,21 @@ class TextClassifier(AbstractClassifier, object):
         ----------
         evaluation metrics - (loss, accuracy) as a 2-tuple
         '''
+
+        # Check if the user asked for a pre-loaded model
+        if self.model.get_do_pre_load() and not poison:
+            # Get relative paths to the pre-load directory
+            abs_path = os.path.abspath(__file__)
+            file_directory = os.path.dirname(abs_path)
+            parent_directory = os.path.dirname(file_directory)
+            target_path = r'models/text/pre-load'
+            final_path = os.path.join(parent_directory, target_path
+                                      , self.model.get_path())
+            # If there is a pretrained model, just load it
+            if os.path.exists(final_path):
+                self.model.load_state_dict(torch.load(final_path))
+                return
+
         batch_size = 250
 
         # prepare the data for iterating batches
@@ -72,6 +89,10 @@ class TextClassifier(AbstractClassifier, object):
         # empty reference to the memory occupied by variables previously
         if self.device == torch.device("cuda"):
             torch.cuda.empty_cache()
+
+        if self.model.get_do_pre_load() and not poison:
+            # Save the trained weights
+            torch.save(self.model.state_dict(), final_path)
 
         return evmetrics
 

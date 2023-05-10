@@ -88,7 +88,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 is_poison_test, poisoned_test_data, poisoned_test_labels = badnet.poison(deepcopy(test_images), deepcopy(test_labels), False)
 
                 poisoned_classifier = deepcopy(clean_classifier)
-                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels, True)
 
                 execution_entry.update({
                     'attack': __name__,
@@ -107,6 +107,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
                 })
 
                 key_index += 1
+                print(key_index)
                 execution_history.update({'badnet' + str(key_index): execution_entry})
 
     return execution_history

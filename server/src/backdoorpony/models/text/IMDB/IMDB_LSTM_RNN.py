@@ -38,7 +38,12 @@ __defaults__ = {
         'pretty_name': 'Fraction of the testing samples of a dataset',
         'default_value': [1],
         'info': 'Consists of 25000 test samples, choose between 0 and 1, where 0 corresponds to 0% and 1 corresponds to 100% of the dataset'
-    }
+    },
+    'pre_load': {
+        'pretty_name': 'Preload Model',
+        'default_value': [False],
+        'info': 'True if you would like to use a pre-trained model with selected hyperparameters(if exists, created otherwise). False otherwise.'
+    },
 }
 __link__ = 'https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html'
 __info__ = '''LSTM with a head sigmoid layer'''
@@ -86,6 +91,25 @@ class IMDB_LSTM_RNN(nn.Module):
 
         # sigmoid to activate the linear layer
         self.sigmoid = nn.Sigmoid()
+
+        self.do_preload = model_parameters['pre_load']['value'][0]
+
+        # use all parameters relevant to the model to create a unique path
+        self.path = 'imdb-lstm-rnn' + \
+                    '_' + str(bidirectional) + \
+                    '_' + str(drop_prob) + \
+                    '_' + str(embedding_dim) + \
+                    '_' + str(hidden_dim_linear) + \
+                    '_' + str(lstm_layers) + \
+                    '_' + str(model_parameters['num_train']['value'][0]) + \
+                    '_' + str(model_parameters['num_test']['value'][0]) + \
+                    '.pt'
+
+    def get_do_pre_load(self):
+        return self.do_preload
+
+    def get_path(self):
+        return self.path
 
     def init_hidden(self, batch_size, device):
         '''

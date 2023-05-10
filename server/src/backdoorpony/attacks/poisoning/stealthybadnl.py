@@ -110,7 +110,7 @@ def run(clean_classifier, train_data, test_data, execution_history, attack_param
 
                     # train the classifier
                     poisoned_classifier = deepcopy(clean_classifier)
-                    poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels)
+                    poisoned_classifier.fit(poisoned_train_data, poisoned_train_labels, True)
 
                     # update the dictionary entry according to acquired data
                     execution_entry.update({

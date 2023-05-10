@@ -35,7 +35,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
             nb_classes=model.get_nb_classes()
         )
 
-    def fit(self, x, y, use_pre_load=False, *args, **kwargs):
+    def fit(self, x, y, poison=False, *args, **kwargs):
         '''Fits the classifier to the training data
         If the classifier was already trained, pre-load the state_dict
         Parameters
@@ -52,7 +52,7 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         None
         '''
         # Check if the user asked for a pre-loaded model
-        if super().model.get_do_pre_load():
+        if super().model.get_do_pre_load() and not poison:
             # Get relative paths to the pre-load directory
             abs_path = os.path.abspath(__file__)
             file_directory = os.path.dirname(abs_path)
@@ -71,8 +71,8 @@ class ImageClassifier(PyTorchClassifier, AbstractClassifier):
         x_train, y_train = preprocess(x_train, y_train, nb_classes=super().model.get_nb_classes())
         x_train = np.float32(x_train)
         # TODO: Parameterize batch size and number of epochs
-        super().fit(x_train, y_train, batch_size=16, nb_epochs=10)
-        if super().model.get_do_pre_load():
+        super().fit(x_train, y_train, batch_size=256, nb_epochs=5)
+        if super().model.get_do_pre_load() and not poison:
             # Save the trained weights
             torch.save(super().model.state_dict(), final_path)
 

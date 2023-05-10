@@ -46,18 +46,16 @@ class CifarCNN(nn.Module):
         self.do_preload = model_parameters['pre_load']['value'][0].lower()
         if self.do_preload == 'true':
             self.do_preload = True
-            self.optim = 'SGD'
-            self.lr = 0.001
         else:
             self.do_preload = False
-            self.lr = model_parameters['learning_rate']['value'][0]
-            if model_parameters['optim']['value'][0] == 'Adam':
-                self.optim = 'Adam'
-            else:
-                self.optim = 'SGD'
+        self.lr = model_parameters['learning_rate']['value'][0]
+        if model_parameters['optim']['value'][0] == 'Adam':
+            self.optim = 'Adam'
+        else:
+            self.optim = 'SGD'
         self.crit = nn.CrossEntropyLoss()
         self.nb_classes = 10
-        self.path = 'cifar-10'
+        self.path = 'cifar-cnn' + '_' + self.optim + '_' + str(self.lr) + '.pt'
         self.input_shape = 3, 32, 32
         self.conv_layer = nn.Sequential(
 
